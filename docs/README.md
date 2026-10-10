@@ -14,6 +14,7 @@ Start with the current behavior guides. Release history belongs in the [changelo
 | [Cast-effect testing](design/cast-effect-testing.md) | Repeatable cast test and detection/rendering diagnosis |
 | [Nameplate settings source review](design/nameplate-settings-review.md) | Evidence for native frame and overhead-name restrictions |
 | [Library provenance](../SimpleNameplates/Libs/README.md) | Bundled dependencies and pinned upstream sources |
+| [Packaging and releases](releasing.md) | Automated builds, version tags, installable ZIP checks, and CurseForge setup |
 
 ## Local checks
 

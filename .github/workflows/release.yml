@@ -1,0 +1,93 @@
+name: Build and release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install Lua test runtime
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends texlive-binaries
+
+      - name: Check version and release notes
+        id: version
+        run: |
+          version=$(python3 scripts/validate_release.py)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Run source checks
+        run: |
+          git show --format= --check HEAD
+          for test in tests/*-smoke.lua; do
+            texlua "$test"
+          done
+
+      - name: Build ZIP with pinned libraries
+        uses: BigWigsMods/packager@e50a250f8705041e40f2fa1ddcb280a686d65aa0 # v2.6.1
+        with:
+          args: -d -l -u -n "{package-name}-${{ steps.version.outputs.version }}"
+          pandoc: 'false'
+
+      - name: Verify and test packaged addon
+        run: |
+          python3 scripts/validate_release.py --archive .release/*.zip
+          cp .release/*.zip dist/
+          mkdir -p dist/smoke
+          unzip -q .release/*.zip -d dist/smoke
+          cp -R tests dist/smoke/tests
+          cd dist/smoke
+          for test in tests/*-smoke.lua; do
+            texlua "$test"
+          done
+
+      - name: Save installable ZIP and release notes
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: SimpleNameplates-${{ steps.version.outputs.version }}
+          path: |
+            dist/*.zip
+            dist/release-notes.md
+          if-no-files-found: error
+          retention-days: 30
+
+  release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Download verified package
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: package
+          merge-multiple: true
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$RELEASE_TAG" package/*.zip \
+            --verify-tag --title "Simple Nameplates ${RELEASE_TAG#v}" \
+            --notes-file package/release-notes.md

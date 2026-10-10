@@ -19,13 +19,15 @@ Simple Nameplates styles Blizzard’s existing nameplates. Health and cast progr
 
 ## Installation
 
-Download the repository using **Code → Download ZIP**, extract it, and copy the inner `SimpleNameplates` folder—the one containing `SimpleNameplates.toc`—to:
+Download the installable ZIP from [GitHub Releases](https://github.com/bblackmoor/SimpleNameplates/releases), extract it, and copy its `SimpleNameplates` folder to:
 
 ```text
 World of Warcraft/_retail_/Interface/AddOns/SimpleNameplates/
 ```
 
-Start World of Warcraft and enable the addon at character selection. Simple Nameplates is for Retail WoW. Its required libraries are included; Plater and Details are not required.
+Start World of Warcraft and enable the addon at character selection. Simple Nameplates is for Retail WoW. No separate library installation is needed; Plater and Details are not required.
+
+Before the first tagged release, or to try a development build, download the installable ZIP from the **Build and release** workflow's [build artifacts](https://github.com/bblackmoor/SimpleNameplates/actions/workflows/release.yml). The artifact download contains the addon ZIP and release notes. **Code → Download ZIP** also works: copy the inner `SimpleNameplates` folder containing `SimpleNameplates.toc`.
 
 On your first login, the addon may ask to enable the nameplate settings it needs. Choose **Apply and enable** to accept the listed changes, or **Disable styling** to leave it off. Disabling styling restores the settings changed by that setup.
 

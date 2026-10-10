@@ -1,3 +1,9 @@
+## 1.0.247 — 2026-10-10
+
+- Add automated GitHub builds with pinned upstream libraries, source and packaged-addon checks, installable ZIP artifacts, and GitHub releases when matching version tags are pushed.
+- Keep manual builds and ordinary commits as downloadable build artifacts. Document release steps and the remaining CurseForge project/token setup.
+- Preserve the library versions and addon behavior already tested; reject packages whose runtime files differ from the bundled development copies.
+
 ## 1.0.246 — 2026-10-09
 
 - Rewrite the README for users, following RP Emote Menu’s structure: audience/pitch, features, installation, settings, profiles, TRP3, limitations, and commands.

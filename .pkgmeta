@@ -1,0 +1,60 @@
+package-as: SimpleNameplates
+
+# Flatten the repository's inner addon folder in the installable ZIP.
+move-folders:
+  SimpleNameplates/SimpleNameplates: SimpleNameplates
+
+# These commits contain the exact library source blobs already tested here.
+# Upgrade the pins and bundled development copies together.
+externals:
+  SimpleNameplates/Libs/LibStub:
+    url: https://github.com/lua-wow/LibStub
+    commit: cc0d836cd83a21268bd915953d1faca499166dff
+    curse-slug: libstub
+  SimpleNameplates/Libs/CallbackHandler-1.0:
+    url: https://github.com/WoWUIDev/Ace3
+    commit: 40f4cc1356ae7fcc0cf71fc0a19dc7d50d6ae6c2
+    path: CallbackHandler-1.0
+    curse-slug: callbackhandler
+  SimpleNameplates/Libs/LibSharedMedia-3.0:
+    url: https://github.com/SquizzCheeze/Squizzumables
+    commit: e40d97410035e5b148c4cbec180af6f2b6317bad
+    path: Libs/LibSharedMedia-3.0
+    curse-slug: libsharedmedia-3-0
+  SimpleNameplates/Libs/DetailsFramework:
+    url: https://github.com/Tercioo/Details-Framework
+    commit: 653af57120e1287be784d468324590a9c150ae98
+    curse-slug: libdframework
+
+ignore:
+  - docs
+  - tests
+  - scripts
+  - Media
+  - dist
+  - SimpleNameplates/Libs/README.md
+  - SimpleNameplates/Libs/LibCustomGlow-1.0
+  - SimpleNameplates/Libs/*/*.toc
+  - SimpleNameplates/Libs/*/*.md
+  - SimpleNameplates/Libs/*/tests
+  - SimpleNameplates/Libs/*/docs
+  - SimpleNameplates/Libs/*/examples
+  - SimpleNameplates/Libs/*/*.examples.lua
+  - SimpleNameplates/Libs/*/*.exemples.lua
+  - SimpleNameplates/Libs/*/*_exemples.lua
+  - SimpleNameplates/Libs/*/*.tests.lua
+  - SimpleNameplates/Libs/*/.checkout
+  - SimpleNameplates/Libs/DetailsFramework/definitions.lua
+  - SimpleNameplates/Libs/LibStub/CHANGELOG.txt
+  - SimpleNameplates/Libs/CallbackHandler-1.0/CallbackHandler-1.0.xml
+
+plain-copy:
+  # Preserve the tested framework core without keyword/line-ending filters.
+  - SimpleNameplates/Libs/DetailsFramework/fw.lua
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+license-output: LICENSE
+enable-nolib-creation: no
+enable-toc-creation: no

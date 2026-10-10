@@ -1,8 +1,17 @@
 # Bundled libraries
 
-Reviewed for 1.0.221 on 2026-10-08 against the repository and `.toc` load chain.
+Reviewed for 1.0.247 on 2026-10-10 against the repository, `.toc` load chain and automated packaging recipe.
 
-LibCustomGlow is no longer bundled or loaded. Cast highlighting uses addon-owned four-edge borders for Pulsing border, Solid border and Alert border; none uses DF border/glow constructors. Pulse uses opacity animation on all four edges. Alert uses native length-only Scale animations and symmetric gradient textures on the top/bottom edges, hiding the sides. All anchor directly to the native cast bar without reading its dimensions. Details Framework remains bundled for settings widgets.
+LibCustomGlow is not loaded or included in installable packages; its legacy development copy is excluded by `.pkgmeta`. Cast highlighting uses addon-owned four-edge borders for Pulsing border, Solid border and Alert border; none uses DF border/glow constructors. Pulse uses opacity animation on all four edges. Alert uses native length-only Scale animations and symmetric gradient textures on the top/bottom edges, hiding the sides. All anchor directly to the native cast bar without reading its dimensions. Details Framework remains bundled for settings widgets.
+
+Automated builds fetch upstream sources at these `.pkgmeta` commit pins. Each pin contains the same library blobs already recorded below; unrelated upstream changes in those repository commits do not enter the addon load chain. Bundled development copies remain available for source ZIP installation and local tests. The release validator checks fetched runtime files against those copies after the documented whitespace normalization; see [Packaging and releases](../../docs/releasing.md).
+
+| Library | Repository | Pinned commit | Subdirectory |
+| --- | --- | --- | --- |
+| LibStub | lua-wow/LibStub | `cc0d836cd83a21268bd915953d1faca499166dff` | Root |
+| CallbackHandler-1.0 | WoWUIDev/Ace3 | `40f4cc1356ae7fcc0cf71fc0a19dc7d50d6ae6c2` | `CallbackHandler-1.0` |
+| LibSharedMedia-3.0 | SquizzCheeze/Squizzumables | `e40d97410035e5b148c4cbec180af6f2b6317bad` | `Libs/LibSharedMedia-3.0` |
+| Details Framework | Tercioo/Details-Framework | `653af57120e1287be784d468324590a9c150ae98` | Root |
 
 LibStub 2 (upstream revision 103), from https://github.com/lua-wow/LibStub/blob/master/LibStub.lua.
 Upstream source blob: `7e9b5cd15277d750ef2f106bca3999c306044f03`.
