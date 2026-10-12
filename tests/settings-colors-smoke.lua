@@ -9,7 +9,7 @@ function GameTooltip:AddLine() end
 local ns, refreshes = {}, 0
 for _, file in ipairs({"Defaults", "FontMedia", "Core", "ManagedNames", "Database",
     "HealthGradient", "FontRendering", "SettingsControls", "SettingsColorPicker", "SettingsWidgets", "SettingsProfileDialogs", "SettingsProfiles", "SettingsHighlight", "SettingsColors"}) do
-    assert(loadfile("SimpleNameplates/" .. file .. ".lua"))("SimpleNameplates", ns)
+    assert(loadfile("RPSimpleNameplates/" .. file .. ".lua"))("RPSimpleNameplates", ns)
 end
 ns.RefreshAll = function() refreshes = refreshes + 1 end
 ns.WorldContext = {Get = function() return {} end}

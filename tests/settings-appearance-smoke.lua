@@ -11,7 +11,7 @@ C_CVar.SetCVar = function(name, value) cvars[name] = tostring(value) end
 local ns, refreshes, queued = {}, 0, 0
 for _, file in ipairs({"Defaults", "FontMedia", "Core", "ManagedNames", "Database",
     "SettingsControls", "SettingsColorPicker", "SettingsWidgets", "SettingsProfileDialogs", "SettingsProfiles", "SettingsAppearance"}) do
-    assert(loadfile("SimpleNameplates/" .. file .. ".lua"))("SimpleNameplates", ns)
+    assert(loadfile("RPSimpleNameplates/" .. file .. ".lua"))("RPSimpleNameplates", ns)
 end
 ns.RefreshAll = function() refreshes = refreshes + 1 end
 ns.QueueNameplateRefresh = function() queued = queued + 1 end

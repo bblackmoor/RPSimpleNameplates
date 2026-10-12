@@ -73,4 +73,4 @@ Resolved: duplicate widget-only and ordinary friendly service-NPC labels in Silv
 
 ## Dependency boundary
 
-LibSharedMedia/CallbackHandler provide fonts and provider notifications. Details Framework minor 762 is bundled for settings widgets; neither its replacement unit/cast bars nor its border/glow constructors drive runtime plates. No texture selector or external font files are bundled. Source/license details are in [library provenance](../../SimpleNameplates/Libs/README.md).
+LibSharedMedia/CallbackHandler provide fonts and provider notifications. Details Framework minor 762 is bundled for settings widgets; neither its replacement unit/cast bars nor its border/glow constructors drive runtime plates. No texture selector or external font files are bundled. Source/license details are in [library provenance](../../RPSimpleNameplates/Libs/README.md).

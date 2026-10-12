@@ -1,5 +1,5 @@
 -- Load real embedded dependencies and the complete recursive DF manifest.
-local root = "SimpleNameplates/"
+local root = "RPSimpleNameplates/"
 local function Load(file) assert(loadfile(root .. file))() end
 for _, file in ipairs({"Libs/LibStub/LibStub.lua",
     "Libs/CallbackHandler-1.0/CallbackHandler-1.0.lua",

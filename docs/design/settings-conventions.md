@@ -1,8 +1,8 @@
 # Shared settings conventions
 
-Documentation reviewed for 1.0.220 on 2026-10-08. Shared settings contracts are unchanged; native settings/picker coexistence acceptance remains open. Current Simple Nameplates control inventory and reset scopes are in [settings architecture](settings-architecture.md) and [saved data](saved-data-model.md).
+Documentation reviewed for 1.0.220 on 2026-10-08. Shared settings contracts are unchanged; native settings/picker coexistence acceptance remains open. Current RP Simple Nameplates control inventory and reset scopes are in [settings architecture](settings-architecture.md) and [saved data](saved-data-model.md).
 
-Current conventions for RP Emote Menu and Simple Nameplates after the four standardization phases. Each repository keeps this document and the contract harness in sync when their shared contract changes; there is no shared runtime dependency.
+Current conventions for RP Emote Menu and RP Simple Nameplates after the four standardization phases. Each repository keeps this document and the contract harness in sync when their shared contract changes; there is no shared runtime dependency.
 
 ## Names and boundaries
 
@@ -25,7 +25,7 @@ About uses a large heading, muted description, Version/Author/Category/License m
 
 ## Behavior deliberately retained
 
-| Area | RP Emote Menu | Simple Nameplates |
+| Area | RP Emote Menu | RP Simple Nameplates |
 | --- | --- | --- |
 | Saved ownership | Global preferences, content/behavior Profiles, shared appearance Themes | Global behavior/integration and appearance Profiles |
 | Database API | `addon.Database` | Existing flat addon exports, including `GetProfile(name)` |
@@ -55,7 +55,7 @@ LuaTeX is the verified interpreter; `luatex --luaonly "$test"` is equivalent. Ru
 | --- | --- |
 | Startup, factories, page order, retries and duplicate protection | settings and settings-registration smoke suites |
 | Silent refresh, disabled controls and preserved reset scope | adapter and page integration suites |
-| About wrapping, source copy and responsive hit areas | Profile/utility (RP Emote Menu) and secondary settings (Simple Nameplates) suites |
+| About wrapping, source copy and responsive hit areas | Profile/utility (RP Emote Menu) and secondary settings (RP Simple Nameplates) suites |
 | Target identity, direct mutations and stale confirmations | picker, Profile/Theme and settings integration suites |
 | Identical picker lifecycle expectations | settings-contract smoke suite and settings-contracts helper |
 
@@ -63,12 +63,12 @@ The default settings-contract suite tests its repository's actual picker module.
 
 ```sh
 # In RPEmoteMenu:
-texlua tests/settings-contract-smoke.lua /path/to/SimpleNameplates/SimpleNameplates/SettingsColorPicker.lua
-# In SimpleNameplates:
+texlua tests/settings-contract-smoke.lua /path/to/RPSimpleNameplates/RPSimpleNameplates/SettingsColorPicker.lua
+# In RPSimpleNameplates:
 texlua tests/settings-contract-smoke.lua /path/to/RPEmoteMenu/RPEmoteMenu/SettingsColorPicker.lua
 ```
 
-Simple Nameplates color rows pass a saved-RGB getter to their widget adapter; opening refreshes the swatch silently and captures current saved RGB for rollback. Generic adapter swatches may use display RGB when no saved getter is supplied.
+RP Simple Nameplates color rows pass a saved-RGB getter to their widget adapter; opening refreshes the swatch silently and captures current saved RGB for rollback. Generic adapter swatches may use display RGB when no saved getter is supplied.
 
 The coexistence check runs both takeover directions and setup variants with and without an intermediate native hide. It checks committed/displaced previews, owner-specific cancellation and stale callbacks against the actual modules.
 

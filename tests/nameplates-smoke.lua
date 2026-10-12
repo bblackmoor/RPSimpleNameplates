@@ -99,7 +99,7 @@ local ns = {
     FRIENDLY_COLOR_CVARS = {},
 }
 for _, file in ipairs({ "Profiler.lua", "PeriodicWork.lua", "WorldContext.lua", "EntityFacts.lua", "NameplateClassification.lua", "PresentationCapabilities.lua", "PresentationRules.lua", "FontRendering.lua", "NameplateFrames.lua", "NPCTitles.lua", "NameplateText.lua", "NameplateThreat.lua", "CastHighlight.lua", "NameplateRestoration.lua", "NameplatePresentation.lua", "Nameplates.lua", "Diagnostics.lua" }) do
-    assert(loadfile("SimpleNameplates/" .. file))("SimpleNameplates", ns)
+    assert(loadfile("RPSimpleNameplates/" .. file))("RPSimpleNameplates", ns)
 end
 -- Retired category-disable fixtures exercise the global restoration path.
 local runtimeRefresh = ns.RefreshAll
@@ -129,7 +129,7 @@ assert(events.scripts.OnEvent and events.scripts.OnUpdate, "event/update scripts
 assert(not events.registered.UNIT_HEALTH and not events.registered.UNIT_MAXHEALTH, "no events for retired threat-layer threshold")
 events.scripts.OnEvent(events, "ADDON_LOADED", "AnotherAddon")
 equal(calls.db, nil, "other addon ignored")
-events.scripts.OnEvent(events, "ADDON_LOADED", "SimpleNameplates")
+events.scripts.OnEvent(events, "ADDON_LOADED", "RPSimpleNameplates")
 equal(calls.db, 1, "database initialized once")
 equal(events.registered.ADDON_LOADED, nil, "load event unregistered")
 events.scripts.OnEvent(events, "PLAYER_LOGIN")
@@ -823,7 +823,7 @@ C_NamePlate.GetNamePlateForUnit, C_NamePlate.GetNamePlates = previousLookup, pre
 output = {}
 unitExists = false
 ns.DebugUnit("target")
-assert(table.concat(output, "\n"):find("Simple Nameplates context:", 1, true), "no-target context")
+assert(table.concat(output, "\n"):find("RP Simple Nameplates context:", 1, true), "no-target context")
 assert(table.concat(output, "\n"):find("No target selected.", 1, true), "no-target reported")
 -- A mouseover report works with no selected target and no nearby plate.
 unitExists = true
@@ -1558,7 +1558,7 @@ end
 ns.RestoreAll()
 
 -- Gradient toggles preserve one outlined label, without health-dependent text work.
-assert(loadfile("SimpleNameplates/HealthGradient.lua"))("SimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/HealthGradient.lua"))("RPSimpleNameplates", ns)
 local gradients = true
 ns.GetGradientOpacity = function() return gradients and 100 or 0 end
 function CreateColor(r, g, b, a) return {r=r, g=g, b=b, a=a} end
@@ -1810,7 +1810,7 @@ local function CheckFocusedUpdates()
     equal(plateFrame.SNPInsideName.text, "Deferred RP", "pending updates keep name work")
 
     -- Actual TRP3 callback uses the queued name path, not complete styling.
-    assert(loadfile("SimpleNameplates/TRP3.lua"))("SimpleNameplates", ns)
+    assert(loadfile("RPSimpleNameplates/TRP3.lua"))("RPSimpleNameplates", ns)
     local refreshRP = ns.TRP3.Refresh
     ns.TRP3, rpName = rp, "Callback RP"
     report = Measure(function() refreshRP(); events.scripts.OnUpdate(events, 0.001) end)

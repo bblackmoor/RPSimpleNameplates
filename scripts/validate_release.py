@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 from zipfile import ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
-ADDON = "SimpleNameplates"
+ADDON = "RPSimpleNameplates"
 TOC = PurePosixPath(f"{ADDON}/{ADDON}.toc")
 
 
@@ -73,7 +73,7 @@ def verify_archive(path, version, source_toc):
                           packaged_toc, re.MULTILINE), "Packaged version does not match source")
         require(load_entries(packaged_toc) == load_entries(source_toc),
                 "Packaged TOC load order differs from source")
-        for field in ("Interface", "SavedVariables", "OptionalDeps", "X-Curse-Project-ID"):
+        for field in ("Title", "Interface", "SavedVariables", "OptionalDeps", "X-Website", "X-Curse-Project-ID"):
             pattern = rf"^## {field}: (.+)$"
             expected = re.search(pattern, source_toc, re.MULTILINE)
             actual = re.search(pattern, packaged_toc, re.MULTILINE)

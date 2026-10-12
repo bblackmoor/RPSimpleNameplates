@@ -13,7 +13,7 @@ function GameTooltip:AddLine() end
 local ns, refreshes, integrations, setup, restored = {}, 0, 0, 0, 0
 for _, file in ipairs({"Defaults", "FontMedia", "Core", "ManagedNames", "NameplateSetup", "Database",
     "SettingsControls", "SettingsColorPicker", "SettingsWidgets", "SettingsBehavior", "SettingsProfileDialogs", "SettingsProfiles", "SettingsTRP3", "SettingsAbout"}) do
-    assert(loadfile("SimpleNameplates/" .. file .. ".lua"))("SimpleNameplates", ns)
+    assert(loadfile("RPSimpleNameplates/" .. file .. ".lua"))("RPSimpleNameplates", ns)
 end
 ns.RefreshAll = function() refreshes=refreshes+1 end
 ns.ApplyManagedNameSettings = function() end

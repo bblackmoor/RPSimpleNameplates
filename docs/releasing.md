@@ -6,21 +6,26 @@ The [Build and release workflow](../.github/workflows/release.yml) uses the
 pinned. GitHub builds run on its hosted runners; no local build server or
 personal access token is needed.
 
+The repository, addon folder and TOC filename use `RPSimpleNameplates`. The
+display name is **RP Simple Nameplates**, and release ZIPs are named
+`RPSimpleNameplates-<version>.zip`. The saved data variable remains
+`SimpleNameplatesDB`.
+
 ## Build a ZIP without publishing
 
 Push to `main`, open or update a pull request against `main`, or select
 **Actions → Build and release → Run workflow**. These builds do not publish a
 release. Select the completed run and download its
-`SimpleNameplates-<version>` artifact. GitHub's artifact download wraps the
+`RPSimpleNameplates-<version>` artifact. GitHub's artifact download wraps the
 installable addon ZIP and `release-notes.md` in another ZIP; install the inner
-`SimpleNameplates-<version>.zip`. Artifacts are retained for 30 days.
+`RPSimpleNameplates-<version>.zip`. Artifacts are retained for 30 days.
 
 The workflow:
 
 1. Requires a numeric three-part TOC version and a matching first changelog entry.
 2. Runs the upload-helper unit tests and all existing Lua smoke suites on the source checkout.
 3. Fetches the four libraries at the exact commits in `.pkgmeta` and builds a
-   ZIP with a single top-level `SimpleNameplates` folder.
+   ZIP with a single top-level `RPSimpleNameplates` folder.
 4. Checks the full TOC/XML load chain against the tested source, retaining
    library licenses and artwork and rejecting unexpected files. Library
    whitespace differences are normalized for the comparison.
@@ -33,20 +38,20 @@ library TOCs, tests, examples, documentation, temporary checkouts and the unused
 legacy LibCustomGlow copy are excluded from the installable ZIP.
 
 The bundled library copies remain in the repository so **Code → Download ZIP**
-and local tests continue to work. When upgrading a library, update its commit
+and local tests continue to work. When changing a library, update its commit
 pin, bundled source, license/provenance records and tests together. The package
 check rejects a fetched runtime file that differs from the bundled copy beyond
 the documented whitespace normalization.
 
 ## Publish a GitHub release
 
-Set `SimpleNameplates/SimpleNameplates.toc` to the intended version and add the
+Set `RPSimpleNameplates/RPSimpleNameplates.toc` to the intended version and add the
 matching entry at the top of `CHANGELOG.md`. Commit and push those changes. Tag
 that commit with `v` followed by the exact TOC version, then push the tag. For
 version 1.0.248, for example:
 
 ```sh
-git tag -a v1.0.248 -m "Simple Nameplates 1.0.248"
+git tag -a v1.0.248 -m "RP Simple Nameplates 1.0.248"
 git push origin v1.0.248
 ```
 
@@ -58,7 +63,7 @@ requires the tag-push event. A failed build prevents publication.
 Only the release job has `contents: write`; it uses GitHub's supplied
 `GITHUB_TOKEN`. It creates a new release and does not overwrite an existing one.
 If Actions are disabled or an account policy blocks the pinned actions, enable
-them in [repository Actions settings](https://github.com/bblackmoor/SimpleNameplates/settings/actions).
+them in [repository Actions settings](https://github.com/bblackmoor/RPSimpleNameplates/settings/actions).
 
 ## Publish to CurseForge
 
@@ -66,7 +71,7 @@ The addon metadata identifies
 [CurseForge project 1740403](https://authors.curseforge.com/#/projects/1740403).
 Create an [author API token](https://authors.curseforge.com/#/settings/api-tokens)
 and save it as `CF_API_TOKEN` in
-[GitHub Actions secrets](https://github.com/bblackmoor/SimpleNameplates/settings/secrets/actions).
+[GitHub Actions secrets](https://github.com/bblackmoor/RPSimpleNameplates/settings/secrets/actions).
 Keep the token out of commits, chat and documentation.
 
 For future matching version-tag pushes, the `curseforge` job waits for the build
@@ -93,15 +98,15 @@ are embedded in the ZIP.
 ## Local packaging checks
 
 With Git, Bash, ZIP and LuaTeX installed, clone the packager at its pinned
-`v2.6.1` release outside this repository. From the Simple Nameplates repository:
+`v2.6.1` release outside this repository. From the RP Simple Nameplates repository:
 
 ```sh
 python3 scripts/validate_release.py
 python3 -m unittest discover -s tests -p 'test_*.py'
 for test in tests/*-smoke.lua; do texlua "$test" || exit 1; done
-bash /path/to/packager/release.sh -d -l -u -n 'SimpleNameplates-1.0.248'
-python3 scripts/validate_release.py --archive .release/SimpleNameplates-1.0.248.zip
-python3 scripts/upload_curseforge.py --archive .release/SimpleNameplates-1.0.248.zip --notes dist/release-notes.md --dry-run
+bash /path/to/packager/release.sh -d -l -u -n 'RPSimpleNameplates-1.0.248'
+python3 scripts/validate_release.py --archive .release/RPSimpleNameplates-1.0.248.zip
+python3 scripts/upload_curseforge.py --archive .release/RPSimpleNameplates-1.0.248.zip --notes dist/release-notes.md --dry-run
 ```
 
 Use the current TOC version in the ZIP name. `.release/`, `dist/` and Python

@@ -3,8 +3,8 @@ local function equal(actual, expected, label)
     assert(actual == expected, label .. ": expected " .. tostring(expected) .. ", got " .. tostring(actual))
 end
 local ns = {}
-assert(loadfile("SimpleNameplates/Profiler.lua"))("SimpleNameplates", ns)
-assert(loadfile("SimpleNameplates/PeriodicWork.lua"))("SimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/Profiler.lua"))("RPSimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/PeriodicWork.lua"))("RPSimpleNameplates", ns)
 local work = ns.PeriodicWork
 GetTimePreciseSec, GetTime = nil, nil
 

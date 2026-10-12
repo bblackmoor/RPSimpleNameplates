@@ -5,7 +5,7 @@ local ns = {AccessibleValue = function(v) return v end,
     AccessibleBoolean = function(v) if type(v) == 'boolean' then return v end end,
     WorldContext = {Get = function() return context end},
     Profiler = {Wrap = function(_, callback) return callback end}}
-assert(loadfile(arg[1] or 'SimpleNameplates/PresentationCapabilities.lua'))('SimpleNameplates', ns)
+assert(loadfile(arg[1] or 'RPSimpleNameplates/PresentationCapabilities.lua'))('RPSimpleNameplates', ns)
 local function Region()
     return {IsForbidden = function() return false end, IsProtected = function() return false end}
 end

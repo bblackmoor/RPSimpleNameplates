@@ -1,10 +1,10 @@
 # Saved data model
 
-Current for 1.0.246. Implemented version-2 schema. Simple Nameplates uses Global behavior and appearance Profiles, with no separate Theme layer.
+Current for 1.0.246. Implemented version-2 schema. RP Simple Nameplates uses Global behavior and appearance Profiles, with no separate Theme layer.
 
 ## Why two scopes are sufficient
 
-Unlike RP Emote Menu, Simple Nameplates has no user-defined emote categories, emotes, window state, or other substantial Profile content to separate from appearance. Its current Profiles already hold the visual configuration. A Profile -> Theme reference would make Profiles mostly wrappers, add shared-reference and deletion rules, and complicate selection without a clear user benefit.
+Unlike RP Emote Menu, RP Simple Nameplates has no user-defined emote categories, emotes, window state, or other substantial Profile content to separate from appearance. Its current Profiles already hold the visual configuration. A Profile -> Theme reference would make Profiles mostly wrappers, add shared-reference and deletion rules, and complicate selection without a clear user benefit.
 
 Each character selects an account-wide appearance Profile. Global behavior applies across characters.
 

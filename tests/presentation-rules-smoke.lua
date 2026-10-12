@@ -1,7 +1,7 @@
 -- Uniform presentation across categories/contexts, with access exceptions.
 -- Run: lua tests/presentation-rules-smoke.lua (or luatex --luaonly).
 local ns = {}
-assert(loadfile("SimpleNameplates/PresentationRules.lua"))("SimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/PresentationRules.lua"))("RPSimpleNameplates", ns)
 local Resolve = ns.PresentationRules.Resolve
 local function equal(actual, expected, label)
     assert(actual == expected, label .. ": expected " .. tostring(expected) .. ", got " .. tostring(actual))

@@ -5,12 +5,12 @@ function print(message) output[#output + 1] = message end
 function GetTimePreciseSec() clockReads = clockReads + 1; return now end
 function UpdateAddOnMemoryUsage() updates = updates + 1 end
 function GetAddOnMemoryUsage(name)
-    assert(name == "SimpleNameplates")
+    assert(name == "RPSimpleNameplates")
     memoryReads = memoryReads + 1
     return memoryReads == 1 and 100 or 90
 end
 local ns = {AccessibleNumber = function(value) if type(value) == "number" then return value end end}
-assert(loadfile("SimpleNameplates/Profiler.lua"))("SimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/Profiler.lua"))("RPSimpleNameplates", ns)
 local p = ns.Profiler
 local function Contains(text)
     for _, line in ipairs(output) do if line:find(text, 1, true) then return true end end

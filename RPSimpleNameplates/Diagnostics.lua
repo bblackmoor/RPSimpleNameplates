@@ -1,4 +1,4 @@
--- Simple Nameplates: targeted-unit relationship and presentation diagnostics.
+-- RP Simple Nameplates: targeted-unit relationship and presentation diagnostics.
 local _, ns = ...
 local UnitExists, UnitName = UnitExists, UnitName
 local AccessibleBoolean, AccessibleValue = ns.AccessibleBoolean, ns.AccessibleValue
@@ -92,7 +92,7 @@ local function DebugAddonText(assessment, context)
     local function Field(object, key) return Capabilities.SafeField(object, key, context) end
     local cached = Field(frame, "SNPNameStyle")
     local decision = Field(frame, "SNPPresentation")
-    print("  Simple Nameplates markers: state " .. DebugValue(Field(frame, "SNPState"))
+    print("  RP Simple Nameplates markers: state " .. DebugValue(Field(frame, "SNPState"))
         .. "; frame unit: " .. DebugValue(Field(frame, "unit"))
         .. "; original unit: " .. DebugValue(Field(frame, "SNPOriginalUnit"))
         .. "; restoring: " .. (assessment.canAccess and (Field(frame, "SNPRestoring") and "yes" or "no")
@@ -121,7 +121,7 @@ local function DebugAddonText(assessment, context)
 end
 
 local function DebugContext(context)
-    print("|cff0cd29fSimple Nameplates context:|r revision " .. context.revision
+    print("|cff0cd29fRP Simple Nameplates context:|r revision " .. context.revision
         .. "; initialized: " .. DebugBoolean(context.initialized))
     print("  Zone: " .. DebugValue(context.zone) .. "; subzone: " .. DebugValue(context.subzone)
         .. "; map: " .. DebugValue(context.mapID) .. "; territory: " .. DebugValue(context.territory)
@@ -286,7 +286,7 @@ local function DebugUnit(unit, context)
     DebugContext(context)
     if AccessibleBoolean(ReadUnitAPI(UnitExists, unit)) ~= true then
         local message = unit == "mouseover" and "No mouseover unit available." or "No target selected."
-        print("|cff0cd29fSimple Nameplates:|r " .. message)
+        print("|cff0cd29fRP Simple Nameplates:|r " .. message)
         return
     end
 
@@ -294,7 +294,7 @@ local function DebugUnit(unit, context)
     local state, rule, facts = StateForUnit(unit, context)
     local matches, direct, scanned, unknown, enumerationAvailable, candidates = FindDiagnosticPlates(unit, context)
     local assessment = matches[1] and matches[1].assessment or direct
-    print("|cff0cd29fSimple Nameplates debug [" .. unit .. "]:|r " .. name)
+    print("|cff0cd29fRP Simple Nameplates debug [" .. unit .. "]:|r " .. name)
     print("  Nameplate lookup: direct " .. direct.status .. "; enumeration available: "
         .. DebugBoolean(enumerationAvailable) .. "; scanned: " .. scanned
         .. "; matching frames: " .. #matches .. "; identity unavailable: " .. unknown
@@ -334,7 +334,7 @@ local function DebugNearby(filter)
     local context = GetContext()
     DebugContext(context)
     filter = type(filter) == "string" and string.lower(filter) or ""
-    print("|cff0cd29fSimple Nameplates nearby snapshot:|r filter " .. (filter ~= "" and filter or "(all)")
+    print("|cff0cd29fRP Simple Nameplates nearby snapshot:|r filter " .. (filter ~= "" and filter or "(all)")
         .. "; addon version " .. (ns.VERSION or "unknown"))
     local plates = ReadUnitAPI(C_NamePlate and C_NamePlate.GetNamePlates)
     if type(plates) ~= "table" then

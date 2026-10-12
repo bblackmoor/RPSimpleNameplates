@@ -7,8 +7,8 @@ local secret = {}
 function issecretvalue(value) return value == secret end
 function canaccessvalue(value) return value ~= secret end
 local ns = {}
-assert(loadfile("SimpleNameplates/Core.lua"))("SimpleNameplates", ns)
-assert(loadfile("SimpleNameplates/WorldContext.lua"))("SimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/Core.lua"))("RPSimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/WorldContext.lua"))("RPSimpleNameplates", ns)
 local world = ns.WorldContext
 equal(world.Get().initialized, false, "uninitialized")
 local territory, subzone, map, lockdown = "sanctuary", "Shared", 1, false
@@ -71,9 +71,9 @@ C_PvP.GetZonePVPInfo = nil
 context = world.Refresh("ZONE_CHANGED_NEW_AREA")
 equal(context.territory, "contested", "legacy API fallback")
 
-assert(loadfile("SimpleNameplates/Profiler.lua"))("SimpleNameplates", ns)
-assert(loadfile("SimpleNameplates/PresentationCapabilities.lua"))("SimpleNameplates", ns)
-assert(loadfile("SimpleNameplates/NameplateFrames.lua"))("SimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/Profiler.lua"))("RPSimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/PresentationCapabilities.lua"))("RPSimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/NameplateFrames.lua"))("RPSimpleNameplates", ns)
 local cap = ns.PresentationCapabilities
 local safe = { combatLockdown = false }
 local forbidden = setmetatable({ IsForbidden = function() return true end }, {

@@ -31,7 +31,7 @@ C_CVar = {
 local function loadCore()
     local namespace = {}
     for _, file in ipairs({ "Defaults.lua", "FontMedia.lua", "Core.lua", "ManagedNames.lua", "Database.lua" }) do
-        assert(loadfile("SimpleNameplates/" .. file))("SimpleNameplates", namespace)
+        assert(loadfile("RPSimpleNameplates/" .. file))("RPSimpleNameplates", namespace)
     end
     return namespace
 end
@@ -537,10 +537,10 @@ equal(ns.DisableFriendlyClassColors, nil, "unsafe CVar writer removed")
 equal(ns.RestoreFriendlyClassColors, nil, "unsafe CVar restorer removed")
 
 -- All declared addon modules must exist, compile, and load in dependency order.
-local toc = assert(io.open("SimpleNameplates/SimpleNameplates.toc", "r"))
+local toc = assert(io.open("RPSimpleNameplates/RPSimpleNameplates.toc", "r"))
 local modules = {}
 local function CompileXML(path)
-    local file = assert(io.open("SimpleNameplates/" .. path, "r"))
+    local file = assert(io.open("RPSimpleNameplates/" .. path, "r"))
     local text = file:read("*a")
     file:close()
     local directory = path:match("^(.*[/])") or ""
@@ -548,7 +548,7 @@ local function CompileXML(path)
         if name:match("%.xml$") then
             CompileXML(directory .. name)
         else
-            assert(loadfile("SimpleNameplates/" .. directory .. name), name .. " must compile")
+            assert(loadfile("RPSimpleNameplates/" .. directory .. name), name .. " must compile")
         end
     end
 end
@@ -556,7 +556,7 @@ for line in toc:lines() do
     line = line:gsub("\\", "/") -- Native TOC paths may use Windows separators.
     if line:match("%.lua$") then
         modules[#modules + 1] = line
-        assert(loadfile("SimpleNameplates/" .. line), line .. " must compile")
+        assert(loadfile("RPSimpleNameplates/" .. line), line .. " must compile")
     elseif line:match("%.xml$") then
         modules[#modules + 1] = line
         CompileXML(line)
@@ -595,7 +595,7 @@ do
     local savedEnableState = GetAddOnEnableState
     local savedDialogs, savedPopup = StaticPopupDialogs, StaticPopup_Show
     local shown, enableCalls = {}, 0
-    local installed = {"EnabledPlate", "DisabledPlate", "LoadedPlate", "Blizzard_Plate", "SimpleNameplates"}
+    local installed = {"EnabledPlate", "DisabledPlate", "LoadedPlate", "Blizzard_Plate", "RPSimpleNameplates"}
     UnitName = function(token) equal(token, "player", "enable-state character token"); return "Tester" end
     StaticPopupDialogs = {}
     StaticPopup_Show = function(_, text) shown[#shown + 1] = text end
@@ -614,7 +614,7 @@ do
     }
     GetAddOnEnableState = function() error("modern API must take precedence") end
     local conflictNS = {}
-    assert(loadfile("SimpleNameplates/Core.lua"))("SimpleNameplates", conflictNS)
+    assert(loadfile("RPSimpleNameplates/Core.lua"))("RPSimpleNameplates", conflictNS)
     conflictNS.ShowNameplateConflictWarning()
     equal(enableCalls, 2, "modern API checks only unloaded third-party plate addons")
     equal(shown[1], "EnabledPlate\nLoadedPlate", "modern warning excludes disabled/self/Blizzard addons")

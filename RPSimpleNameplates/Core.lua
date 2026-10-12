@@ -1,10 +1,10 @@
--- Simple Nameplates: metadata, addon conflict warning, and safe-value helpers.
+-- RP Simple Nameplates: metadata, addon conflict warning, and safe-value helpers.
 local addon, ns = ...
 
 local getAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
 
 ns.VERSION = getAddOnMetadata and getAddOnMetadata(addon, "Version") or "Unknown"
-ns.SOURCE_URL = "https://github.com/bblackmoor/SimpleNameplates"
+ns.SOURCE_URL = "https://github.com/bblackmoor/RPSimpleNameplates"
 
 local issecretvalue = issecretvalue or function() return false end
 local canaccessvalue = canaccessvalue or function(v) return not issecretvalue(v) end
@@ -52,7 +52,7 @@ local function ShowNameplateConflictWarning()
     if #conflicts == 0 then return end
 
     StaticPopupDialogs["SNP_NAMEPLATE_CONFLICT"] = {
-        text = "|cff0cd29fSimple Nameplates|r\n\nOther enabled addons whose names contain ‘plate’ were found:\n\n%s\n\nRunning more than one nameplate addon can cause conflicting colors or duplicate nameplates. Disable the others and reload the UI if you see problems.",
+        text = "|cff0cd29fRP Simple Nameplates|r\n\nOther enabled addons whose names contain ‘plate’ were found:\n\n%s\n\nRunning more than one nameplate addon can cause conflicting colors or duplicate nameplates. Disable the others and reload the UI if you see problems.",
         button1 = OKAY or "Okay",
         timeout = 0, whileDead = true, hideOnEscape = true, preferredIndex = 3,
     }

@@ -32,7 +32,7 @@ local ns = {}
 for _, file in ipairs({"Defaults", "FontMedia", "Core", "ManagedNames", "Database",
     "HealthGradient", "FontRendering", "SettingsControls", "SettingsColorPicker", "SettingsWidgets",
     "SettingsBehavior", "SettingsProfileDialogs", "SettingsProfiles", "SettingsAppearance", "SettingsHighlight", "SettingsColors", "SettingsTRP3"}) do
-    assert(loadfile("SimpleNameplates/" .. file .. ".lua"))("SimpleNameplates", ns)
+    assert(loadfile("RPSimpleNameplates/" .. file .. ".lua"))("RPSimpleNameplates", ns)
 end
 ns.RefreshAll = function() end
 ns.WorldContext = {Get = function() return {} end}

@@ -61,13 +61,13 @@ local ns = {
     GetThreatEnabled = function() return enabled end,
     NameplateFrames = {GetHealthBar = function(value) return value.healthBar end},
 }
-assert(loadfile("SimpleNameplates/FontRendering.lua"))("SimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/FontRendering.lua"))("RPSimpleNameplates", ns)
 local getAppearance = ns.GetAppearanceSetting
 ns.GetAppearanceSetting = function(key)
     if key == "useSlugRendering" then return slug end
     return getAppearance(key)
 end
-assert(loadfile("SimpleNameplates/NameplateThreat.lua"))("SimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/NameplateThreat.lua"))("RPSimpleNameplates", ns)
 local function Update(showBar)
     ns.NameplateThreat.UpdateThreatText(frame, "hostile", {}, {showHealthBar = showBar})
 end

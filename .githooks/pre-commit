@@ -3,7 +3,7 @@
 set -eu
 
 repo_root=$(git rev-parse --show-toplevel)
-toc="$repo_root/SimpleNameplates/SimpleNameplates.toc"
+toc="$repo_root/RPSimpleNameplates/RPSimpleNameplates.toc"
 
 if [ ! -f "$toc" ]; then
     echo "Error: $toc not found."

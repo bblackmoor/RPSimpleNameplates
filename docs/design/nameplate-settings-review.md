@@ -14,7 +14,7 @@ The pinned Blizzard [Nameplates settings definition](https://github.com/Gethe/wo
 | Friendly NPC Nameplates | `nameplateShowFriendlyNpcs` | `1` |
 | Only Show Names | `nameplateShowOnlyNameForFriendlyPlayerUnits` | `0` |
 
-The [unit-frame implementation](https://github.com/Gethe/wow-ui-source/blob/09b9db7948abc9b9648dedaab51eb0cf3ee67b31/Interface/AddOns/Blizzard_NamePlates/Blizzard_NamePlateUnitFrame.lua) shows that Only Show Names changes bars, auras, classification, anchors, and hit testing on an existing friendly-player frame. Turning it off lets Simple Nameplates manage bars itself; it does not establish that a missing sanctuary plate will be created. Widget-only mode is a separate property, explaining why a widget-only NPC plate must suppress actor text while preserving its widgets.
+The [unit-frame implementation](https://github.com/Gethe/wow-ui-source/blob/09b9db7948abc9b9648dedaab51eb0cf3ee67b31/Interface/AddOns/Blizzard_NamePlates/Blizzard_NamePlateUnitFrame.lua) shows that Only Show Names changes bars, auras, classification, anchors, and hit testing on an existing friendly-player frame. Turning it off lets RP Simple Nameplates manage bars itself; it does not establish that a missing sanctuary plate will be created. Widget-only mode is a separate property, explaining why a widget-only NPC plate must suppress actor text while preserving its widgets.
 
 These files are pinned snapshots of the public UI-source mirror, not proof that every engine behavior or deployed client build is identical.
 

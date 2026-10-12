@@ -4,15 +4,15 @@ local secretTexture = {}
 issecretvalue = function(value) return value == secretTexture end
 local slug = false
 ns.GetAppearanceSetting = function(key) return key == "useSlugRendering" and slug end
-assert(loadfile("SimpleNameplates/FontRendering.lua"))("SimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/FontRendering.lua"))("RPSimpleNameplates", ns)
 local barRGB = {1, 1, 0}
 ns.PriorityColorForState = function() return barRGB[1], barRGB[2], barRGB[3] end
 local unpackValues = unpack or table.unpack
-assert(loadfile("SimpleNameplates/Core.lua"))("SimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/Core.lua"))("RPSimpleNameplates", ns)
 ns.WorldContext = {Get = function() return {combatLockdown = false} end}
-assert(loadfile("SimpleNameplates/Profiler.lua"))("SimpleNameplates", ns)
-assert(loadfile("SimpleNameplates/PresentationCapabilities.lua"))("SimpleNameplates", ns)
-assert(loadfile("SimpleNameplates/NameplateFrames.lua"))("SimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/Profiler.lua"))("RPSimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/PresentationCapabilities.lua"))("RPSimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/NameplateFrames.lua"))("RPSimpleNameplates", ns)
 local function Region()
     local r = {alpha = 1, shown = true, texture = "original", coords = {0.1, 0.9, 0.2, 0.8},
         font = "font", size = 10, flags = "OUTLINE", shadow = {0, 0, 0, 1}, offset = {1, -1}}

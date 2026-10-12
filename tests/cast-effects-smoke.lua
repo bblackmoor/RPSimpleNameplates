@@ -38,9 +38,9 @@ local ns = {
     },
     NameplateFrames = {GetCastBar = function(f) return f.castBar end, GetHealthBar = function() end},
 }
-assert(loadfile("SimpleNameplates/Defaults.lua"))("SimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/Defaults.lua"))("RPSimpleNameplates", ns)
 for _, module in ipairs({"Profiler", "PeriodicWork", "CastHighlight"}) do
-    assert(loadfile("SimpleNameplates/"..module..".lua"))("SimpleNameplates", ns)
+    assert(loadfile("RPSimpleNameplates/"..module..".lua"))("RPSimpleNameplates", ns)
 end
 local owner = {unit = "nameplate1", castBar = CreateFrame("StatusBar"), SNPPresentation = {showCastBar = true}}
 owner.castBar.Icon = CreateFrame("Frame", nil, owner.castBar)

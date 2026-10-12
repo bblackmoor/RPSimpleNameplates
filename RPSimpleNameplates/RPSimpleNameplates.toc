@@ -1,5 +1,5 @@
 ## Interface: 120100, 120105
-## Title: Simple Nameplates
+## Title: RP Simple Nameplates
 ## Category: Unit Frames
 ## Notes: Colors accessible Blizzard plates. Known limit: opposite-faction PC world names in sanctuary; entity types and contexts are listed in About.
 ## Author: Brandon Blackmoor <bblackmoor@blackgate.net>
@@ -8,7 +8,7 @@
 ## SavedVariables: SimpleNameplatesDB
 ## IconTexture: Interface\Icons\INV_Misc_Eye_01
 ## X-License: GPL-3.0
-## X-Website: https://github.com/bblackmoor/SimpleNameplates
+## X-Website: https://github.com/bblackmoor/RPSimpleNameplates
 ## X-Curse-Project-ID: 1740403
 
 Libs/LibStub/LibStub.lua

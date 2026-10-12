@@ -100,7 +100,7 @@ The additional wrappers increase profiling overhead. Compare each build in match
 
 ## Read the memory figures
 
-The profiler refreshes WoW's addon memory accounting at start and stop and reports Simple Nameplates' start/end KiB and change. Reporting while running shows only the start reading; reporting a stopped session reuses the frozen readings.
+The profiler refreshes WoW's addon memory accounting at start and stop and reports RP Simple Nameplates' start/end KiB and change. Reporting while running shows only the start reading; reporting a stopped session reuses the frozen readings.
 
 These are aggregate addon readings, not allocations by function. They can include profiler storage and shared-library attribution, and garbage collection can produce a negative change. The profiler does not force garbage collection. A growing reading from a single session is insufficient evidence of a leak.
 

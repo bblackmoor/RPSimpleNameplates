@@ -91,9 +91,9 @@ frame.castBar.BorderShield = Region(frame.castBar)
 frame.castBar.BorderShield:Hide()
 frame.castBar.HideIconWhenNotInterruptible = true
 
-assert(loadfile("SimpleNameplates/Profiler.lua"))("SimpleNameplates", ns)
-assert(loadfile("SimpleNameplates/PeriodicWork.lua"))("SimpleNameplates", ns)
-assert(loadfile("SimpleNameplates/CastHighlight.lua"))("SimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/Profiler.lua"))("RPSimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/PeriodicWork.lua"))("RPSimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/CastHighlight.lua"))("RPSimpleNameplates", ns)
 local function Update() ns.CastHighlight.UpdateInterruptibleHighlight(frame, {}, frame.SNPPresentation) end
 
 Update()

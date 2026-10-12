@@ -1,8 +1,11 @@
 ## 1.0.248 — 2026-10-11
 
+- Complete the rename to RP Simple Nameplates: use `RPSimpleNameplates` for the addon folder, TOC filename, build artifacts and installable ZIP; update source links, display names, packaging, release checks, tests and developer paths.
+- Retain `/snp` commands and current nameplate styling and settings behavior. Installation instructions describe a first release.
+
 - Connect release metadata to CurseForge project 1740403 and add tag-triggered uploads of the same verified ZIP published on GitHub.
 - Include the current release notes, exact supported Retail versions, and embedded-library relations in CurseForge uploads. Configure the CF_API_TOKEN repository secret to enable publishing.
-- Retain the author's latest README, screenshots and icon source assets; no addon runtime behavior changes.
+- Retain the author's latest README, screenshots and icon source assets; no nameplate styling or settings behavior changes.
 
 ## 1.0.247 — 2026-10-10
 

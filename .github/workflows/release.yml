@@ -65,7 +65,7 @@ jobs:
       - name: Save installable ZIP and release notes
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: SimpleNameplates-${{ steps.version.outputs.version }}
+          name: RPSimpleNameplates-${{ steps.version.outputs.version }}
           path: |
             dist/*.zip
             dist/release-notes.md
@@ -83,7 +83,7 @@ jobs:
       - name: Download verified package
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          name: SimpleNameplates-${{ needs.build.outputs.version }}
+          name: RPSimpleNameplates-${{ needs.build.outputs.version }}
           path: package
           merge-multiple: true
 
@@ -94,7 +94,7 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           gh release create "$RELEASE_TAG" package/*.zip \
-            --verify-tag --title "Simple Nameplates ${RELEASE_TAG#v}" \
+            --verify-tag --title "RP Simple Nameplates ${RELEASE_TAG#v}" \
             --notes-file package/release-notes.md
 
   curseforge:
@@ -126,7 +126,7 @@ jobs:
         if: steps.setup.outputs.ready == 'true'
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          name: SimpleNameplates-${{ needs.build.outputs.version }}
+          name: RPSimpleNameplates-${{ needs.build.outputs.version }}
           path: package
 
       - name: Upload verified ZIP to CurseForge

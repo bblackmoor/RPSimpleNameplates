@@ -27,14 +27,14 @@ end
 local function CheckTarget(target, allowMissing)
     if target and (target.object or allowMissing)
         and addon.GetProfile(target.name) == target.object then return true end
-    print("|cff0cd29fSimple Nameplates:|r The profile changed. Reopen the profile dialog to continue.")
+    print("|cff0cd29fRP Simple Nameplates:|r The profile changed. Reopen the profile dialog to continue.")
     return false
 end
 
 local function CheckDialogTarget(target)
     if not target then return true end -- Creating a new profile has no source target.
     if target.name ~= addon.GetActiveProfileName() then
-        print("|cff0cd29fSimple Nameplates:|r Selected profile changed. Reopen the profile dialog to continue.")
+        print("|cff0cd29fRP Simple Nameplates:|r Selected profile changed. Reopen the profile dialog to continue.")
         return false
     end
     return CheckTarget(target)
@@ -62,7 +62,7 @@ function UI.RegisterProfileDialogs()
             if not CanAccept(data) or not CheckDialogTarget(data.target) then return end
             local editBox = GetEditBox(self)
             local ok, message = data.action(editBox:GetText())
-            if not ok and message then print("|cff0cd29fSimple Nameplates:|r " .. message) end
+            if not ok and message then print("|cff0cd29fRP Simple Nameplates:|r " .. message) end
             if ok then data.onChanged() end
         end,
         EditBoxOnEnterPressed = function(self)
@@ -80,7 +80,7 @@ function UI.RegisterProfileDialogs()
         OnAccept = function(_, data)
             if not CanAccept(data) or not CheckDialogTarget(data.target) then return end
             local ok, message = addon.DeleteActiveProfile()
-            if not ok and message then print("|cff0cd29fSimple Nameplates:|r " .. message) end
+            if not ok and message then print("|cff0cd29fRP Simple Nameplates:|r " .. message) end
             if ok then data.onChanged() end
         end,
         timeout = 0, whileDead = true, hideOnEscape = true, preferredIndex = 3,

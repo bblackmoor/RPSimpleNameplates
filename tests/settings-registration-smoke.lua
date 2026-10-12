@@ -1,6 +1,6 @@
 -- Registration preflight, retry, routing and duplicate protection.
 local addon = {MAX_CATEGORIES = 8, Database = {GetSettings = function() return {selectedCategory = 2} end}}
-assert(loadfile("SimpleNameplates/Settings.lua"))("SimpleNameplates", addon)
+assert(loadfile("RPSimpleNameplates/Settings.lua"))("RPSimpleNameplates", addon)
 local keys = {"About","Profiles","Appearance","Colors","Highlight","TRP3"}
 local register = addon.RegisterSettingsPanels
 local created, registered, refreshes, selected, editors = 0, {}, {}, nil, nil

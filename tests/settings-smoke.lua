@@ -108,7 +108,7 @@ local profile = { matchSanctuaryFont = true, nameFont = "ARIALN", nameSize = 12,
 local fontOptions = { {value = "ARIALN", label = "Arial Narrow"} }
 local ns = {
     Defaults = {showThreat = true, interruptibleHighlight = false, hideCritterCompanionNames = false},
-    VERSION = "1.0.test", SOURCE_URL = "https://github.com/bblackmoor/SimpleNameplates",
+    VERSION = "1.0.test", SOURCE_URL = "https://github.com/bblackmoor/RPSimpleNameplates",
     GetFontOptions = function() return fontOptions end,
     FontLabel = function(value)
         for _, option in ipairs(fontOptions) do if option.value == value then return option.label end end
@@ -192,12 +192,12 @@ for _, name in ipairs({
 
 dofile("tests/details-framework-loader.lua")("Libs/DetailsFramework/load.xml")
 
-assert(loadfile("SimpleNameplates/Profiler.lua"))("SimpleNameplates", ns)
+assert(loadfile("RPSimpleNameplates/Profiler.lua"))("RPSimpleNameplates", ns)
 
 local function loadSettings()
-    for line in assert(io.open("SimpleNameplates/SimpleNameplates.toc")):lines() do
+    for line in assert(io.open("RPSimpleNameplates/RPSimpleNameplates.toc")):lines() do
         if line:match("^Settings[%w]*%.lua$") then
-            assert(loadfile("SimpleNameplates/" .. line))("SimpleNameplates", ns)
+            assert(loadfile("RPSimpleNameplates/" .. line))("RPSimpleNameplates", ns)
         end
     end
 end
@@ -206,7 +206,7 @@ assert(ns.RegisterSettingsPanels, "settings registration API")
 ns.RegisterSettingsPanels()
 equal(#categories, 6, "About and four subcategories")
 equal(table.concat({categories[1].name,categories[2].name,categories[3].name,categories[4].name,categories[5].name,categories[6].name}, ","),
-    "Simple Nameplates,Profiles,Text,Colors,Highlight,TRP3", "tab order")
+    "RP Simple Nameplates,Profiles,Text,Colors,Highlight,TRP3", "tab order")
 ns.RegisterSettingsPanels()
 equal(#categories, 6, "one-time registration")
 equal(SLASH_SNP1, "/snp", "slash registration")

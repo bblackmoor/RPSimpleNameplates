@@ -31,7 +31,7 @@ end
 local function Load()
     local ns = {}
     for _, file in ipairs({"Defaults", "FontMedia", "Core", "ManagedNames", "NameplateSetup", "Database"}) do
-        assert(loadfile("SimpleNameplates/" .. file .. ".lua"))("SimpleNameplates", ns)
+        assert(loadfile("RPSimpleNameplates/" .. file .. ".lua"))("RPSimpleNameplates", ns)
     end
     ns.RefreshAll = function() refreshes = refreshes + 1 end
     ns.RestoreAll = function() restores = restores + 1 end

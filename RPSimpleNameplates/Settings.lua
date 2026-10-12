@@ -1,4 +1,4 @@
--- Simple Nameplates: register settings pages and slash routes.
+-- RP Simple Nameplates: register settings pages and slash routes.
 local _, addon = ...
 local rootCategory
 local categories, panels = {}, {}
@@ -30,7 +30,7 @@ local function RegisterSettingsPanels()
         panels[page.key] = addon.SettingsPanels[page.key]()
     end
     if addon.SettingsUI and addon.SettingsUI.InstallCombatGuard then addon.SettingsUI.InstallCombatGuard() end
-    rootCategory = Settings.RegisterCanvasLayoutCategory(panels.About, "Simple Nameplates")
+    rootCategory = Settings.RegisterCanvasLayoutCategory(panels.About, "RP Simple Nameplates")
     categories.About = rootCategory
     Settings.RegisterAddOnCategory(rootCategory)
     for index = 2, #pageOrder do
@@ -50,19 +50,19 @@ local function RegisterSettingsPanels()
             end
             local unit = argument == "" and "target" or argument
             if unit ~= "target" and unit ~= "mouseover" then
-                print("|cff0cd29fSimple Nameplates:|r /snp debug [target|mouseover|nearby [name]]")
+                print("|cff0cd29fRP Simple Nameplates:|r /snp debug [target|mouseover|nearby [name]]")
                 return
             end
             if addon.DebugUnit then addon.DebugUnit(unit) end
             return
         end
         if InCombatLockdown and InCombatLockdown() then
-            print("|cff0cd29fSimple Nameplates:|r Settings cannot be opened during combat.")
+            print("|cff0cd29fRP Simple Nameplates:|r Settings cannot be opened during combat.")
             return
         end
         local category = aliases[command] and categories[aliases[command]]
         if category then Settings.OpenToCategory(category:GetID())
-        else print("|cff0cd29fSimple Nameplates:|r /snp, /snp profiles, /snp text, /snp colors, /snp highlight, /snp trp3, /snp debug [target|mouseover|nearby [name]], /snp perf [start|stop|report], /snp about") end
+        else print("|cff0cd29fRP Simple Nameplates:|r /snp, /snp profiles, /snp text, /snp colors, /snp highlight, /snp trp3, /snp debug [target|mouseover|nearby [name]], /snp perf [start|stop|report], /snp about") end
     end
 end
 addon.RegisterSettingsPanels = RegisterSettingsPanels

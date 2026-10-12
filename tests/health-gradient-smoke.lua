@@ -11,7 +11,7 @@ local ns = {GetGradientOpacity = function() return opacity end,
         ReadRegion = function(object, method) return object[method](object) end,
     }}
 for _, file in ipairs({"Core", "FontRendering", "HealthGradient"}) do
-    assert(loadfile("SimpleNameplates/" .. file .. ".lua"))("SimpleNameplates", ns)
+    assert(loadfile("RPSimpleNameplates/" .. file .. ".lua"))("RPSimpleNameplates", ns)
 end
 function UnitHealth() error("gradient must not read health") end
 function UnitHealthMax() error("gradient must not read health") end

@@ -30,7 +30,7 @@ def upload_metadata(version, toc, notes, recipe):
     require(slugs, "Missing embedded-library relations in .pkgmeta")
     require(notes.startswith(f"## {version} — "), "Release notes do not match the addon version")
     payload = {
-        "displayName": f"Simple Nameplates {version}",
+        "displayName": f"RP Simple Nameplates {version}",
         "releaseType": "release",
         "changelog": notes,
         "changelogType": "markdown",
@@ -53,7 +53,7 @@ def resolve_versions(names, catalog):
 
 
 def multipart(payload, filename, contents):
-    boundary = "SimpleNameplates-" + uuid4().hex
+    boundary = "RPSimpleNameplates-" + uuid4().hex
     require('"' not in filename and "\r" not in filename and "\n" not in filename,
             "Invalid archive filename")
     body = (

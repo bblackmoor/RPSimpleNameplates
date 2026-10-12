@@ -18,7 +18,7 @@ These runs are not matched benchmarks. Inclusive timing rows overlap and must no
 
 ## Normal play with profiling off
 
-- [ ] Install the current inner `SimpleNameplates` folder using the README instructions and confirm the About version. Play normally with profiling off; observe grey background names and inside labels without duplicate native text or visible hitches.
+- [ ] Install the current inner `RPSimpleNameplates` folder using the README instructions and confirm the About version. Play normally with profiling off; observe grey background names and inside labels without duplicate native text or visible hitches.
 - [ ] Change target/mouseover, enter/leave combat, move out of range/back, recycle plates and change zones. Verify current names/colors remain stable and no stale labels reappear.
 - [ ] Gain/lose threat; start, interrupt and finish casts/channels. Check immediate affected-unit updates, name space, pulse and title substitution.
 - [ ] Change profiles/fonts/size/width/gradients and toggle global Active off/on. Verify priority plates update immediately, background plates settle promptly over subsequent frames, and native presentation restores when disabled.

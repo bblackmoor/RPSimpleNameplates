@@ -1,7 +1,7 @@
 -- Real DF sources and adapter, with explicit native UI stubs only.
 -- Run from repository root: luatex --luaonly tests/details-framework-smoke.lua
 local ui = dofile("tests/details-framework-ui-stubs.lua")
-local root = "SimpleNameplates/"
+local root = "RPSimpleNameplates/"
 local LoadXML = dofile("tests/details-framework-loader.lua")
 local scripts, manifests = LoadXML("Libs/DetailsFramework/load.xml")
 assert(scripts == 52 and manifests == 9, "complete pinned load chain")
@@ -10,15 +10,15 @@ local df = LibStub:GetLibrary("DetailsFramework-1.0")
 assert(df.dversion == 762)
 for _, callback in ipairs(df.OnLoginSchedules) do callback() end
 local ns = {}
-assert(loadfile(root .. "SettingsWidgets.lua"))("SimpleNameplates", ns)
+assert(loadfile(root .. "SettingsWidgets.lua"))("RPSimpleNameplates", ns)
 local widgets = ns.SettingsWidgets
 assert(not ns.SettingsUI and not ns.SettingsPanels, "adapter does not register or replace legacy pages")
 assert(SimpleNameplatesDB == nil, "loading must not initialize saved settings")
 local profile = {}
 ns.GetActiveProfileName = function() return "Test" end
 ns.GetProfile = function(name) if name == "Test" then return profile end end
-assert(loadfile(root .. "SettingsControls.lua"))("SimpleNameplates", ns)
-assert(loadfile(root .. "SettingsColorPicker.lua"))("SimpleNameplates", ns)
+assert(loadfile(root .. "SettingsControls.lua"))("RPSimpleNameplates", ns)
+assert(loadfile(root .. "SettingsColorPicker.lua"))("RPSimpleNameplates", ns)
 assert(widgets.GetFramework() == df)
 
 local changes, selected, rgb = 0

@@ -6,7 +6,7 @@ function Saturate(x) return math.max(0,math.min(1,x)) end; function Clamp(x,a,b)
 UISpecialFrames = {}
 C_GuildInfo = {}
 LOCALIZED_CLASS_NAMES_MALE = {}; LOCALIZED_CLASS_NAMES_FEMALE = {}
-function debugstack() return "Interface/AddOns/SimpleNameplates/Libs/DetailsFramework/fw.lua" end
+function debugstack() return "Interface/AddOns/RPSimpleNameplates/Libs/DetailsFramework/fw.lua" end
 bit = {band=function() return 0 end}; function securecallfunction(f, ...) return f(...) end
 function getfenv() return _G end
 unpack = unpack or table.unpack

@@ -1,4 +1,4 @@
--- Simple Nameplates: review Blizzard settings before enabling styling.
+-- RP Simple Nameplates: review Blizzard settings before enabling styling.
 local _, ns = ...
 
 local requirements = {
@@ -6,7 +6,7 @@ local requirements = {
     { "nameplateShowEnemies", "1", "Enemy Unit Nameplate", "Makes enemy plates available." },
     { "nameplateShowFriendlyPlayers", "1", "Friendly Player Nameplates", "Makes friendly player plates available." },
     { "nameplateShowFriendlyNpcs", "1", "Friendly NPC Nameplates", "Makes ordinary NPC names and service titles available." },
-    { "nameplateShowOnlyNameForFriendlyPlayerUnits", "0", "Only Show Names", "Lets Simple Nameplates show friendly health bars." },
+    { "nameplateShowOnlyNameForFriendlyPlayerUnits", "0", "Only Show Names", "Lets RP Simple Nameplates show friendly health bars." },
 }
 ns.NAMEPLATE_SETUP_CVARS = {}
 for _, requirement in ipairs(requirements) do
@@ -87,7 +87,7 @@ local function Disable()
     ns.SetStylingEnabled(false)
     ns.RestoreManagedNameSettings()
     if ns.RestoreAll then ns.RestoreAll() end
-    print("Simple Nameplates styling is disabled. Enable it again using Active in /snp profiles.")
+    print("RP Simple Nameplates styling is disabled. Enable it again using Active in /snp profiles.")
 end
 
 local function ShowReview(issues, failure)
@@ -100,7 +100,7 @@ local function ShowReview(issues, failure)
     local text = table.concat(lines, "\n\n")
     if failure then text = failure .. "\n\n" .. text end
     StaticPopupDialogs.SNP_NAMEPLATE_SETUP = {
-        text = "|cff0cd29fSimple Nameplates — Setup|r\n\n%s\n\nChanged WoW settings are restored when styling is disabled.\n\nWoW may still withhold some plates, including opposite-faction players in sanctuary.",
+        text = "|cff0cd29fRP Simple Nameplates — Setup|r\n\n%s\n\nChanged WoW settings are restored when styling is disabled.\n\nWoW may still withhold some plates, including opposite-faction players in sanctuary.",
         button1 = "Apply and enable", button2 = "Disable styling",
         OnAccept = function() Apply() end,
         OnCancel = function() Disable() end,

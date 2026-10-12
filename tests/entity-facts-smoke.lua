@@ -35,7 +35,7 @@ end
 function UnitGUID() return data.guid end
 local ns = {}
 for _, file in ipairs({"Core.lua", "Profiler.lua", "WorldContext.lua", "EntityFacts.lua", "NameplateClassification.lua"}) do
-    assert(loadfile("SimpleNameplates/" .. file))("SimpleNameplates", ns)
+    assert(loadfile("RPSimpleNameplates/" .. file))("RPSimpleNameplates", ns)
 end
 local context = {revision = 7, sanctuary = false, playerFaction = "Alliance", warModeDesired = true}
 local function sample(values)

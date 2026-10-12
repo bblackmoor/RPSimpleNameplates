@@ -14,7 +14,7 @@ end}
 function UnitGUID() return "Player-Media" end
 function UnitFullName() return "Player", "Realm" end
 function strtrim(value) return value:match("^%s*(.-)%s*$") end
-local function Load(file, ns) assert(loadfile("SimpleNameplates/" .. file))("SimpleNameplates", ns) end
+local function Load(file, ns) assert(loadfile("RPSimpleNameplates/" .. file))("RPSimpleNameplates", ns) end
 Load("Libs/LibStub/LibStub.lua")
 Load("Libs/CallbackHandler-1.0/CallbackHandler-1.0.lua")
 Load("Libs/LibSharedMedia-3.0/LibSharedMedia-3.0.lua")

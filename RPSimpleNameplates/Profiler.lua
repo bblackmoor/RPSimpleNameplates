@@ -18,7 +18,7 @@ local function Memory()
     local read, value = pcall(GetAddOnMemoryUsage, addonName)
     if read then return Finite(value) end
 end
-local function Say(message) print("|cff0cd29fSimple Nameplates:|r " .. message) end
+local function Say(message) print("|cff0cd29fRP Simple Nameplates:|r " .. message) end
 -- Call sites supply bounded, readable labels, never unit identities or secret values.
 -- No counter tables are created outside a profiling session.
 local function Count(group, reason)
