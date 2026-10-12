@@ -1,5 +1,7 @@
 # Simple Nameplates
 
+<img width="400" height="400" alt="icon-400" src="https://github.com/user-attachments/assets/60460ced-103b-464b-a258-dcbd92c3f04b" />
+
 **Simple Nameplates** makes it easier to see who is attacking you, who might, and who is worth talking to. It gives Blizzard's nameplates clear, consistent colors and readable names, with optional roleplaying names and titles. It is for players who want a useful view of the people and creatures around them, especially during everyday play and roleplay. Choose it over Blizzard's defaults for more control over colors and text, or over **EllesmereUI** or **Plater** when a few straightforward settings cover what you need.
 
 ## Features
@@ -33,7 +35,7 @@ Simple Nameplates styles Blizzard's existing nameplates. Health and cast progres
 
 ## Installation
 
-Simple Nameplates is available on CurtseForge.
+Simple Nameplates is available on CurseForge.
 
 Alternatively, download the installable ZIP from [GitHub Releases](https://github.com/bblackmoor/SimpleNameplates/releases), extract it, and copy its `SimpleNameplates` folder to:
 
