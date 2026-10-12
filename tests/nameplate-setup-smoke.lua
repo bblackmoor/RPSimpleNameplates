@@ -61,12 +61,12 @@ equal(ns.CheckNameplateSetup(), false, "incompatible startup")
 equal(ns.GetStylingEnabled(), false, "styling suspended awaiting choice")
 equal(ns.EnsureDB().global.stylingEnabled, true, "saved intent survives pending popup")
 equal(#writes, 0, "no changes before consent")
-equal(shown.key, "SNP_NAMEPLATE_SETUP", "setup popup")
+equal(shown.key, "RPSN_NAMEPLATE_SETUP", "setup popup")
 equal(shown.text:find("Friendly NPC Nameplates: Off -> On", 1, true) ~= nil, true, "current and required NPC setting")
 equal(shown.text:find("Only Show Names: On -> Off", 1, true) ~= nil, true, "Only Show Names off requirement")
 ns.ApplyManagedNameSettings()
 equal(#writes, 0, "managed settings honor setup suspension")
-StaticPopupDialogs.SNP_NAMEPLATE_SETUP.OnAccept()
+StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnAccept()
 equal(cvars.nameplateShowFriendlyNpcs, "1", "approved NPC visibility")
 equal(cvars.nameplateShowOnlyNameForFriendlyPlayerUnits, "0", "approved bars control")
 equal(ns.GetStylingEnabled(), true, "styling resumes after verified writes")
@@ -88,7 +88,7 @@ equal(next(ns.EnsureDB().global.nameplateSetupOriginals[character]), nil, "succe
 ns = Fresh()
 cvars.nameplateShowFriendlyPlayers = "0"
 ns.CheckNameplateSetup()
-StaticPopupDialogs.SNP_NAMEPLATE_SETUP.OnCancel()
+StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnCancel()
 equal(ns.GetStylingEnabled(), false, "disable choice")
 equal(ns.EnsureDB().global.stylingEnabled, false, "disable persisted")
 equal(#writes, 0, "declining never changes WoW settings")
@@ -103,9 +103,9 @@ equal(shown, nil, "review deferred in combat")
 equal(#writes, 0, "combat startup has no writes")
 inCombat = false
 ns.RetryNameplateSetup()
-equal(shown.key, "SNP_NAMEPLATE_SETUP", "review after combat")
+equal(shown.key, "RPSN_NAMEPLATE_SETUP", "review after combat")
 inCombat = true
-StaticPopupDialogs.SNP_NAMEPLATE_SETUP.OnAccept()
+StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnAccept()
 equal(#writes, 0, "approval write deferred in combat")
 inCombat = false
 ns.RetryNameplateSetup()
@@ -122,11 +122,11 @@ for _, failure in ipairs({"silent", "error"}) do
     cvars.nameplateShowEnemies, cvars.nameplateShowFriendlyNpcs = "0", "0"
     rejected.nameplateShowFriendlyNpcs = failure
     ns.CheckNameplateSetup()
-    StaticPopupDialogs.SNP_NAMEPLATE_SETUP.OnAccept()
+    StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnAccept()
     equal(ns.GetStylingEnabled(), false, "failed apply remains suspended")
     Flush()
     equal(shown.text:find("could not be applied", 1, true) ~= nil, true, "failure reported")
-    StaticPopupDialogs.SNP_NAMEPLATE_SETUP.OnCancel()
+    StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnCancel()
     equal(cvars.nameplateShowEnemies, "0", "partial apply restored on disable")
     -- A rejected restoration retains its backup and succeeds when retried.
     equal(ns.EnsureDB().global.nameplateSetupOriginals[character].nameplateShowFriendlyNpcs, nil, "unchanged failed CVar already at original")
@@ -135,7 +135,7 @@ end
 ns = Fresh()
 cvars.nameplateShowAll = "0"
 ns.CheckNameplateSetup()
-StaticPopupDialogs.SNP_NAMEPLATE_SETUP.OnAccept()
+StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnAccept()
 rejected.nameplateShowAll = "silent"
 ns.SetStylingEnabled(false)
 equal(ns.EnsureDB().global.nameplateSetupOriginals[character].nameplateShowAll, "0", "failed restore retains original")
@@ -146,7 +146,7 @@ equal(cvars.nameplateShowAll, "0", "failed restore retries")
 ns = Fresh()
 cvars.nameplateShowAll = "0"
 ns.CheckNameplateSetup()
-StaticPopupDialogs.SNP_NAMEPLATE_SETUP.OnAccept()
+StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnAccept()
 character = "Player-Two"
 cvars.nameplateShowAll = "1"
 ns = Load()
@@ -168,7 +168,7 @@ equal(shown.text:find("Friendly NPC Nameplates: Off -> On", 1, true) ~= nil, tru
 ns = Fresh()
 cvars.nameplateShowAll = "0"
 ns.CheckNameplateSetup()
-StaticPopupDialogs.SNP_NAMEPLATE_SETUP.OnAccept()
+StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnAccept()
 inCombat = true
 ns.SetStylingEnabled(false)
 ns.SetStylingEnabled(true)
@@ -181,7 +181,7 @@ ns = Fresh()
 character = nil
 cvars.nameplateShowAll = "0"
 ns.CheckNameplateSetup()
-StaticPopupDialogs.SNP_NAMEPLATE_SETUP.OnAccept()
+StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnAccept()
 equal(#writes, 0, "no changes without character backup identity")
 equal(ns.GetStylingEnabled(), false, "unknown character keeps styling suspended")
 -- Setup cannot approve settings whose legacy restoration is still pending.
@@ -197,8 +197,8 @@ ns.ApplyPendingManagedNameSettings()
 ns.RetryNameplateSetup()
 equal(cvars.nameplateShowFriendlyNpcs, "0", "legacy retry releases original")
 equal(ns.GetStylingEnabled(), false, "styling still paused for compatibility consent")
-equal(shown.key, "SNP_NAMEPLATE_SETUP", "review appears after restoration finishes")
-StaticPopupDialogs.SNP_NAMEPLATE_SETUP.OnAccept()
+equal(shown.key, "RPSN_NAMEPLATE_SETUP", "review appears after restoration finishes")
+StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnAccept()
 equal(ns.GetStylingEnabled(), true, "fresh consent resumes styling")
 equal(cvars.nameplateShowFriendlyNpcs, "1", "consent reapplies required NPC plates")
 

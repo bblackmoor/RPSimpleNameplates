@@ -255,7 +255,7 @@ C_NamePlate.GetNamePlates = function() return { plate } end
 
 unit = { reaction = 3 }
 ns.RefreshAll()
-equal(plateFrame.SNPState, "hostile", "hostile presentation category")
+equal(plateFrame.RPSNState, "hostile", "hostile presentation category")
 equal(plateFrame.healthBar.shown, true, "hostile bar visible")
 equal(plateFrame.name.r, 1, "bar name white red")
 equal(plateFrame.name.g, 1, "bar name white green")
@@ -293,30 +293,30 @@ end }
 trp3Options = { useRoleplayingName = true, showFullTitle = true }
 ns.RefreshAll()
 equal(plateFrame.name.text, "Roleplay Name", "TRP3 name retained")
-equal(plateFrame.SNPFullTitleText.shown, true, "name-only long title shown")
+equal(plateFrame.RPSNFullTitleText.shown, true, "name-only long title shown")
 -- Combat changes presentation without changing the Friendly classification.
 appearance.namePlacement = "INSIDE"
 local oldNameStyle = {}
-for key, value in pairs(plateFrame.SNPNameStyle) do oldNameStyle[key] = value end
+for key, value in pairs(plateFrame.RPSNNameStyle) do oldNameStyle[key] = value end
 events.scripts.OnEvent(events, "PLAYER_REGEN_DISABLED")
 Tick(0.25)
-equal(plateFrame.SNPState, "friendly", "combat does not change category")
+equal(plateFrame.RPSNState, "friendly", "combat does not change category")
 equal(plateFrame.healthBar.shown, true, "friendly combat bar")
-equal(plateFrame.SNPFullTitleText.shown, true, "idle friendly combat retains long title")
-equal(plateFrame.SNPInsideName.shown, true, "friendly combat inside name")
+equal(plateFrame.RPSNFullTitleText.shown, true, "idle friendly combat retains long title")
+equal(plateFrame.RPSNInsideName.shown, true, "friendly combat inside name")
 equal(plateFrame.healthBar.height, 20, "friendly combat padding")
 equal(plateFrame.name.g, 1, "bright bar inside name stays white")
-equal(plateFrame.SNPInsideName.r, 1, "inside overlay stays white")
+equal(plateFrame.RPSNInsideName.r, 1, "inside overlay stays white")
 barColorOverride = {0, 0, 0.2}
 ns.RefreshAll()
-equal(plateFrame.SNPInsideName.r, 1, "dark bar inside name stays white")
+equal(plateFrame.RPSNInsideName.r, 1, "dark bar inside name stays white")
 plateFrame.name:SetTextColor(0, 0, 0)
 ns.NameplateText.RepairCachedName(plateFrame, ns.WorldContext.Get())
-equal(plateFrame.SNPInsideName.r, 1, "cached repair preserves white inside text")
+equal(plateFrame.RPSNInsideName.r, 1, "cached repair preserves white inside text")
 barColorOverride = nil
 ns.RefreshAll()
 
-plateFrame.SNPNameStyle = oldNameStyle
+plateFrame.RPSNNameStyle = oldNameStyle
 equal(ns.NameplateText.RepairCachedName(plateFrame, ns.WorldContext.Get()), false, "stale cache rejected")
 Tick(0.25)
 equal(plateFrame.healthBar.shown, true, "stale drift cannot undo combat bar")
@@ -324,41 +324,41 @@ events.scripts.OnEvent(events, "PLAYER_REGEN_ENABLED")
 -- A Blizzard name hook must apply the whole new decision before the queued refresh.
 hooks[2].callback(plateFrame)
 equal(plateFrame.healthBar.shown, true, "name hook preserves bar on combat exit")
-equal(plateFrame.SNPFullTitleText.shown, true, "combat exit restores title")
-equal(plateFrame.SNPInsideName.shown, true, "combat exit retains inside name")
+equal(plateFrame.RPSNFullTitleText.shown, true, "combat exit restores title")
+equal(plateFrame.RPSNInsideName.shown, true, "combat exit retains inside name")
 equal(plateFrame.name.alpha, 0, "combat exit retains concealed native name")
 equal(plateFrame.healthBar.height, 20, "combat exit restores height")
 
 unit = { reaction = 3 }
 appearance.namePlacement = "INSIDE"
 ns.RefreshAll()
-equal(plateFrame.SNPFullTitleText.shown, true, "idle health bar permits long title")
-equal(plateFrame.SNPInsideName.text, "Roleplay Name", "inside name retained")
+equal(plateFrame.RPSNFullTitleText.shown, true, "idle health bar permits long title")
+equal(plateFrame.RPSNInsideName.text, "Roleplay Name", "inside name retained")
 equal(plateFrame.name.alpha, 0, "original inside name concealed")
 equal(plateFrame.healthBar.height, 20, "inside padding retained")
-equal(plateFrame.SNPInsideName.size, 12, "inside name retains selected size")
-equal(plateFrame.SNPInsideName.flags, "OUTLINE", "inside name has thin outline")
+equal(plateFrame.RPSNInsideName.size, 12, "inside name retains selected size")
+equal(plateFrame.RPSNInsideName.flags, "OUTLINE", "inside name has thin outline")
 threatEnabled, threatPercent = true, nil
 ns.RefreshAll()
-equal(plateFrame.SNPInsideName.points[2][2], plateFrame.healthBar, "blank threat uses full bar width")
-equal(plateFrame.SNPInsideName.points[2][4], -3, "blank threat leaves only right padding")
+equal(plateFrame.RPSNInsideName.points[2][2], plateFrame.healthBar, "blank threat uses full bar width")
+equal(plateFrame.RPSNInsideName.points[2][4], -3, "blank threat leaves only right padding")
 threatPercent = 255
 ns.RefreshAll()
-equal(plateFrame.SNPInsideName.points[2][2], plateFrame.SNPThreatText, "name ends beside visible threat")
-equal(plateFrame.SNPInsideName.points[2][3], "LEFT", "name uses actual threat left edge")
+equal(plateFrame.RPSNInsideName.points[2][2], plateFrame.RPSNThreatText, "name ends beside visible threat")
+equal(plateFrame.RPSNInsideName.points[2][3], "LEFT", "name uses actual threat left edge")
 ns.NameplateText.RepairCachedName(plateFrame, ns.WorldContext.Get())
-equal(plateFrame.SNPInsideName.points[2][2], plateFrame.SNPThreatText, "cached repair preserves threat anchor")
+equal(plateFrame.RPSNInsideName.points[2][2], plateFrame.RPSNThreatText, "cached repair preserves threat anchor")
 threatEnabled, threatPercent = false, nil
 ns.RefreshAll()
 
 equal(plateFrame.name.flags, "OUTLINE", "hidden native inside name has thin outline")
 appearance.nameSize = 36
 ns.RefreshAll()
-equal(plateFrame.SNPInsideName.size, 36, "large inside name retains full size")
-equal(plateFrame.SNPInsideName.shadow[4], 0, "inside name native shadow disabled")
-equal(plateFrame.SNPInsideName.shadowX, 0, "inside name native shadow x cleared")
-equal(plateFrame.SNPInsideName.shadowY, 0, "inside name native shadow y cleared")
-equal(plateFrame.SNPInsideName.points[1][5], -0.5, "asymmetric padding moves name half unit down")
+equal(plateFrame.RPSNInsideName.size, 36, "large inside name retains full size")
+equal(plateFrame.RPSNInsideName.shadow[4], 0, "inside name native shadow disabled")
+equal(plateFrame.RPSNInsideName.shadowX, 0, "inside name native shadow x cleared")
+equal(plateFrame.RPSNInsideName.shadowY, 0, "inside name native shadow y cleared")
+equal(plateFrame.RPSNInsideName.points[1][5], -0.5, "asymmetric padding moves name half unit down")
 equal(plateFrame.healthBar.height, 43, "bar expands for full font plus padding")
 equal(plateFrame.HealthBarsContainer.height, 43, "container expands with bar")
 plateFrame.healthBar:SetHeight(20)
@@ -367,7 +367,7 @@ equal(plateFrame.healthBar.height, 43, "drift repair retains expanded height")
 appearance.namePlacement, threatEnabled, threatPercent = "ABOVE", true, 100
 ns.RefreshAll()
 equal(plateFrame.healthBar.height, 43, "above-bar names still leave padding for threat text")
-equal(plateFrame.SNPInsideName.shown, false, "threat text does not move above-bar name inside")
+equal(plateFrame.RPSNInsideName.shown, false, "threat text does not move above-bar name inside")
 equal(plateFrame.name.flags, "OUTLINE", "outside name keeps thin outline")
 appearance.namePlacement, threatEnabled, threatPercent = "INSIDE", false, nil
 appearance.nameSize = 12
@@ -376,8 +376,8 @@ ns.RefreshAll()
 
 categoryMode = "inactive"
 ns.RefreshAll()
-equal(plateFrame.SNPState, nil, "inactive restores category presentation")
-equal(plateFrame.SNPInsideName.shown, false, "inside overlay restored")
+equal(plateFrame.RPSNState, nil, "inactive restores category presentation")
+equal(plateFrame.RPSNInsideName.shown, false, "inside overlay restored")
 equal(plateFrame.name.alpha, 1, "original name alpha restored")
 equal(plateFrame.healthBar.height, 20, "original bar height restored")
 equal(plateFrame.name.font, "NativeFont", "original native font restored")
@@ -389,7 +389,7 @@ categoryMode = "active"
 appearance.namePlacement = "ABOVE"
 ns.RefreshAll()
 ns.RestoreAll()
-equal(plateFrame.SNPState, nil, "master restoration reachable")
+equal(plateFrame.RPSNState, nil, "master restoration reachable")
 
 -- Restoration must not invoke native updates that compare secret health.
 local nativeUpdates = 0
@@ -405,7 +405,7 @@ for index = 1, 3 do
     ns.RefreshAll()
     categoryMode = "inactive"
     ns.RefreshAll()
-    equal(plateFrame.SNPState, nil, "hostile disable succeeds without native updates")
+    equal(plateFrame.RPSNState, nil, "hostile disable succeeds without native updates")
     equal(ns.NameplateRestoration.IsPending(plateFrame), false, "secret health cannot queue retries")
     equal(plateFrame.name.font, "NativeFont", "hostile disable restores native font")
     equal(plateFrame.healthBar.barG, 0.5, "hostile disable restores native bar color")
@@ -420,13 +420,13 @@ ns.RefreshAll()
 local setBarColor = plateFrame.healthBar.SetStatusBarColor
 plateFrame.healthBar.SetStatusBarColor = function() error("simulated presentation restoration failure") end
 ns.RestoreAll()
-equal(plateFrame.SNPRestoring, nil, "failed restoration releases guard")
+equal(plateFrame.RPSNRestoring, nil, "failed restoration releases guard")
 assert(ns.NameplateRestoration.IsPending(plateFrame), "failed restoration retained for retry")
-assert(plateFrame.SNPOriginalPresentation, "failed restoration retains native presentation")
+assert(plateFrame.RPSNOriginalPresentation, "failed restoration retains native presentation")
 plateFrame.healthBar.SetStatusBarColor = setBarColor
 Tick(0.25)
 equal(ns.NameplateRestoration.IsPending(plateFrame), false, "successful retry removes pending work")
-equal(plateFrame.SNPState, "hostile", "successful retry reapplies hostile presentation")
+equal(plateFrame.RPSNState, "hostile", "successful retry reapplies hostile presentation")
 ns.RestoreAll()
 plateFrame.unit = "nameplate1"
 C_NamePlate.GetNamePlateForUnit = function() return nil end
@@ -439,7 +439,7 @@ unit = { player = true, faction = "Alliance", reaction = 5 }
 plateFrame.castBar = Region()
 plateFrame.castBar:Hide()
 plateFrame.castBar.Icon = Region()
-plateFrame.SNPInterruptibleHighlight = nil
+plateFrame.RPSNInterruptibleHighlight = nil
 local castHighlight = ns.CastHighlight.EnsureInterruptibleHighlight(plateFrame)
 local castOverlay = castHighlight.frame
 highlightEnabled = true
@@ -449,20 +449,20 @@ plateFrame.castBar:Show()
 ns.RefreshAll()
 equal(castOverlay.shown, true, "uniform friendly cast effect permitted")
 equal(castHighlight.pulse:IsPlaying(), true, "visible cast highlight starts pulse")
-equal(plateFrame.SNPFullTitleText.shown, false, "active cast replaces title")
+equal(plateFrame.RPSNFullTitleText.shown, false, "active cast replaces title")
 plateFrame.castBar:Hide()
-equal(plateFrame.SNPFullTitleText.shown, true, "cast end restores title without a styling pass")
-equal(plateFrame.SNPFullTitleText.points[1][2], plateFrame.healthBar, "title anchors below health bar")
+equal(plateFrame.RPSNFullTitleText.shown, true, "cast end restores title without a styling pass")
+equal(plateFrame.RPSNFullTitleText.points[1][2], plateFrame.healthBar, "title anchors below health bar")
 ns.RefreshAll()
 equal(plateFrame.castBar.shown, false, "styling does not show idle cast bar")
 plateFrame.castBar:Show()
-equal(plateFrame.SNPFullTitleText.shown, false, "channel/cast start immediately hides title")
+equal(plateFrame.RPSNFullTitleText.shown, false, "channel/cast start immediately hides title")
 plateFrame.IsForbidden = function() return true end
 plateFrame.castBar:Hide()
-equal(plateFrame.SNPTitleVisibilityPending, true, "blocked transition queues title visibility")
+equal(plateFrame.RPSNTitleVisibilityPending, true, "blocked transition queues title visibility")
 plateFrame.IsForbidden = nil
 Tick(0.25)
-equal(plateFrame.SNPFullTitleText.shown, true, "blocked cast end retries when accessible")
+equal(plateFrame.RPSNFullTitleText.shown, true, "blocked cast end retries when accessible")
 plateFrame.castBar:Show()
 events.scripts.OnEvent(events, "PLAYER_REGEN_DISABLED")
 Tick(0.25)
@@ -479,32 +479,32 @@ local hideBar = plateFrame.healthBar.Hide
 plateFrame.healthBar.Hide = function() end
 plateFrame.healthBar.shown = true
 ns.RefreshAll()
-equal(plateFrame.SNPFullTitleText.shown, true, "observed health bar permits idle title")
+equal(plateFrame.RPSNFullTitleText.shown, true, "observed health bar permits idle title")
 local currentCast = plateFrame.castBar
 local titleHooks = #currentCast.scriptHooks.OnShow
 local readShown = currentCast.IsShown
 currentCast.IsShown = function() error("cast visibility unavailable") end
 ns.RefreshAll()
-equal(plateFrame.SNPFullTitleText.shown, false, "unreadable cast visibility hides title")
-equal(plateFrame.SNPTitleVisibilityPending, true, "unreadable cast visibility queues retry")
+equal(plateFrame.RPSNFullTitleText.shown, false, "unreadable cast visibility hides title")
+equal(plateFrame.RPSNTitleVisibilityPending, true, "unreadable cast visibility queues retry")
 currentCast.IsShown = readShown
 Tick(0.25)
-equal(plateFrame.SNPFullTitleText.shown, true, "readable idle state restores title")
+equal(plateFrame.RPSNFullTitleText.shown, true, "readable idle state restores title")
 plateFrame.castBar = Region(); plateFrame.castBar:Hide(); ns.RefreshAll()
 plateFrame.castBar:Show()
 currentCast:Show(); currentCast:Hide()
-equal(plateFrame.SNPFullTitleText.shown, false, "retired cast cannot show title over replacement cast")
+equal(plateFrame.RPSNFullTitleText.shown, false, "retired cast cannot show title over replacement cast")
 plateFrame.castBar:Hide()
-equal(plateFrame.SNPFullTitleText.shown, true, "replacement cast end restores title")
+equal(plateFrame.RPSNFullTitleText.shown, true, "replacement cast end restores title")
 plateFrame.castBar = currentCast; ns.RefreshAll()
 equal(#currentCast.scriptHooks.OnShow, titleHooks, "returning cast bar reuses title hook")
 trp3Options.showFullTitle = false; ns.RefreshAll()
 currentCast:Show(); currentCast:Hide()
-equal(plateFrame.SNPFullTitleText.shown, false, "cast end cannot revive disabled TRP3 title")
+equal(plateFrame.RPSNFullTitleText.shown, false, "cast end cannot revive disabled TRP3 title")
 trp3Options.showFullTitle = true; ns.RefreshAll()
 stylingEnabled = false; ns.RestoreAll()
 currentCast:Show(); currentCast:Hide()
-equal(plateFrame.SNPFullTitleText.shown, false, "cast end cannot revive restored title")
+equal(plateFrame.RPSNFullTitleText.shown, false, "cast end cannot revive restored title")
 stylingEnabled = true; ns.RefreshAll()
 plateFrame.healthBar.Hide = hideBar
 ns.RefreshAll()
@@ -517,14 +517,14 @@ plateFrame.healthBar = nil
 unit = { reaction = 3 }
 events.scripts.OnEvent(events, "PLAYER_REGEN_DISABLED")
 Tick(0.25)
-equal(plateFrame.SNPPresentation.showHealthBar, false, "no fabricated health bar")
-equal(plateFrame.SNPPresentation.nameOnly, true, "missing bar uses name color")
+equal(plateFrame.RPSNPresentation.showHealthBar, false, "no fabricated health bar")
+equal(plateFrame.RPSNPresentation.nameOnly, true, "missing bar uses name color")
 equal(plateFrame.name.g, 0, "missing-bar priority color")
-equal(plateFrame.SNPFullTitleText.shown, true, "missing bar allows long title")
+equal(plateFrame.RPSNFullTitleText.shown, true, "missing bar allows long title")
 plateFrame.name:ClearAllPoints()
 equal(ns.NameplateText.RepairCachedName(plateFrame, ns.WorldContext.Get()), true, "unchanged readable properties need no repair")
 equal(#plateFrame.name.points, 0, "reconciliation does not rewrite unobserved native anchors")
-ns.NameplateText.UpdateNameLayout(plateFrame, ns.WorldContext.Get(), plateFrame.SNPPresentation)
+ns.NameplateText.UpdateNameLayout(plateFrame, ns.WorldContext.Get(), plateFrame.RPSNPresentation)
 equal(plateFrame.name.points[1][2], plateFrame, "missing-bar repair uses the owning frame")
 equal(plateFrame.name.points[1][1], "BOTTOM", "missing-bar repair restores floating placement")
 plateFrame.healthBar = savedBar
@@ -566,14 +566,14 @@ function InCombatLockdown() return locked end
 plateFrame.IsProtected = function() return true end
 C_NamePlate.GetNamePlateForUnit = function() return plate end
 C_NamePlate.GetNamePlates = function() return {plate} end
-plateFrame.SNPState = nil
+plateFrame.RPSNState = nil
 ns.WorldContext.Refresh("PLAYER_REGEN_DISABLED")
 ns.RefreshAll()
-equal(plateFrame.SNPState, nil, "protected frame skipped during lockdown")
+equal(plateFrame.RPSNState, nil, "protected frame skipped during lockdown")
 locked = false
 events.scripts.OnEvent(events, "PLAYER_REGEN_ENABLED")
 Tick(0.25)
-assert(plateFrame.SNPState, "protected frame refreshed after lockdown")
+assert(plateFrame.RPSNState, "protected frame refreshed after lockdown")
 plateFrame.IsProtected = nil
 C_NamePlate.GetNamePlateForUnit = function() return nil end
 C_NamePlate.GetNamePlates = function() return {} end
@@ -593,13 +593,13 @@ ns.WorldContext.Refresh("PLAYER_REGEN_DISABLED")
 stylingEnabled = false
 ns.RestoreAll()
 Tick(0.25)
-assert(plateFrame.SNPState, "protected style retained until safe restoration")
+assert(plateFrame.RPSNState, "protected style retained until safe restoration")
 locked = false
 events.scripts.OnEvent(events, "PLAYER_REGEN_ENABLED")
 Tick(0.25)
-equal(plateFrame.SNPState, nil, "disabled styling restoration retried")
-equal(plateFrame.SNPPresentation, nil, "presentation cache cleared on restore")
-equal(plateFrame.SNPInsideName.shown, false, "deferred inside name hidden")
+equal(plateFrame.RPSNState, nil, "disabled styling restoration retried")
+equal(plateFrame.RPSNPresentation, nil, "presentation cache cleared on restore")
+equal(plateFrame.RPSNInsideName.shown, false, "deferred inside name hidden")
 equal(plateFrame.healthBar.height, 20, "deferred original height restored")
 plateFrame.IsProtected = nil
 stylingEnabled = true
@@ -609,10 +609,10 @@ plate.IsForbidden = function() return baseForbidden end
 stylingEnabled = false
 ns.RestoreAll()
 Tick(0.25)
-assert(plateFrame.SNPState, "forbidden base plate restoration postponed")
+assert(plateFrame.RPSNState, "forbidden base plate restoration postponed")
 baseForbidden = false
 Tick(0.25)
-equal(plateFrame.SNPState, nil, "base plate restoration retried with styling off")
+equal(plateFrame.RPSNState, nil, "base plate restoration retried with styling off")
 plate.IsForbidden = nil
 stylingEnabled = true
 categoryMode = "active"
@@ -623,7 +623,7 @@ categoryMode = "inactive"
 ns.RefreshAll()
 frameForbidden = false
 Tick(0.25)
-equal(plateFrame.SNPState, nil, "inactive restoration after access returns without context event")
+equal(plateFrame.RPSNState, nil, "inactive restoration after access returns without context event")
 plateFrame.IsForbidden = nil
 categoryMode = "active"
 ns.RefreshAll()
@@ -638,9 +638,9 @@ locked = false
 ns.WorldContext.Refresh("PLAYER_REGEN_ENABLED")
 C_NamePlate.GetNamePlateForUnit = function() return plate end
 ns.RefreshAll()
-equal(plateFrame.SNPOriginalUnit, "nameplate2", "recycled frame captures current owner")
+equal(plateFrame.RPSNOriginalUnit, "nameplate2", "recycled frame captures current owner")
 Tick(0.25)
-assert(plateFrame.SNPState, "old pending cleanup does not clear recycled style")
+assert(plateFrame.RPSNState, "old pending cleanup does not clear recycled style")
 equal(plateFrame.name.text, "Roleplay Name", "recycled name remains")
 plateFrame.IsProtected = nil
 plateFrame.unit = "nameplate1"
@@ -650,7 +650,7 @@ ns.RefreshAll()
 C_NamePlate.GetNamePlateForUnit = function() return nil end
 C_NamePlate.GetNamePlates = function() return {} end
 events.scripts.OnEvent(events, "NAME_PLATE_UNIT_REMOVED", "nameplate1")
-equal(plateFrame.SNPState, nil, "removed known frame cleaned")
+equal(plateFrame.RPSNState, nil, "removed known frame cleaned")
 equal(plateFrame.name.text, "", "removed name cleared")
 appearance.namePlacement = "ABOVE"
 
@@ -666,17 +666,17 @@ local frameCount, hookCount = #frames, #hooks
 plateFrame.castBar = Region()
 plateFrame.castBar:Hide()
 C_NamePlate.GetNamePlateForUnit = function() return plate end
-plateFrame.SNPInterruptibleHighlight = nil
+plateFrame.RPSNInterruptibleHighlight = nil
 ns.DebugUnit("nameplate1")
 equal(#frames, frameCount, "diagnostic creates no frame")
 equal(#hooks, hookCount, "diagnostic installs no hook")
-equal(plateFrame.SNPInterruptibleHighlight, nil, "diagnostic creates no overlay")
+equal(plateFrame.RPSNInterruptibleHighlight, nil, "diagnostic creates no overlay")
 -- Diagnose the actual current icon's registered hook without installing one.
 local diagnosticIcon = Region()
 plateFrame.castBar.Icon = diagnosticIcon
-plateFrame.SNPInterruptibleHighlight = nil
+plateFrame.RPSNInterruptibleHighlight = nil
 ns.CastHighlight.EnsureInterruptibleHighlight(plateFrame)
-assert(plateFrame.SNPInterruptibleHighlight.hookedIcons[diagnosticIcon], "diagnostic fixture installs real cast hook")
+assert(plateFrame.RPSNInterruptibleHighlight.hookedIcons[diagnosticIcon], "diagnostic fixture installs real cast hook")
 local diagnosticFrames, diagnosticHooks = #frames, #hooks
 output = {}
 ns.DebugUnit("nameplate1")
@@ -695,7 +695,7 @@ ns.DebugUnit("nameplate1")
 assert(table.concat(output, "\n"):find("cast icon found no; hook installed no", 1, true), "missing current icon diagnosed")
 equal(#frames, diagnosticFrames, "hook diagnosis creates no frames")
 equal(#hooks, diagnosticHooks, "hook diagnosis installs no hooks")
-plateFrame.SNPInterruptibleHighlight = nil
+plateFrame.RPSNInterruptibleHighlight = nil
 
 output = {}
 categoryMode = "inactive"
@@ -715,9 +715,9 @@ unitExists = false
 unitExists = true
 local previousIsUnit, previousGUID = UnitIsUnit, UnitGUID
 local previousLookup, previousList = C_NamePlate.GetNamePlateForUnit, C_NamePlate.GetNamePlates
-local cachedStyle = plateFrame.SNPNameStyle
-plateFrame.SNPNameStyle = {text = "Cached diagnostic label", nameOnly = true, inside = false}
-local diagnosticStyle = plateFrame.SNPNameStyle
+local cachedStyle = plateFrame.RPSNNameStyle
+plateFrame.RPSNNameStyle = {text = "Cached diagnostic label", nameOnly = true, inside = false}
+local diagnosticStyle = plateFrame.RPSNNameStyle
 local beforeFrames, beforeHooks = #frames, #hooks
 C_NamePlate.GetNamePlateForUnit = function(token)
     if token == "target" then return nil end
@@ -731,8 +731,8 @@ assert(report:find("direct missing", 1, true), "target direct lookup miss report
 assert(report:find("matching frames: 1", 1, true), "enumeration finds and deduplicates matching frame")
 assert(report:find("enumerated unit match", 1, true), "lookup source reported")
 assert(report:find("Cached name style: found", 1, true), "addon cached text reported")
-assert(report:find("SNPFullTitleText: found", 1, true), "addon title region reported")
-equal(plateFrame.SNPNameStyle, diagnosticStyle, "diagnostic does not rewrite cached style")
+assert(report:find("RPSNFullTitleText: found", 1, true), "addon title region reported")
+equal(plateFrame.RPSNNameStyle, diagnosticStyle, "diagnostic does not rewrite cached style")
 equal(#frames, beforeFrames, "enumerated diagnostic creates no frames")
 equal(#hooks, beforeHooks, "enumerated diagnostic creates no hooks")
 
@@ -752,7 +752,7 @@ assert(not report:find("Different NPC", 1, true), "unrelated unit not dumped")
 assert(not report:find("text: Orin Straylight", 1, true), "stale displayed name not used to select a plate")
 equal(plateFrame.name.text, "Orin Straylight", "diagnostic does not repair stale text")
 equal(plateFrame.unit, "nameplate2", "diagnostic does not change unit")
-equal(plateFrame.SNPNameStyle, diagnosticStyle, "nonmatching cache untouched")
+equal(plateFrame.RPSNNameStyle, diagnosticStyle, "nonmatching cache untouched")
 equal(#frames, beforeFrames, "nonmatching diagnostic creates no frames")
 equal(#hooks, beforeHooks, "nonmatching diagnostic creates no hooks")
 
@@ -818,7 +818,7 @@ C_NamePlate.GetNamePlates = function() error("enumeration unavailable") end
 ns.DebugUnit("target")
 assert(table.concat(output, "\n"):find("enumeration available: no", 1, true), "failed enumeration reported")
 UnitIsUnit, UnitGUID = previousIsUnit, previousGUID
-plateFrame.SNPNameStyle = cachedStyle
+plateFrame.RPSNNameStyle = cachedStyle
 C_NamePlate.GetNamePlateForUnit, C_NamePlate.GetNamePlates = previousLookup, previousList
 output = {}
 unitExists = false
@@ -862,9 +862,9 @@ for _, case in ipairs({
     ns.WorldContext.Refresh("PLAYER_REGEN_ENABLED")
     ns.RefreshAll()
     equal(plateFrame.name.g, 1, "sanctuary uniform bar name")
-    equal(plateFrame.SNPFullTitleText.r, 1, "TRP3 title remains white across categories: red")
-    equal(plateFrame.SNPFullTitleText.g, 1, "TRP3 title remains white across categories: green")
-    equal(plateFrame.SNPFullTitleText.b, 1, "TRP3 title remains white across categories: blue")
+    equal(plateFrame.RPSNFullTitleText.r, 1, "TRP3 title remains white across categories: red")
+    equal(plateFrame.RPSNFullTitleText.g, 1, "TRP3 title remains white across categories: green")
+    equal(plateFrame.RPSNFullTitleText.b, 1, "TRP3 title remains white across categories: blue")
     plateFrame.name:SetTextColor(0, 0, 0)
     hooks[2].callback(plateFrame)
     equal(plateFrame.name.g, 1, "sanctuary uniform name repair")
@@ -885,28 +885,28 @@ ns.RefreshAll()
 equal(plateFrame.name.font, "Fonts\\WorldLocalized.ttf", "sanctuary uses localized world font")
 equal(plateFrame.name.size, 12, "sanctuary preserves name size")
 equal(plateFrame.name.flags, "OUTLINE", "sanctuary name uses thin outline")
-equal(plateFrame.SNPFullTitleText.flags, "OUTLINE", "title uses thin outline")
-equal(plateFrame.SNPFullTitleText.font, "Fonts\\WorldLocalized.ttf", "sanctuary TRP3 title font")
+equal(plateFrame.RPSNFullTitleText.flags, "OUTLINE", "title uses thin outline")
+equal(plateFrame.RPSNFullTitleText.font, "Fonts\\WorldLocalized.ttf", "sanctuary TRP3 title font")
 plateFrame.name:SetFont("Fonts\\Drift.ttf", 12, "OUTLINE")
 Tick(0.25)
 equal(plateFrame.name.font, "Fonts\\WorldLocalized.ttf", "cached repair retains sanctuary font")
 appearance.matchSanctuaryFont = false
 Tick(0.25)
 equal(plateFrame.name.font, "Fonts\\ARIALN.TTF", "switch off invalidates font cache")
-equal(plateFrame.SNPFullTitleText.font, "Fonts\\ARIALN.TTF", "switch off refreshes title font")
+equal(plateFrame.RPSNFullTitleText.font, "Fonts\\ARIALN.TTF", "switch off refreshes title font")
 appearance.matchSanctuaryFont = true
 appearance.namePlacement = "INSIDE"
 ns.WorldContext.Refresh("PLAYER_REGEN_DISABLED")
 ns.RefreshAll()
-equal(plateFrame.SNPInsideName.font, "Fonts\\WorldLocalized.ttf", "inside-bar sanctuary font")
+equal(plateFrame.RPSNInsideName.font, "Fonts\\WorldLocalized.ttf", "inside-bar sanctuary font")
 C_PvP = {GetZonePVPInfo = function() return "friendly", false end}
 ns.WorldContext.Refresh("ZONE_CHANGED_NEW_AREA")
 ns.RefreshAll()
 equal(plateFrame.name.font, "Fonts\\ARIALN.TTF", "leaving sanctuary restores selected font")
-equal(plateFrame.SNPInsideName.shown, true, "leaving sanctuary retains uniform inside name")
+equal(plateFrame.RPSNInsideName.shown, true, "leaving sanctuary retains uniform inside name")
 ns.WorldContext.Refresh("PLAYER_REGEN_DISABLED")
 ns.RefreshAll()
-equal(plateFrame.SNPInsideName.font, "Fonts\\ARIALN.TTF", "outside sanctuary combat restores inside font")
+equal(plateFrame.RPSNInsideName.font, "Fonts\\ARIALN.TTF", "outside sanctuary combat restores inside font")
 appearance.namePlacement = "ABOVE"
 C_PvP = {GetZonePVPInfo = function() return "sanctuary", false end}
 ns.WorldContext.Refresh("PLAYER_REGEN_ENABLED")
@@ -929,29 +929,29 @@ unit = {reaction = 5, interactable = true}
 trp3Options = {}
 ns.WorldContext.Refresh("PLAYER_REGEN_ENABLED")
 ns.RefreshAll()
-equal(plateFrame.SNPFullTitleText.text, "<Voidforge Steward>", "NPC service title independent of TRP3")
-equal(plateFrame.SNPFullTitleText.shown, true, "NPC service title shown below floating name")
-equal(plateFrame.SNPFullTitleText.size, 10, "NPC title uses name size minus two")
-equal(plateFrame.SNPFullTitleText.r, 1, "NPC title white red channel")
-equal(plateFrame.SNPFullTitleText.g, 1, "NPC title white green channel")
-equal(plateFrame.SNPFullTitleText.b, 1, "NPC title white blue channel")
+equal(plateFrame.RPSNFullTitleText.text, "<Voidforge Steward>", "NPC service title independent of TRP3")
+equal(plateFrame.RPSNFullTitleText.shown, true, "NPC service title shown below floating name")
+equal(plateFrame.RPSNFullTitleText.size, 10, "NPC title uses name size minus two")
+equal(plateFrame.RPSNFullTitleText.r, 1, "NPC title white red channel")
+equal(plateFrame.RPSNFullTitleText.g, 1, "NPC title white green channel")
+equal(plateFrame.RPSNFullTitleText.b, 1, "NPC title white blue channel")
 appearance.matchSanctuaryFont = true
 SystemFont_World = {GetFont = function() return "Fonts\\WorldLocalized.ttf" end}
 ns.RefreshAll()
-equal(plateFrame.SNPFullTitleText.font, "Fonts\\WorldLocalized.ttf", "NPC service title uses sanctuary font")
+equal(plateFrame.RPSNFullTitleText.font, "Fonts\\WorldLocalized.ttf", "NPC service title uses sanctuary font")
 appearance.matchSanctuaryFont = false
 SystemFont_World = nil
 ns.WorldContext.Refresh("PLAYER_REGEN_DISABLED")
 ns.RefreshAll()
-equal(plateFrame.SNPFullTitleText.shown, true, "NPC title remains below health bar in combat")
+equal(plateFrame.RPSNFullTitleText.shown, true, "NPC title remains below health bar in combat")
 ns.WorldContext.Refresh("PLAYER_REGEN_ENABLED")
 ns.RefreshAll()
-equal(plateFrame.SNPFullTitleText.shown, true, "NPC title restored after combat")
+equal(plateFrame.RPSNFullTitleText.shown, true, "NPC title restored after combat")
 C_TooltipInfo.GetUnit = function() return {lines = {{type = 2}, {type = 47}}} end
 unit.names = {nameplate1 = "Different NPC", target = "Different NPC"}
 ns.RefreshAll()
-equal(plateFrame.SNPFullTitleText.shown, false, "missing subtitle clears previous title")
-equal(plateFrame.SNPFullTitleText.text, "", "old NPC service text cleared")
+equal(plateFrame.RPSNFullTitleText.shown, false, "missing subtitle clears previous title")
+equal(plateFrame.RPSNFullTitleText.text, "", "old NPC service text cleared")
 C_TooltipInfo = nil
 
 -- Match the screenshot: sparse plate tooltip, fuller target tooltip, false
@@ -972,21 +972,21 @@ C_TooltipInfo = {GetUnit = function(token)
     return {lines = lines}
 end}
 ns.RefreshAll()
-equal(plateFrame.SNPFullTitleText.text, "<Voidforge Steward>", "sparse plate resolves target subtitle")
-equal(plateFrame.SNPFullTitleText.shown, true, "resolved service title visible")
+equal(plateFrame.RPSNFullTitleText.text, "<Voidforge Steward>", "sparse plate resolves target subtitle")
+equal(plateFrame.RPSNFullTitleText.shown, true, "resolved service title visible")
 equal(plateFrame.name.g, 1, "verified useful NPC bar name white")
-equal(plateFrame.SNPFullTitleText.g, 1, "verified useful NPC title white")
+equal(plateFrame.RPSNFullTitleText.g, 1, "verified useful NPC title white")
 currentGUID = "Creature-Orin-Plate"
 ns.RefreshAll()
-equal(plateFrame.SNPFullTitleText.text, "<Voidforge Steward>", "unmatched readable GUID resolves by NPC name")
-equal(plateFrame.SNPEntityFacts.npcTitleSource, "cached NPC name (GUID unmatched)", "weaker association reported")
+equal(plateFrame.RPSNFullTitleText.text, "<Voidforge Steward>", "unmatched readable GUID resolves by NPC name")
+equal(plateFrame.RPSNEntityFacts.npcTitleSource, "cached NPC name (GUID unmatched)", "weaker association reported")
 UnitGUID = function(token) if token == "nameplate1" then return currentGUID end end
 ns.RefreshAll()
-equal(plateFrame.SNPFullTitleText.text, "<Voidforge Steward>", "title survives target change")
+equal(plateFrame.RPSNFullTitleText.text, "<Voidforge Steward>", "title survives target change")
 currentGUID = "Creature-Other"
 unit.names = {nameplate1 = "Different NPC"}
 ns.RefreshAll()
-equal(plateFrame.SNPFullTitleText.shown, false, "token reuse clears service title")
+equal(plateFrame.RPSNFullTitleText.shown, false, "token reuse clears service title")
 equal(plateFrame.name.g, 1, "token reuse retains white bar name")
 
 -- Hyperlink titles retain white text while the category colors the bar.
@@ -996,10 +996,10 @@ C_TooltipInfo.GetHyperlink = function() return {lines = {
     {type = 0, leftText = "Voidforge Steward"}, {type = 47, leftText = "Level 90"},
 }} end
 ns.RefreshAll()
-equal(plateFrame.SNPFullTitleText.text, "<Voidforge Steward>", "hyperlink title displayed")
-equal(plateFrame.SNPEntityFacts.npcTitleSource, "GUID hyperlink tooltip", "hyperlink presentation source")
+equal(plateFrame.RPSNFullTitleText.text, "<Voidforge Steward>", "hyperlink title displayed")
+equal(plateFrame.RPSNEntityFacts.npcTitleSource, "GUID hyperlink tooltip", "hyperlink presentation source")
 equal(plateFrame.name.g, 1, "hyperlink retains white bar name")
-equal(plateFrame.SNPFullTitleText.g, 1, "hyperlink title remains white")
+equal(plateFrame.RPSNFullTitleText.g, 1, "hyperlink title remains white")
 local oldIsUnit, oldWidgetsOnly, oldCVar = UnitIsUnit, UnitNameplateShowsWidgetsOnly, C_CVar
 UnitIsUnit = function(token, other) return token == "nameplate1" and other == "softinteract" end
 UnitNameplateShowsWidgetsOnly = function(token) return token == "nameplate1" end
@@ -1032,7 +1032,7 @@ widgetFrame.unit, widgetFrame.name = "nameplate21", Region()
 widgetFrame.name:SetAlpha(0.7)
 widgetFrame.healthBar, widgetFrame.HealthBarsContainer = Region(), Region()
 widgetFrame.WidgetContainer = Region()
-widgetFrame.SNPFullTitleText, widgetFrame.SNPInsideName = Region(), Region()
+widgetFrame.RPSNFullTitleText, widgetFrame.RPSNInsideName = Region(), Region()
 local widgetPlate = {UnitFrame = widgetFrame}
 C_NamePlate.GetNamePlateForUnit = function(token) return token == "nameplate21" and widgetPlate or plate end
 C_NamePlate.GetNamePlates = function() return {widgetPlate, plate} end
@@ -1044,28 +1044,28 @@ local widgetMode = true
 UnitNameplateShowsWidgetsOnly = function(token) return token == "nameplate21" and widgetMode end
 ns.RefreshAll()
 equal(widgetFrame.name.alpha, 0, "widget actor name suppressed")
-equal(widgetFrame.SNPFullTitleText.shown, false, "widget title suppressed")
-equal(widgetFrame.SNPInsideName.shown, false, "widget inside name suppressed")
+equal(widgetFrame.RPSNFullTitleText.shown, false, "widget title suppressed")
+equal(widgetFrame.RPSNInsideName.shown, false, "widget inside name suppressed")
 equal(widgetFrame.shown, true, "widget frame preserved")
 equal(widgetFrame.WidgetContainer.shown, true, "widget container preserved")
 equal(widgetFrame.healthBar.shown, true, "widget bar visibility untouched")
 equal(widgetFrame.HealthBarsContainer.shown, true, "widget bar ancestor untouched")
 equal(plateFrame.name.alpha, 1, "ordinary actor name remains visible")
-equal(plateFrame.SNPFullTitleText.text, "<Voidforge Steward>", "ordinary plate retains service title")
-equal(plateFrame.SNPFullTitleText.shown, true, "ordinary service title visible")
+equal(plateFrame.RPSNFullTitleText.text, "<Voidforge Steward>", "ordinary plate retains service title")
+equal(plateFrame.RPSNFullTitleText.shown, true, "ordinary service title visible")
 equal(plateFrame.name.g, 1, "ordinary uniform bar name remains white")
 widgetFrame.name:SetAlpha(1)
-widgetFrame.SNPFullTitleText:Show()
+widgetFrame.RPSNFullTitleText:Show()
 Tick(0.25)
 equal(widgetFrame.name.alpha, 0, "widget name drift repaired")
-equal(widgetFrame.SNPFullTitleText.shown, false, "widget title drift repaired")
+equal(widgetFrame.RPSNFullTitleText.shown, false, "widget title drift repaired")
 widgetFrame.name:SetAlpha(1)
 hooks[2].callback(widgetFrame)
 equal(widgetFrame.name.alpha, 0, "Blizzard name hook preserves suppression")
 categoryMode = "inactive"
 ns.NameplatePresentation.ApplySimpleStyle(widgetFrame)
 equal(widgetFrame.name.alpha, 0.7, "inactive restores original name opacity")
-equal(widgetFrame.SNPPresentation, nil, "inactive clears suppression decision")
+equal(widgetFrame.RPSNPresentation, nil, "inactive clears suppression decision")
 categoryMode = "active"
 ns.RefreshAll()
 stylingEnabled = false
@@ -1077,7 +1077,7 @@ ns.RefreshAll()
 widgetMode = false
 Tick(0.25)
 equal(widgetFrame.name.alpha, 1, "widget-to-ordinary transition restores name")
-equal(widgetFrame.SNPFullTitleText.shown, true, "widget-to-ordinary transition styles title")
+equal(widgetFrame.RPSNFullTitleText.shown, true, "widget-to-ordinary transition styles title")
 widgetMode = true
 Tick(0.25)
 equal(widgetFrame.name.alpha, 0, "ordinary-to-widget transition suppresses text")
@@ -1094,7 +1094,7 @@ widgetFrame.unit = "nameplate22"
 UnitNameplateShowsWidgetsOnly = function() return false end
 ns.NameplatePresentation.ApplySimpleStyle(widgetFrame)
 equal(widgetFrame.name.alpha, 1, "recycled widget frame becomes ordinary")
-equal(widgetFrame.SNPOriginalUnit, "nameplate22", "recycled frame captures new unit")
+equal(widgetFrame.RPSNOriginalUnit, "nameplate22", "recycled frame captures new unit")
 ns.RestoreAll()
 UnitNameplateShowsWidgetsOnly = oldWidgetsOnly
 C_TooltipInfo = nil
@@ -1105,7 +1105,7 @@ C_NamePlate.GetNamePlateForUnit = function() return plate end
 unit = {reaction = 3}
 stylingEnabled, categoryMode, highlightEnabled = true, "active", false
 appearance.namePlacement = "INSIDE"
-plateFrame.SNPInterruptibleHighlight = nil
+plateFrame.RPSNInterruptibleHighlight = nil
 local originalSetFont = plateFrame.name.SetFont
 local fontWrites = 0
 function plateFrame.name:SetFont(...)
@@ -1117,25 +1117,25 @@ end
 for index = 1, 3 do
     categoryMode = "inactive"
     ns.RefreshAll()
-    equal(plateFrame.SNPState, nil, "hostile toggle restores native display")
+    equal(plateFrame.RPSNState, nil, "hostile toggle restores native display")
     categoryMode, fontWrites = "active", 0
     ns.RefreshAll()
     equal(fontWrites, 1, "hostile toggle applies font once despite native callback")
-    equal(plateFrame.SNPInsideName.flags, "OUTLINE", "hostile toggle retains shadow rendering")
+    equal(plateFrame.RPSNInsideName.flags, "OUTLINE", "hostile toggle retains shadow rendering")
 end
 plateFrame.name.SetFont = function() error("simulated font write failure") end
 local ok = pcall(ns.RefreshAll)
 equal(ok, false, "style failure remains visible")
-equal(plateFrame.SNPApplyingStyle, nil, "style failure releases reentry guard")
+equal(plateFrame.RPSNApplyingStyle, nil, "style failure releases reentry guard")
 plateFrame.name.SetFont = originalSetFont
 ns.RefreshAll()
-equal(plateFrame.SNPInsideName.shown, true, "styling recovers after failed write")
-local nativeFlags = plateFrame.SNPOriginalPresentation.name.SetFont[3] or ""
+equal(plateFrame.RPSNInsideName.shown, true, "styling recovers after failed write")
+local nativeFlags = plateFrame.RPSNOriginalPresentation.name.SetFont[3] or ""
 appearance.useSlugRendering = true
 equal(ns.NameplateText.RepairCachedName(plateFrame, ns.WorldContext.Get()), false, "ordinary font cache cannot undo Slug selection")
 ns.RefreshAll()
-equal(plateFrame.SNPInsideName.flags, "SLUG,OUTLINE", "inside name uses Slug with thin outline")
-assert(plateFrame.SNPInsideName.SNPUnderlayers == nil, "inside name has no glyph copies")
+equal(plateFrame.RPSNInsideName.flags, "SLUG,OUTLINE", "inside name uses Slug with thin outline")
+assert(plateFrame.RPSNInsideName.RPSNUnderlayers == nil, "inside name has no glyph copies")
 plateFrame.name:SetFont("drifted", 10, "")
 ns.NameplateText.RepairCachedName(plateFrame, ns.WorldContext.Get())
 equal(plateFrame.name.flags, "SLUG,OUTLINE", "cached repair preserves Slug")
@@ -1143,7 +1143,7 @@ appearance.namePlacement = "ABOVE"; ns.RefreshAll()
 equal(plateFrame.name.flags, "SLUG,OUTLINE", "above-bar name uses thin Slug outline")
 unit = {reaction = 5, interactable = true}; ns.RefreshAll()
 equal(plateFrame.name.flags, "SLUG,OUTLINE", "floating name uses outlined Slug")
-equal(plateFrame.SNPFullTitleText.flags, "SLUG,OUTLINE", "title uses outlined Slug")
+equal(plateFrame.RPSNFullTitleText.flags, "SLUG,OUTLINE", "title uses outlined Slug")
 appearance.useSlugRendering = false; ns.RefreshAll()
 equal(plateFrame.name.flags, "OUTLINE", "toggle off restores ordinary name outline")
 ns.RestoreAll()
@@ -1180,9 +1180,9 @@ hooks[2].callback(plateFrame)
 plateFrame.name.text = "Drifted"
 Tick(0.25)
 -- Label-chain drift needs only layout; structural invalidation still falls back.
-plateFrame.SNPNameStyle.healthTextSignature = "stale"
+plateFrame.RPSNNameStyle.healthTextSignature = "stale"
 Tick(0.25)
-plateFrame.SNPNameStyle.presentation = nil
+plateFrame.RPSNNameStyle.presentation = nil
 Tick(0.25)
 ns.NameplateText.RepairCachedName(plateFrame, ns.WorldContext.Get())
 events.scripts.OnEvent(events, "UNIT_NAME_UPDATE", "nameplate1")
@@ -1253,20 +1253,20 @@ for _, placement in ipairs({"ABOVE", "INSIDE"}) do
     Tick(0.25)
     equal(plateFrame.name.text, "Expected RP name", "native text-only drift repaired")
     if placement == "INSIDE" then
-        plateFrame.SNPInsideName:SetText("Overwritten inside name")
+        plateFrame.RPSNInsideName:SetText("Overwritten inside name")
         Tick(0.25)
-        equal(plateFrame.SNPInsideName.text, "Expected RP name", "inside text-only drift repaired")
+        equal(plateFrame.RPSNInsideName.text, "Expected RP name", "inside text-only drift repaired")
     end
 end
 local secretName = setmetatable({}, {__tostring = function() error("secret name inspected") end})
 local previousSecretCheck = issecretvalue
 issecretvalue = function(value) return rawequal(value, secretName) end
 plateFrame.name:SetText(secretName)
-plateFrame.SNPInsideName:SetText(secretName)
+plateFrame.RPSNInsideName:SetText(secretName)
 assert(not ns.NameplateText.CachedNameHasDrifted(plateFrame), "restricted text skipped")
-plateFrame.SNPNameStyle.text = secretName
+plateFrame.RPSNNameStyle.text = secretName
 plateFrame.name:SetText("Readable replacement")
-plateFrame.SNPInsideName:SetText("Readable replacement")
+plateFrame.RPSNInsideName:SetText("Readable replacement")
 assert(not ns.NameplateText.CachedNameHasDrifted(plateFrame), "restricted expected text skipped")
 issecretvalue = previousSecretCheck
 ns.RefreshAll()
@@ -1275,7 +1275,7 @@ ns.RefreshAll()
 ns.RestoreAll()
 plateFrame.castBar = Region()
 plateFrame.castBar.Icon = Region()
-plateFrame.SNPInterruptibleHighlight = nil
+plateFrame.RPSNInterruptibleHighlight = nil
 local retryOverlay = ns.CastHighlight.EnsureInterruptibleHighlight(plateFrame).frame
 highlightEnabled = true
 local iconBlocked = false
@@ -1423,25 +1423,25 @@ plateFrame.CastBarsContainer.castBar = nestedCast
 plateFrame.castBar, plateFrame.CastBar = nil, nil
 nestedCast:Show()
 ns.RefreshAll()
-equal(plateFrame.SNPPresentation.showCastBar, true, "native nested cast included in presentation")
-equal(plateFrame.SNPFullTitleText.shown, false, "native nested cast hides long title")
-equal(plateFrame.SNPInterruptibleHighlight.castBar, nestedCast, "highlight uses native nested cast")
-equal(plateFrame.SNPInterruptibleHighlight.frame.shown, true, "nested interruptible cast permits highlight")
+equal(plateFrame.RPSNPresentation.showCastBar, true, "native nested cast included in presentation")
+equal(plateFrame.RPSNFullTitleText.shown, false, "native nested cast hides long title")
+equal(plateFrame.RPSNInterruptibleHighlight.castBar, nestedCast, "highlight uses native nested cast")
+equal(plateFrame.RPSNInterruptibleHighlight.frame.shown, true, "nested interruptible cast permits highlight")
 events.scripts.OnEvent(events, "UNIT_SPELLCAST_NOT_INTERRUPTIBLE", "nameplate1")
 events.scripts.OnUpdate(events, 0.01)
-equal(plateFrame.SNPInterruptibleHighlight.frame.shown, false, "not-interruptible event hides highlight")
+equal(plateFrame.RPSNInterruptibleHighlight.frame.shown, false, "not-interruptible event hides highlight")
 events.scripts.OnEvent(events, "UNIT_SPELLCAST_INTERRUPTIBLE", "nameplate1")
 events.scripts.OnUpdate(events, 0.01)
-equal(plateFrame.SNPInterruptibleHighlight.frame.shown, true, "interruptible event restores highlight")
+equal(plateFrame.RPSNInterruptibleHighlight.frame.shown, true, "interruptible event restores highlight")
 nestedCast:Hide()
-equal(plateFrame.SNPFullTitleText.shown, true, "nested cast end restores title without restyling")
+equal(plateFrame.RPSNFullTitleText.shown, true, "nested cast end restores title without restyling")
 nestedCast:Show()
-equal(plateFrame.SNPFullTitleText.shown, false, "nested channel start hides title")
+equal(plateFrame.RPSNFullTitleText.shown, false, "nested channel start hides title")
 stylingEnabled = false; ns.RestoreAll()
 equal(nestedCast.shown, true, "disable preserves native nested cast visibility")
-equal(plateFrame.SNPInterruptibleHighlight.frame.shown, false, "disable hides nested cast effect")
+equal(plateFrame.RPSNInterruptibleHighlight.frame.shown, false, "disable hides nested cast effect")
 nestedCast:Hide()
-equal(plateFrame.SNPFullTitleText.shown, false, "nested cast end cannot revive disabled title")
+equal(plateFrame.RPSNFullTitleText.shown, false, "nested cast end cannot revive disabled title")
 
 -- Coordinate every displayed health label with threat and the inside name.
 ns.RestoreAll()
@@ -1464,7 +1464,7 @@ for _, placement in ipairs({"INSIDE", "ABOVE"}) do
             for key, label in pairs(healthLabels) do label:SetShown(selected[key] == true) end
             appearance.namePlacement, threatEnabled, threatPercent = placement, showThreat, 100
             ns.RefreshAll()
-            local preceding = showThreat and plateFrame.SNPThreatText or plateFrame.healthBar
+            local preceding = showThreat and plateFrame.RPSNThreatText or plateFrame.healthBar
             if showThreat then
                 equal(preceding.points[1][2], plateFrame.healthBar, "threat keeps bar right edge")
                 equal(preceding.points[1][4], -3, "threat keeps right padding")
@@ -1481,7 +1481,7 @@ for _, placement in ipairs({"INSIDE", "ABOVE"}) do
                 equal(label.shown, selected[key] == true, "native health visibility preserved")
             end
             if placement == "INSIDE" then
-                equal(plateFrame.SNPInsideName.points[2][2], preceding, "name reserves all health and threat text")
+                equal(plateFrame.RPSNInsideName.points[2][2], preceding, "name reserves all health and threat text")
             end
             ns.RestoreAll()
             for _, label in pairs(healthLabels) do
@@ -1519,7 +1519,7 @@ issecretvalue = function(value) return rawequal(value, opaqueHealth) end
 healthLabels.LeftText:SetText(opaqueHealth)
 healthLabels.LeftText.IsShown = function() return opaqueHealth end
 ns.RefreshAll()
-equal(plateFrame.SNPInsideName.points[2][2], healthLabels.LeftText, "unknown health visibility conservatively reserves name space")
+equal(plateFrame.RPSNInsideName.points[2][2], healthLabels.LeftText, "unknown health visibility conservatively reserves name space")
 healthLabels.LeftText.IsShown, issecretvalue = oldShown, oldSecretCheck
 ns.RestoreAll()
 
@@ -1539,20 +1539,20 @@ for _, placement in ipairs({"ABOVE", "INSIDE"}) do
         ns.RefreshAll()
         equal(plateFrame.healthBar.shown, false, "bar off hides native health bar")
         equal(plateFrame.name.alpha, 1, "bar off keeps floating name visible")
-        equal(plateFrame.SNPPresentation.nameOnly, true, "bar off uses colored floating name")
-        equal(plateFrame.SNPInsideName.shown, false, "bar off removes inside copy")
-        equal(plateFrame.SNPFullTitleText.points[1][2], plateFrame.name, "title directly below name")
-        equal(plateFrame.SNPFullTitleText.points[1][5], -1, "one-unit title gap")
-        equal(plateFrame.SNPFullTitleText.size, size - 2, "title exactly two smaller")
-        equal(plateFrame.SNPFullTitleText.shown, true, "bar off displays title")
-        equal(plateFrame.SNPThreatText.shown, false, "bar off hides threat")
+        equal(plateFrame.RPSNPresentation.nameOnly, true, "bar off uses colored floating name")
+        equal(plateFrame.RPSNInsideName.shown, false, "bar off removes inside copy")
+        equal(plateFrame.RPSNFullTitleText.points[1][2], plateFrame.name, "title directly below name")
+        equal(plateFrame.RPSNFullTitleText.points[1][5], -1, "one-unit title gap")
+        equal(plateFrame.RPSNFullTitleText.size, size - 2, "title exactly two smaller")
+        equal(plateFrame.RPSNFullTitleText.shown, true, "bar off displays title")
+        equal(plateFrame.RPSNThreatText.shown, false, "bar off hides threat")
         plateFrame.healthBar:Show()
         Tick(0.25)
         equal(plateFrame.healthBar.shown, false, "reconciliation repairs native reshow")
         showBar = true
         ns.RefreshAll()
         equal(plateFrame.healthBar.shown, true, "bar on restores health")
-        equal(plateFrame.SNPFullTitleText.points[1][2], plateFrame.healthBar, "bar on restores title anchor")
+        equal(plateFrame.RPSNFullTitleText.points[1][2], plateFrame.healthBar, "bar on restores title anchor")
     end
 end
 ns.RestoreAll()
@@ -1581,17 +1581,17 @@ function bar:CreateMaskTexture() return GradientTexture() end
 function UnitHealthPercent() error("retired health threshold must not be queried") end
 appearance.namePlacement, threatEnabled, threatPercent = "INSIDE", true, 255
 ns.RefreshAll()
-assert(bar.SNPHealthGradient.shown)
-assert(plateFrame.SNPInsideName.flags == "OUTLINE" and plateFrame.SNPInsideName.SNPUnderlayers == nil)
+assert(bar.RPSNHealthGradient.shown)
+assert(plateFrame.RPSNInsideName.flags == "OUTLINE" and plateFrame.RPSNInsideName.RPSNUnderlayers == nil)
 Tick(0.25)
 gradients = false
 ns.RefreshAll()
-assert(not bar.SNPHealthGradient.shown)
-assert(plateFrame.SNPInsideName.flags == "OUTLINE" and plateFrame.SNPInsideName.SNPUnderlayers == nil)
+assert(not bar.RPSNHealthGradient.shown)
+assert(plateFrame.RPSNInsideName.flags == "OUTLINE" and plateFrame.RPSNInsideName.RPSNUnderlayers == nil)
 gradients = true
 ns.RefreshAll()
 ns.RestoreAll()
-assert(not bar.SNPHealthGradient.shown, "global restoration removes gradient")
+assert(not bar.RPSNHealthGradient.shown, "global restoration removes gradient")
 
 -- Use fresh interaction/title observations, independent of earlier cache fixtures.
 UnitIsInteractable = function() return unit.interactable or false end
@@ -1607,16 +1607,16 @@ for _, barEnabled in ipairs({true, false}) do
         for _, enabled in ipairs({false, true}) do
             dimBackground = enabled
             ns.RefreshAll()
-            equal(plateFrame.SNPState, "useless", "background classification")
+            equal(plateFrame.RPSNState, "useless", "background classification")
             local expected = enabled and 153 / 255 or 1
             equal(plateFrame.name.r, expected, "background native name shade")
             equal(plateFrame.name.g, expected, "background native name green")
             equal(plateFrame.name.b, expected, "background native name blue")
-            equal(plateFrame.SNPFullTitleText.r, expected, "background title matches name red")
-            equal(plateFrame.SNPFullTitleText.g, expected, "background title matches name green")
-            equal(plateFrame.SNPFullTitleText.b, expected, "background title matches name blue")
+            equal(plateFrame.RPSNFullTitleText.r, expected, "background title matches name red")
+            equal(plateFrame.RPSNFullTitleText.g, expected, "background title matches name green")
+            equal(plateFrame.RPSNFullTitleText.b, expected, "background title matches name blue")
             if barEnabled and placement == "INSIDE" then
-                equal(plateFrame.SNPInsideName.r, expected, "background inside name shade")
+                equal(plateFrame.RPSNInsideName.r, expected, "background inside name shade")
             end
             plateFrame.name:SetTextColor(0, 0, 0)
             ns.NameplateText.RepairCachedName(plateFrame, ns.WorldContext.Get())
@@ -1627,7 +1627,7 @@ end
 showBar = true; unit = {reaction = 5, interactable = true}
 ns.RefreshAll()
 equal(plateFrame.name.r, 1, "interactive NPC name stays white")
-equal(plateFrame.SNPFullTitleText.r, 1, "interactive NPC title stays white")
+equal(plateFrame.RPSNFullTitleText.r, 1, "interactive NPC title stays white")
 ns.NPCTitles.GetTitle = function() return nil end
 
 -- Native one-line title layout is constrained even when the bar is hidden.
@@ -1637,7 +1637,7 @@ for _, enabled in ipairs({true, false}) do
     showBar = enabled
     appearance.healthBarWidth = 100
     ns.RefreshAll()
-    local title = plateFrame.SNPFullTitleText
+    local title = plateFrame.RPSNFullTitleText
     local healthBar = ns.NameplateFrames.GetHealthBar(plateFrame)
     equal(title.width, healthBar.width, "title uses bar width with either visibility")
     equal(title.wordWrap, false, "title cannot wrap")
@@ -1652,7 +1652,7 @@ for _, enabled in ipairs({true, false}) do
     equal(title.width, healthBar.width, "cached repair restores title width")
 end
 appearance.healthBarWidth = 100; ns.RefreshAll()
-local title = plateFrame.SNPFullTitleText
+local title = plateFrame.RPSNFullTitleText
 local healthBar = ns.NameplateFrames.GetHealthBar(plateFrame)
 healthBar:SetWidth(73)
 assert(ns.NameplateText.CachedNameHasDrifted(plateFrame, ns.WorldContext.Get()))
@@ -1704,7 +1704,7 @@ local function CheckFocusedUpdates()
     NoWork(report, {"Full styling", "Classification", "NPC title lookup", "Bar artwork", "Name/title styling", "Health text layout"})
     Calls(report, "Name hook repair", 1); Calls(report, "Health-color repair", 1)
     equal(plateFrame.name.text, "RP Focus", "name hook restores cached RP name")
-    equal(plateFrame.SNPInsideName.text, "RP Focus", "inside RP name retained")
+    equal(plateFrame.RPSNInsideName.text, "RP Focus", "inside RP name retained")
     equal(plateFrame.name.alpha, 0, "focused name hook keeps native name concealed")
     equal(plateFrame.healthBar.barR, 1, "health hook repairs category color")
 
@@ -1713,19 +1713,19 @@ local function CheckFocusedUpdates()
     plateFrame.name.SetFont = function(self, ...)
         focusedSetFont(self, ...)
         for _, callback in ipairs(plateFrame.healthBar.scriptHooks.OnShow) do callback(plateFrame.healthBar) end
-        assert(plateFrame.SNPArtworkPending, "native artwork callback retained during focused write")
+        assert(plateFrame.RPSNArtworkPending, "native artwork callback retained during focused write")
     end
     report = Measure(function() hooks[2].callback(plateFrame) end)
     Calls(report, "Bar artwork", 1)
     NoWork(report, {"Full styling", "Classification", "Name/title styling"})
-    assert(not plateFrame.SNPArtworkPending, "deferred native artwork callback serviced after focused write")
+    assert(not plateFrame.RPSNArtworkPending, "deferred native artwork callback serviced after focused write")
     plateFrame.name.SetFont = focusedSetFont
 
     -- Real native source changes refresh names/titles, without bar artwork.
     unit.names.nameplate1, rpName = "Renamed Native", "Renamed RP"
     report = Measure(function() hooks[2].callback(plateFrame) end)
     NoWork(report, {"Full styling", "Bar artwork"})
-    equal(plateFrame.SNPInsideName.text, "Renamed RP", "changed source updates RP display")
+    equal(plateFrame.RPSNInsideName.text, "Renamed RP", "changed source updates RP display")
 
     -- Threat presence changes layout once; percent changes keep fonts/layout.
     threatPercent = 55
@@ -1736,10 +1736,10 @@ local function CheckFocusedUpdates()
     end)
     Calls(report, "Data update", 1); Calls(report, "Classification", 1); Calls(report, "Name layout update", 1)
     NoWork(report, {"Full styling", "Bar artwork", "Name/title styling"})
-    equal(plateFrame.SNPThreatText.text, "55%", "threat event updates percentage")
-    equal(plateFrame.SNPInsideName.points[2][2], plateFrame.SNPThreatText, "threat presence reserves name space")
-    local fontWrites, setFont = 0, plateFrame.SNPThreatText.SetFont
-    plateFrame.SNPThreatText.SetFont = function(self, ...)
+    equal(plateFrame.RPSNThreatText.text, "55%", "threat event updates percentage")
+    equal(plateFrame.RPSNInsideName.points[2][2], plateFrame.RPSNThreatText, "threat presence reserves name space")
+    local fontWrites, setFont = 0, plateFrame.RPSNThreatText.SetFont
+    plateFrame.RPSNThreatText.SetFont = function(self, ...)
         fontWrites = fontWrites + 1; return setFont(self, ...)
     end
     threatPercent = 65
@@ -1752,8 +1752,8 @@ local function CheckFocusedUpdates()
     threatPercent = nil
     events.scripts.OnEvent(events, "UNIT_THREAT_LIST_UPDATE", "nameplate1")
     events.scripts.OnUpdate(events, 0.001)
-    equal(plateFrame.SNPInsideName.points[2][2], plateFrame.healthBar, "missing threat releases name space")
-    plateFrame.SNPThreatText.SetFont = setFont
+    equal(plateFrame.RPSNInsideName.points[2][2], plateFrame.healthBar, "missing threat releases name space")
+    plateFrame.RPSNThreatText.SetFont = setFont
 
     -- A queued global classification refresh must not discard a unit name event.
     rpName, threatPercent = "Merged RP", 75
@@ -1765,8 +1765,8 @@ local function CheckFocusedUpdates()
     end)
     Calls(report, "Data update", 1); Calls(report, "Classification", 1); Calls(report, "Name/title styling", 1)
     NoWork(report, {"Full styling", "Bar artwork"})
-    equal(plateFrame.SNPInsideName.text, "Merged RP", "coalescing keeps name request")
-    equal(plateFrame.SNPThreatText.text, "75%", "coalescing keeps threat request")
+    equal(plateFrame.RPSNInsideName.text, "Merged RP", "coalescing keeps name request")
+    equal(plateFrame.RPSNThreatText.text, "75%", "coalescing keeps threat request")
 
     unit.aggro = true
     report = Measure(function()
@@ -1774,8 +1774,8 @@ local function CheckFocusedUpdates()
         events.scripts.OnUpdate(events, 0.001)
     end)
     NoWork(report, {"Full styling", "Bar artwork"})
-    equal(plateFrame.SNPState, "attacking", "classification updates category without complete styling")
-    equal(plateFrame.SNPNameStyle.presentation, plateFrame.SNPPresentation, "focused update retains coherent cache")
+    equal(plateFrame.RPSNState, "attacking", "classification updates category without complete styling")
+    equal(plateFrame.RPSNNameStyle.presentation, plateFrame.RPSNPresentation, "focused update retains coherent cache")
 
     report = Measure(function()
         events.scripts.OnEvent(events, "UNIT_SPELLCAST_START", "nameplate1")
@@ -1807,7 +1807,7 @@ local function CheckFocusedUpdates()
     C_NamePlate.GetNamePlateForUnit = function() return plate end
     report = Measure(function() Tick(0.25) end)
     Calls(report, "Data update", 1)
-    equal(plateFrame.SNPInsideName.text, "Deferred RP", "pending updates keep name work")
+    equal(plateFrame.RPSNInsideName.text, "Deferred RP", "pending updates keep name work")
 
     -- Actual TRP3 callback uses the queued name path, not complete styling.
     assert(loadfile("RPSimpleNameplates/TRP3.lua"))("RPSimpleNameplates", ns)
@@ -1816,17 +1816,17 @@ local function CheckFocusedUpdates()
     report = Measure(function() refreshRP(); events.scripts.OnUpdate(events, 0.001) end)
     Calls(report, "Data update", 1); Calls(report, "Name/title styling", 1)
     NoWork(report, {"Full styling", "Classification", "Bar artwork"})
-    equal(plateFrame.SNPInsideName.text, "Callback RP", "TRP3 callback updates content")
+    equal(plateFrame.RPSNInsideName.text, "Callback RP", "TRP3 callback updates content")
 
     -- Invalid settings and identity use safe full-styling fallbacks.
     appearance.nameSize = 20
     report = Measure(function() hooks[2].callback(plateFrame) end)
     Calls(report, "Full styling", 1)
-    equal(plateFrame.SNPInsideName.size, 20, "settings invalidate focused cache")
+    equal(plateFrame.RPSNInsideName.size, 20, "settings invalidate focused cache")
     identity = "Player-Recycled-Same-Token"
     report = Measure(function() hooks[1].callback(plateFrame) end)
     Calls(report, "Full styling", 1)
-    equal(plateFrame.SNPEntityFacts.guid, identity, "readable GUID detects same-token recycling")
+    equal(plateFrame.RPSNEntityFacts.guid, identity, "readable GUID detects same-token recycling")
 
     -- Replaced native names restore the retired region and capture a new baseline.
     local retired = plateFrame.name
@@ -1835,7 +1835,7 @@ local function CheckFocusedUpdates()
     plateFrame.name:SetAlpha(0.6)
     report = Measure(function() hooks[2].callback(plateFrame) end)
     Calls(report, "Full styling", 1)
-    equal(plateFrame.SNPOriginalName, plateFrame.name, "replacement name gets its own baseline")
+    equal(plateFrame.RPSNOriginalName, plateFrame.name, "replacement name gets its own baseline")
     assert(retired.alpha ~= 0, "retired native name no longer concealed")
     ns.RestoreAll()
     equal(plateFrame.name.font, "Replacement native", "replacement native font restored")
@@ -1847,7 +1847,7 @@ local function CheckFocusedUpdates()
     plateFrame.name.SetFont = function() error(failure) end
     local ok, err = pcall(hooks[2].callback, plateFrame)
     assert(not ok and err == failure, "focused errors retain the original object")
-    assert(plateFrame.SNPApplyingStyle == nil, "failed focused write releases guard")
+    assert(plateFrame.RPSNApplyingStyle == nil, "failed focused write releases guard")
     plateFrame.name.SetFont = nativeSetFont
     hooks[2].callback(plateFrame)
 
@@ -1875,7 +1875,7 @@ local function CheckFocusedUpdates()
     end)
     Calls(report, "Full styling", 1)
     equal(plateFrame.healthBar.shown, false, "changed category preference switches to name-only")
-    equal(plateFrame.SNPInsideName.shown, false, "structural change hides inside overlay")
+    equal(plateFrame.RPSNInsideName.shown, false, "structural change hides inside overlay")
     ns.GetHealthBarEnabled = oldBarPreference
     ns.RefreshAll()
 
@@ -1887,8 +1887,8 @@ local function CheckFocusedUpdates()
     events.scripts.OnEvent(events, "NAME_PLATE_UNIT_ADDED", "nameplate2")
     report = Measure(function() events.scripts.OnUpdate(events, 0.001) end)
     NoWork(report, {"Data update", "Full styling", "Name/title styling"})
-    equal(plateFrame.SNPOriginalUnit, "nameplate2", "recycled plate retains current assignment")
-    equal(plateFrame.SNPInsideName.text, "New owner", "removed-unit work cannot overwrite new name")
+    equal(plateFrame.RPSNOriginalUnit, "nameplate2", "recycled plate retains current assignment")
+    equal(plateFrame.RPSNInsideName.text, "New owner", "removed-unit work cannot overwrite new name")
 end
 CheckFocusedUpdates()
 end
@@ -1910,7 +1910,7 @@ local function CheckSelectiveReconciliation()
     Tick(0.25)
     local context = ns.WorldContext.Get()
     local cap, text = ns.PresentationCapabilities, ns.NameplateText
-    local name, bar, inside, title = plateFrame.name, plateFrame.healthBar, plateFrame.SNPInsideName, plateFrame.SNPFullTitleText
+    local name, bar, inside, title = plateFrame.name, plateFrame.healthBar, plateFrame.RPSNInsideName, plateFrame.RPSNFullTitleText
     local writes, saved = {}, {}
     local function Watch(region, label)
         if not region then return end
@@ -1931,7 +1931,7 @@ local function CheckSelectiveReconciliation()
     end
     Watch(name, "name"); Watch(bar, "bar"); Watch(inside, "inside"); Watch(title, "title")
     Watch(plateFrame.HealthBarsContainer, "container")
-    Watch(plateFrame.SNPThreatText, "threat")
+    Watch(plateFrame.RPSNThreatText, "threat")
     for _, key in ipairs({"LeftText", "RightText", "Text"}) do Watch(bar[key], key) end
     local function Only(expected, label)
         for key, count in pairs(writes) do equal(count, expected[key], label .. " unexpected " .. key) end
@@ -1967,7 +1967,7 @@ local function CheckSelectiveReconciliation()
     assert(report:find("Access assessment: 1 calls;", 1, true), "unchanged scan shares one assessment: " .. report)
     assert(not report:find("Text repair:", 1, true), "unchanged scan does not enter repair")
     Only({}, "unchanged scan")
-    plateFrame.SNPTitleVisibilityPending = true
+    plateFrame.RPSNTitleVisibilityPending = true
     Reconcile(); Only({}, "unchanged pending title")
     name.text = "Native overwritten"; Reconcile(); Only({["name.SetText"] = 1}, "native text only")
     name.r = 0.2; Reconcile(); Only({["name.SetTextColor"] = 1}, "native color only")
@@ -2036,7 +2036,7 @@ local function CheckSelectiveReconciliation()
     local castShown = cast.IsShown
     cast.IsShown = function() castReads = castReads + 1; return nil end
     text.SyncFullTitleVisibility(plateFrame, context)
-    assert(not title.shown and plateFrame.SNPTitleVisibilityPending)
+    assert(not title.shown and plateFrame.RPSNTitleVisibilityPending)
     writes = {}
     for _ = 1, 40 do Reconcile() end
     assert(castReads <= 8, "unknown cast visibility retries are bounded")
@@ -2078,7 +2078,7 @@ local function CheckSelectiveReconciliation()
     name.SetTextColor = function() error(failure) end
     local ok, err = pcall(Reconcile)
     assert(not ok and err == failure, "selective repair preserves original error")
-    assert(not plateFrame.SNPApplyingStyle, "selective failure releases reentry guard")
+    assert(not plateFrame.RPSNApplyingStyle, "selective failure releases reentry guard")
     name.SetTextColor = colorSetter
     Reconcile(); Only({["name.SetTextColor"] = 1}, "failed write retry")
     for region, methods in pairs(saved) do for method, original in pairs(methods) do region[method] = original end end
@@ -2143,10 +2143,10 @@ local function CheckBoundedRuntime()
     urgent.castBar:Show()
     events.scripts.OnEvent(events, "UNIT_SPELLCAST_INTERRUPTIBLE", token)
     events.scripts.OnUpdate(events, 0.001)
-    equal(urgent.SNPInsideName.text, "Immediate RP", "queued name update bypasses scan backlog")
-    equal(urgent.SNPThreatText.text, "55%", "threat update bypasses scan backlog")
-    equal(urgent.SNPInterruptibleHighlight.frame.shown, true, "cast pulse bypasses scan backlog")
-    equal(urgent.SNPFullTitleText.shown, false, "cast/title substitution stays immediate")
+    equal(urgent.RPSNInsideName.text, "Immediate RP", "queued name update bypasses scan backlog")
+    equal(urgent.RPSNThreatText.text, "55%", "threat update bypasses scan backlog")
+    equal(urgent.RPSNInterruptibleHighlight.frame.shown, true, "cast pulse bypasses scan backlog")
+    equal(urgent.RPSNFullTitleText.shown, false, "cast/title substitution stays immediate")
     -- Finish this routine cycle without advancing its next 0.25-second deadline.
     events.scripts.OnUpdate(events, 0.001)
     events.scripts.OnUpdate(events, 0.001)
@@ -2164,14 +2164,14 @@ local function CheckBoundedRuntime()
         if currentToken == "nameplate101" then return byUnit.nameplate102 end
         return correctLookup(currentToken)
     end
-    local wrongFrame, wrongText = framesByUnit.nameplate102, framesByUnit.nameplate102.SNPInsideName.text
+    local wrongFrame, wrongText = framesByUnit.nameplate102, framesByUnit.nameplate102.RPSNInsideName.text
     events.scripts.OnEvent(events, "UNIT_NAME_UPDATE", "nameplate101")
     events.scripts.OnUpdate(events, 0.001)
-    equal(wrongFrame.SNPInsideName.text, wrongText, "mismatched lookup cannot consume another owner's work")
+    equal(wrongFrame.RPSNInsideName.text, wrongText, "mismatched lookup cannot consume another owner's work")
     assert(work.Has("unit retry", "nameplate101"), "mismatched assignment retains merged work")
     C_NamePlate.GetNamePlateForUnit = correctLookup
     Tick(0.25)
-    equal(framesByUnit.nameplate101.SNPInsideName.text, "Immediate RP", "correct assignment receives deferred name work")
+    equal(framesByUnit.nameplate101.RPSNInsideName.text, "Immediate RP", "correct assignment receives deferred name work")
     assert(not work.Has("unit retry", "nameplate101"), "recovered unit request leaves retry queue")
 
     -- New native snapshots may reorder plates without starving older work.
@@ -2190,11 +2190,11 @@ local function CheckBoundedRuntime()
     local newToken = "nameplate199"
     recycled.unit, byUnit[newToken], framesByUnit[newToken], unit.names[newToken] = newToken, recycledPlate, recycled, "New native"
     events.scripts.OnEvent(events, "NAME_PLATE_UNIT_ADDED", newToken)
-    equal(recycled.SNPOriginalUnit, newToken, "recycled owner initialized immediately")
+    equal(recycled.RPSNOriginalUnit, newToken, "recycled owner initialized immediately")
     repairs = {}
     for _ = 1, 4 do events.scripts.OnUpdate(events, 0.001) end
     assert(not repairs[retiredToken], "departed queued owner performs no later text writes")
-    equal(recycled.SNPInsideName.text, "Immediate RP", "stale scan cannot overwrite recycled content")
+    equal(recycled.RPSNInsideName.text, "Immediate RP", "stale scan cannot overwrite recycled content")
 
     -- Broad settings/context refreshes now share the bounded scheduler.
     appearance.nameSize = 22
@@ -2202,10 +2202,10 @@ local function CheckBoundedRuntime()
     assert(not work.Has("reconciliation", byUnit.nameplate116), "full refresh cancels the old cycle")
     events.scripts.OnUpdate(events, 0.001)
     local changed = 0
-    for _, frame in pairs(framesByUnit) do if frame.SNPInsideName.size == 22 then changed = changed + 1 end end
+    for _, frame in pairs(framesByUnit) do if frame.RPSNInsideName.size == 22 then changed = changed + 1 end end
     assert(changed > 0 and changed <= 4, "broad settings refresh is paced within one frame")
     for _ = 1, 12 do events.scripts.OnUpdate(events, 0.001) end
-    for _, frame in pairs(framesByUnit) do equal(frame.SNPInsideName.size, 22, "bounded settings refresh reaches every plate") end
+    for _, frame in pairs(framesByUnit) do equal(frame.RPSNInsideName.size, 22, "bounded settings refresh reaches every plate") end
     local oldRevision = ns.WorldContext.Get().revision
     C_PvP = {GetZonePVPInfo = function() return "contested", false end}
     events.scripts.OnEvent(events, "ZONE_CHANGED_NEW_AREA")
@@ -2213,7 +2213,7 @@ local function CheckBoundedRuntime()
     events.scripts.OnUpdate(events, 0.001)
     for _ = 1, 12 do events.scripts.OnUpdate(events, 0.001) end
     for _, frame in pairs(framesByUnit) do
-        equal(frame.SNPPresentation.contextRevision, ns.WorldContext.Get().revision, "jobs/settings use fresh context")
+        equal(frame.RPSNPresentation.contextRevision, ns.WorldContext.Get().revision, "jobs/settings use fresh context")
     end
     stylingEnabled = false
     ns.RestoreAll()
@@ -2229,7 +2229,7 @@ local function CheckBoundedRuntime()
     stylingEnabled = false; ns.RestoreAll()
     for _, frame in pairs(framesByUnit) do
         assert(ns.NameplateRestoration.IsPending(frame), "blocked restoration scheduled")
-        ns.CastHighlight.UpdateInterruptibleHighlight(frame, ns.WorldContext.Get(), frame.SNPPresentation)
+        ns.CastHighlight.UpdateInterruptibleHighlight(frame, ns.WorldContext.Get(), frame.RPSNPresentation)
     end
     blocked = false
     local originalCount, jobs = ns.Profiler.Count, 0
@@ -2240,7 +2240,7 @@ local function CheckBoundedRuntime()
     events.scripts.OnUpdate(events, 0.25)
     equal(jobs, 4, "disabled runtime bounds restoration/cast work together")
     local restored = 0
-    for _, frame in pairs(framesByUnit) do if not frame.SNPState then restored = restored + 1 end end
+    for _, frame in pairs(framesByUnit) do if not frame.RPSNState then restored = restored + 1 end end
     equal(restored, 4, "restoration no longer retries all plates in one frame")
     for _ = 1, 12 do
         jobs = 0; events.scripts.OnUpdate(events, 0.001)
@@ -2248,7 +2248,7 @@ local function CheckBoundedRuntime()
     end
     ns.Profiler.Count = originalCount
     for _, frame in pairs(framesByUnit) do
-        equal(frame.SNPState, nil, "every blocked restoration recovers fairly")
+        equal(frame.RPSNState, nil, "every blocked restoration recovers fairly")
         assert(not work.Has("cast retry", frame), "every cast retry recovers fairly")
         frame.IsForbidden = nil
     end
@@ -2274,7 +2274,7 @@ do
     C_NamePlate.GetNamePlateForUnit = function() return plate end
     C_NamePlate.GetNamePlates = function() return {plate} end
     ns.RefreshAll()
-    local name, expected = plateFrame.name, plateFrame.SNPNameStyle
+    local name, expected = plateFrame.name, plateFrame.RPSNNameStyle
     local originals, callbacks = {}, {}
     for _, hook in ipairs(hooks) do
         if hook.name == name and hook.method then callbacks[hook.method] = hook.callback end
@@ -2311,42 +2311,42 @@ do
     equal(name.size, 18, "native text height immediately repaired")
     name:SetFont("Different face", 11, "THICKOUTLINE")
     equal(name.flags, expected.flags, "direct font flags immediately repaired")
-    plateFrame.SNPApplyingStyle = true
+    plateFrame.RPSNApplyingStyle = true
     name:SetFontObject("Native during callback")
-    assert(plateFrame.SNPNameAppearancePending, "guarded native font-object write survives")
-    plateFrame.SNPApplyingStyle = nil
+    assert(plateFrame.RPSNNameAppearancePending, "guarded native font-object write survives")
+    plateFrame.RPSNApplyingStyle = nil
     ns.NameplateText.RepairPendingNameAppearance(plateFrame)
     equal(name.font, expected.font, "pending native appearance repaired after guard")
     equal(name.r, 153 / 255, "pending native white repaired after guard")
-    assert(not plateFrame.SNPNameAppearancePending)
+    assert(not plateFrame.RPSNNameAppearancePending)
     -- Native callbacks can recolor names while addon writes are guarded.
     -- Final own writes must converge without recursive or redundant font work.
     local fontWrites, fontSetter = 0, name.SetFont
     name.SetFont = function(self, ...) fontWrites = fontWrites + 1; return fontSetter(self, ...) end
-    plateFrame.SNPApplyingStyle = true
+    plateFrame.RPSNApplyingStyle = true
     name:SetTextColor(1, 1, 1)
-    assert(plateFrame.SNPNameColorPending, "guarded native color write survives")
-    plateFrame.SNPApplyingStyle = nil
+    assert(plateFrame.RPSNNameColorPending, "guarded native color write survives")
+    plateFrame.RPSNApplyingStyle = nil
     ns.NameplateText.RepairPendingNameAppearance(plateFrame)
     equal(name.r, expected.r, "guarded native color repaired before reconciliation")
     equal(fontWrites, 0, "pending color does not rewrite font")
-    plateFrame.SNPApplyingArtwork = true
+    plateFrame.RPSNApplyingArtwork = true
     name:SetVertexColor(0.2, 0.3, 0.4, 1)
-    plateFrame.SNPApplyingArtwork = nil
+    plateFrame.RPSNApplyingArtwork = nil
     ns.NameplateText.RepairPendingNameAppearance(plateFrame)
     equal(name.vr, 1, "guarded native vertex tint repaired")
     equal(name.r, expected.r, "guarded vertex repair finishes with intended grey")
-    plateFrame.SNPApplyingStyle = true
+    plateFrame.RPSNApplyingStyle = true
     name:SetVertexColor(1, 1, 1, 1)
     name:SetTextColor(expected.r, expected.g, expected.b, 1)
-    plateFrame.SNPApplyingStyle = nil
+    plateFrame.RPSNApplyingStyle = nil
     local repairCalls = 0
     local colorSetter = name.SetTextColor
     name.SetTextColor = function(self, ...) repairCalls = repairCalls + 1; return colorSetter(self, ...) end
     ns.NameplateText.RepairPendingNameAppearance(plateFrame)
     equal(repairCalls, 0, "converged own color writes need no follow-up setter")
     name.SetTextColor = colorSetter
-    assert(not plateFrame.SNPNameColorPending, "pending color flag cleared")
+    assert(not plateFrame.RPSNNameColorPending, "pending color flag cleared")
     -- A real selective visibility repair triggers a native callback after its
     -- earlier color write. The completed operation must still converge.
     local shownSetter = name.SetShown
@@ -2366,24 +2366,24 @@ do
 
     name:SetAlpha(0.2)
     equal(name.alpha, 1, "above-bar native name immediately restores opacity")
-    plateFrame.SNPApplyingStyle = true
+    plateFrame.RPSNApplyingStyle = true
     name:SetAlpha(0.2)
-    assert(plateFrame.SNPNameAlphaPending, "guarded native alpha retained")
-    plateFrame.SNPApplyingStyle = nil
+    assert(plateFrame.RPSNNameAlphaPending, "guarded native alpha retained")
+    plateFrame.RPSNApplyingStyle = nil
     ns.NameplateText.RepairPendingNameAppearance(plateFrame)
     equal(name.alpha, 1, "guarded alpha repaired after style")
-    plateFrame.SNPApplyingArtwork = true
+    plateFrame.RPSNApplyingArtwork = true
     name:SetAlpha(1)
-    plateFrame.SNPApplyingArtwork = nil
+    plateFrame.RPSNApplyingArtwork = nil
     local alphaSetter, alphaCalls = name.SetAlpha, 0
     name.SetAlpha = function(self, ...) alphaCalls = alphaCalls + 1; return alphaSetter(self, ...) end
     ns.NameplateText.RepairPendingNameAppearance(plateFrame)
     equal(alphaCalls, 0, "converged own opacity needs no extra write")
     name.SetAlpha = alphaSetter
-    assert(not plateFrame.SNPNameAlphaPending, "pending alpha cleared")
-    plateFrame.SNPRestoring = true; name:SetAlpha(0.3)
+    assert(not plateFrame.RPSNNameAlphaPending, "pending alpha cleared")
+    plateFrame.RPSNRestoring = true; name:SetAlpha(0.3)
     equal(name.alpha, 0.3, "restoration retains native opacity")
-    plateFrame.SNPRestoring = nil
+    plateFrame.RPSNRestoring = nil
     stylingEnabled = false; name:SetAlpha(0.4)
     equal(name.alpha, 0.4, "disable retains native opacity")
     stylingEnabled = true
@@ -2400,7 +2400,7 @@ do
         and not report:find("Bar artwork:", 1, true), "setter repair avoids broad work")
     assert(report:find("Name appearance writes: SetFontObject =", 1, true))
     assert(report:find("Name appearance deferred: color repair =", 1, true))
-    assert(maximum <= 3 and not plateFrame.SNPRepairingNameAppearance, "reentry guard released")
+    assert(maximum <= 3 and not plateFrame.RPSNRepairingNameAppearance, "reentry guard released")
 
     -- A semantically identical native GetFont result causes no repeated repair.
     local getter = name.GetFont
@@ -2414,9 +2414,9 @@ do
     name.GetFont = getter
 
     -- Restoration/disabled/recycled/inaccessible names retain native control.
-    plateFrame.SNPRestoring = true; name:SetTextColor(1, 1, 1)
+    plateFrame.RPSNRestoring = true; name:SetTextColor(1, 1, 1)
     equal(name.r, 1, "restoration bypasses appearance repair")
-    plateFrame.SNPRestoring = nil
+    plateFrame.RPSNRestoring = nil
     stylingEnabled = false; name:SetTextColor(0.8, 0.8, 0.8)
     equal(name.r, 0.8, "disabled styling bypasses appearance repair")
     stylingEnabled = true
@@ -2434,13 +2434,13 @@ do
     local failure = {}
     name.SetTextColor = function() error(failure) end
     local ok, err = pcall(callbacks.SetFontObject)
-    assert(not ok and err == failure and not plateFrame.SNPRepairingNameAppearance, "failed setter releases guard")
+    assert(not ok and err == failure and not plateFrame.RPSNRepairingNameAppearance, "failed setter releases guard")
     name.SetTextColor = setColor
     -- Model a color setter that also overwrites opacity. Appearance hooks
     -- must finish with native alpha zero while the addon inside label is shown.
     showBar, appearance.namePlacement = true, "INSIDE"
     ns.RefreshAll()
-    expected = plateFrame.SNPNameStyle
+    expected = plateFrame.RPSNNameStyle
     assert(expected.inside, "inside-name fixture")
     local vertexSetter = name.SetVertexColor
     name.SetVertexColor = function(self, ...)
@@ -2450,11 +2450,11 @@ do
     name:SetVertexColor(0.2, 0.3, 0.4, 1)
     equal(name.alpha, 0, "appearance color repair finishes by concealing native inside name")
     equal(name.r, expected.r, "inside native color still restored")
-    equal(plateFrame.SNPInsideName.shown, true, "addon inside label remains shown")
+    equal(plateFrame.RPSNInsideName.shown, true, "addon inside label remains shown")
     name:SetAlpha(1)
     equal(name.alpha, 0, "direct native opacity cannot expose duplicate inside name")
-    plateFrame.SNPApplyingArtwork = true; name:SetAlpha(1)
-    plateFrame.SNPApplyingArtwork = nil
+    plateFrame.RPSNApplyingArtwork = true; name:SetAlpha(1)
+    plateFrame.RPSNApplyingArtwork = nil
     ns.NameplateText.RepairPendingNameAppearance(plateFrame)
     equal(name.alpha, 0, "guarded inside opacity repaired")
     name.SetVertexColor = vertexSetter
@@ -2463,7 +2463,7 @@ do
     UnitGUID = function() return "Creature-Appearance" end
     UnitNameplateShowsWidgetsOnly = function() return true end
     ns.RefreshAll()
-    assert(plateFrame.SNPNameStyle.suppressed)
+    assert(plateFrame.RPSNNameStyle.suppressed)
     name:SetAlpha(1)
     equal(name.alpha, 0, "widget-only cached presentation immediately repairs opacity")
     UnitNameplateShowsWidgetsOnly = function() return false end
@@ -2616,11 +2616,11 @@ do
             ns.Profiler.Command("stop"); ns.Profiler.Command("report"); print = savedPrint
             assert(not table.concat(lines, "\n"):find("Full styling:", 1, true),
                 "initial and late handlers reuse current presentation")
-            NativeAnchors(); frame.SNPApplyingStyle = true; geometryHook()
-            assert(frame.SNPGeometryPending, "nested native anchor update remains pending")
-            frame.SNPApplyingStyle = nil
+            NativeAnchors(); frame.RPSNApplyingStyle = true; geometryHook()
+            assert(frame.RPSNGeometryPending, "nested native anchor update remains pending")
+            frame.RPSNApplyingStyle = nil
             ns.NameplatePresentation.InitializeOrRefresh(frame, context, "late plate")
-            assert(not frame.SNPGeometryPending, "focused pass drains pending geometry")
+            assert(not frame.RPSNGeometryPending, "focused pass drains pending geometry")
             equal(bar:GetWidth(), 168, "pending native geometry restored")
             NativeAnchors()
             local drift, reason, plan = ns.NameplateText.CachedNameHasDrifted(frame, context, cap.InspectFrame(frame, context))
@@ -2713,12 +2713,12 @@ do
     report = Measure(late)
     assert(not report:find("Full styling:", 1, true), "late callback refreshes data without full styling")
     events.scripts.OnEvent(events, "NAME_PLATE_UNIT_REMOVED", "nameplate11")
-    frame.SNPNameStyle = nil
+    frame.RPSNNameStyle = nil
     events.scripts.OnEvent(events, "NAME_PLATE_UNIT_ADDED", "nameplate11")
     report = Measure(late)
     assert(not report:find("Data update:", 1, true) and not report:find("Full styling:", 1, true),
         "old late callback cannot refresh a recycled token")
-    frame.SNPNameStyle = nil
+    frame.RPSNNameStyle = nil
     report = Measure(function() ns.NameplatePresentation.InitializeOrRefresh(frame, ns.WorldContext.Get(), "late plate") end)
     assert(report:find("Full styling: 1 calls;", 1, true), "missing cache still initializes fully")
     C_NamePlate.GetNamePlateForUnit = originalGetter
@@ -2737,7 +2737,7 @@ do
     unit = {reaction = 3}; UnitGUID = function() return "Creature-Visibility" end
     local context, cap, text = ns.WorldContext.Get(), ns.PresentationCapabilities, ns.NameplateText
     ns.NameplatePresentation.ApplySimpleStyle(frame, context)
-    local inside = frame.SNPInsideName
+    local inside = frame.RPSNInsideName
     bar.shown, container.shown, inside.shown = false, false, false
     local drift, reason, plan = text.CachedNameHasDrifted(frame, context, cap.InspectFrame(frame, context))
     assert(drift and reason == "bar visibility" and not plan.full and plan.barShown and plan.containerShown
@@ -2858,7 +2858,7 @@ do
         if not ok then assert(err == failure, "global retry retains original error"); failed = true; break end
     end
     assert(failed and scheduler.Has("global refresh", failedPlate), "failed global job remains queued")
-    assert(not failedPlate.UnitFrame.SNPApplyingStyle, "failed global write releases style guard")
+    assert(not failedPlate.UnitFrame.RPSNApplyingStyle, "failed global write releases style guard")
     failedPlate.UnitFrame.name.SetFont = setter
     events.scripts.OnUpdate(events, 0.25); Settle()
     equal(failedPlate.UnitFrame.name.size, 29, "failed global job retries its original work")
@@ -2902,7 +2902,7 @@ do
         if resetAlpha then frame.name.alpha = 1 end
     end
     ns.NameplatePresentation.ApplySimpleStyle(frame)
-    local name, expected, text, cap, context = frame.name, frame.SNPNameStyle,
+    local name, expected, text, cap, context = frame.name, frame.RPSNNameStyle,
         ns.NameplateText, ns.PresentationCapabilities, ns.WorldContext.Get()
     assert(expected.inside)
     equal(name.r, 153 / 255, "full style establishes dim native appearance")
@@ -2947,9 +2947,9 @@ do
     assessment = cap.InspectFrame(frame, context)
     drifted, _, plan = text.CachedNameHasDrifted(frame, context, assessment)
     assert(drifted and plan.color)
-    frame.SNPArtworkPending = true
+    frame.RPSNArtworkPending = true
     assert(text.RepairCachedName(frame, context, assessment, plan))
-    assert(not frame.SNPArtworkPending, "selective repair drains pending artwork")
+    assert(not frame.RPSNArtworkPending, "selective repair drains pending artwork")
     equal(name.r, expected.r, "pending artwork cannot undo selective color")
     equal(name.alpha, 0, "pending artwork cannot undo selective alpha")
     assert(not text.CachedNameHasDrifted(frame, context, cap.InspectFrame(frame, context)), "combined repair converges")
@@ -2966,21 +2966,21 @@ do
     expected.unknownReads = nil
     name.r, name.g, name.b, name.alpha = 1, 1, 1, 1
     stylingEnabled = false; text.FinishCachedAppearance(frame, context); stylingEnabled = true
-    frame.SNPRestoring = true; text.FinishCachedAppearance(frame, context); frame.SNPRestoring = nil
+    frame.RPSNRestoring = true; text.FinishCachedAppearance(frame, context); frame.RPSNRestoring = nil
     name.IsForbidden = function() return true end; text.FinishCachedAppearance(frame, context); name.IsForbidden = nil
     UnitGUID = function() return "Creature-Recycled" end; text.FinishCachedAppearance(frame, context)
     UnitGUID = function() return "Creature-Finalization" end
-    local revision = frame.SNPPresentation.contextRevision
-    frame.SNPPresentation.contextRevision = -1; text.FinishCachedAppearance(frame, context)
-    frame.SNPPresentation.contextRevision = revision
+    local revision = frame.RPSNPresentation.contextRevision
+    frame.RPSNPresentation.contextRevision = -1; text.FinishCachedAppearance(frame, context)
+    frame.RPSNPresentation.contextRevision = revision
     equal(colorWrites, colors, "invalid finalization performs no color writes")
     equal(alphaWrites, alphas, "invalid finalization performs no alpha writes")
     -- A native write failure releases the bounded finalization/appearance guards.
     local failure = {}
     name.SetTextColor = function() error(failure) end
     local ok, err = pcall(text.FinishCachedAppearance, frame, context)
-    assert(not ok and err == failure and not frame.SNPFinishingNameAppearance
-        and not frame.SNPRepairingNameAppearance, "failed finalization releases guards and preserves error")
+    assert(not ok and err == failure and not frame.RPSNFinishingNameAppearance
+        and not frame.RPSNRepairingNameAppearance, "failed finalization releases guards and preserves error")
     name.SetTextColor = colorSetter
     text.FinishCachedAppearance(frame, context)
     equal(name.r, expected.r, "failed finalization can recover")
@@ -3003,19 +3003,19 @@ do
     local context = ns.WorldContext.Get()
     local cap, text = ns.PresentationCapabilities, ns.NameplateText
     ns.NameplatePresentation.ApplySimpleStyle(frame, context, "opacity regression")
-    assert(frame.SNPNameStyle.inside, "opacity fixture uses inside name")
+    assert(frame.RPSNNameStyle.inside, "opacity fixture uses inside name")
     equal(frame.healthBar.alpha, 1, "initial transparent bar repaired")
     equal(frame.HealthBarsContainer.alpha, 1, "initial transparent container repaired")
     equal(frame.alpha, 0.7, "whole-unit fade remains native")
     -- Raw assignments simulate native changes that bypass Lua setter hooks.
-    frame.healthBar.alpha, frame.HealthBarsContainer.alpha, frame.SNPInsideName.alpha = 0, 0, 0
+    frame.healthBar.alpha, frame.HealthBarsContainer.alpha, frame.RPSNInsideName.alpha = 0, 0, 0
     local assessment = cap.InspectFrame(frame, context)
     local drifted, _, plan = text.CachedNameHasDrifted(frame, context, assessment)
     assert(drifted and plan.barAlpha == 1 and plan.containerAlpha == 1 and plan.insideAlpha == 1)
     assert(text.RepairCachedName(frame, context, assessment, plan))
     equal(frame.healthBar.alpha, 1, "untargeted bar opacity recovered")
     equal(frame.HealthBarsContainer.alpha, 1, "untargeted ancestor opacity recovered")
-    equal(frame.SNPInsideName.alpha, 1, "untargeted inside name opacity recovered")
+    equal(frame.RPSNInsideName.alpha, 1, "untargeted inside name opacity recovered")
     assert(not text.CachedNameHasDrifted(frame, context, cap.InspectFrame(frame, context)), "opacity repair converges")
     -- Explicit alpha setters get immediate recovery as well.
     frame.HealthBarsContainer.alpha = 0
@@ -3028,7 +3028,7 @@ do
     assert(ns.NameplateRestoration.Request(frame, context))
     equal(frame.healthBar.alpha, 0.4, "native bar opacity restored")
     equal(frame.HealthBarsContainer.alpha, 0.6, "native container opacity restored")
-    equal(frame.SNPInsideName.shown, false, "replacement hidden on restoration")
+    equal(frame.RPSNInsideName.shown, false, "replacement hidden on restoration")
 end
 
 -- Nearby diagnostics must preserve a vanished untargeted plate: no direct
@@ -3036,8 +3036,8 @@ end
 do
     local base, frame, container, bar, inside = Region(), Region(), Region(), Region(), Region()
     base.UnitFrame, frame.unit = frame, "nameplate1"
-    frame.name, frame.HealthBarsContainer, frame.healthBar, frame.SNPInsideName = Region(), container, bar, inside
-    frame.SNPState, frame.SNPNameStyle = "hostile", {inside = true}
+    frame.name, frame.HealthBarsContainer, frame.healthBar, frame.RPSNInsideName = Region(), container, bar, inside
+    frame.RPSNState, frame.RPSNNameStyle = "hostile", {inside = true}
     frame.alpha = 0
     function inside:GetParent() return bar end
     function bar:GetParent() return container end
@@ -3104,9 +3104,9 @@ do
     ns.NameplatePresentation.ApplySimpleStyle(frame, context)
     equal(bar.width, 140, "height-only anchor release preserves bar width")
     equal(container.width, 140, "height-only anchor release preserves container width")
-    equal(frame.SNPNameStyle.barWidth, 140, "100% width participates in reconciliation")
-    equal(frame.SNPNameStyle.containerWidth, 140, "100% container participates in reconciliation")
-    equal(frame.SNPInsideName.shown, true, "inside name survives initial styling")
+    equal(frame.RPSNNameStyle.barWidth, 140, "100% width participates in reconciliation")
+    equal(frame.RPSNNameStyle.containerWidth, 140, "100% container participates in reconciliation")
+    equal(frame.RPSNInsideName.shown, true, "inside name survives initial styling")
     bar.width, container.width = 0, 0
     local assessment = cap.InspectFrame(frame, context)
     local drifted, _, plan = text.CachedNameHasDrifted(frame, context, assessment)

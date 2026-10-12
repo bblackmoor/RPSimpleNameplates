@@ -86,6 +86,6 @@ UpdateAddOnMemoryUsage = function() error("unavailable") end
 output = {}; p.Command("start"); parent(); p.Command("stop"); p.Command("report")
 Contains("Addon memory readings unavailable")
 Contains("Parent: 1 calls")
-p.Command("invalid"); Contains("/snp perf start | stop | report")
+p.Command("invalid"); Contains("/rpsn perf start | stop | report")
 print = originalPrint
 print("Profiler smoke: passed")

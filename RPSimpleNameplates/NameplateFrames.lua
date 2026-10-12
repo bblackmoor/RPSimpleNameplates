@@ -122,8 +122,8 @@ local function PrepareBarSize(frame, region, context)
     local width = ns.AccessibleNumber(Capabilities.ReadRegion(region, "GetWidth", context))
     if not width or width <= 0 then return AnchorPreparationResult(false, "width unavailable") end
     points.width = width
-    frame.SNPOriginalSizeAnchors = frame.SNPOriginalSizeAnchors or {}
-    if not frame.SNPOriginalSizeAnchors[region] then frame.SNPOriginalSizeAnchors[region] = points end
+    frame.RPSNOriginalSizeAnchors = frame.RPSNOriginalSizeAnchors or {}
+    if not frame.RPSNOriginalSizeAnchors[region] then frame.RPSNOriginalSizeAnchors[region] = points end
     region:ClearAllPoints()
     if points.pixelPoint then
         points.pixelPoint(region, Center(first[1]), first[2], Center(first[3]), (first[4] + last[4]) / 2, first[5])
@@ -136,7 +136,7 @@ local function PrepareBarSize(frame, region, context)
 end
 
 local function RestoreSizeAnchors(frame, context)
-    for region, points in pairs(frame.SNPOriginalSizeAnchors or {}) do
+    for region, points in pairs(frame.RPSNOriginalSizeAnchors or {}) do
         if Capabilities.ObjectStatus(region, context) ~= "accessible" then
             error("Bar anchor restoration is temporarily inaccessible")
         end
@@ -149,20 +149,20 @@ local function RestoreSizeAnchors(frame, context)
             else region:SetPoint((unpack or table.unpack)(point)) end
         end
     end
-    frame.SNPOriginalSizeAnchors = nil
+    frame.RPSNOriginalSizeAnchors = nil
 end
 
 local function RestoreBarWidth(frame, assessment)
-    local bar = frame.SNPOriginalHealthBar or assessment.healthBar
-    local container = frame.SNPOriginalHealthBarsContainer or frame.HealthBarsContainer
-    if bar and frame.SNPOriginalBarWidth then
-        bar:SetWidth(frame.SNPOriginalBarWidth)
+    local bar = frame.RPSNOriginalHealthBar or assessment.healthBar
+    local container = frame.RPSNOriginalHealthBarsContainer or frame.HealthBarsContainer
+    if bar and frame.RPSNOriginalBarWidth then
+        bar:SetWidth(frame.RPSNOriginalBarWidth)
     end
-    if container and frame.SNPOriginalContainerWidth then
-        container:SetWidth(frame.SNPOriginalContainerWidth)
+    if container and frame.RPSNOriginalContainerWidth then
+        container:SetWidth(frame.RPSNOriginalContainerWidth)
     end
-    frame.SNPOriginalBarWidth, frame.SNPOriginalContainerWidth = nil, nil
-    frame.SNPBarWidth, frame.SNPContainerWidth = nil, nil
+    frame.RPSNOriginalBarWidth, frame.RPSNOriginalContainerWidth = nil, nil
+    frame.RPSNBarWidth, frame.RPSNContainerWidth = nil, nil
 end
 
 local function ApplyBarWidth(frame, assessment, context)
@@ -173,8 +173,8 @@ local function ApplyBarWidth(frame, assessment, context)
         return
     end
     for _, item in ipairs({
-        {assessment.healthBar, "SNPOriginalBarWidth", "SNPBarWidth"},
-        {frame.HealthBarsContainer, "SNPOriginalContainerWidth", "SNPContainerWidth"},
+        {assessment.healthBar, "RPSNOriginalBarWidth", "RPSNBarWidth"},
+        {frame.HealthBarsContainer, "RPSNOriginalContainerWidth", "RPSNContainerWidth"},
     }) do
         local region, originalKey, expectedKey = item[1], item[2], item[3]
         if region and not frame[originalKey] then
@@ -205,8 +205,8 @@ end
 
 local function OriginalArtwork(frame, region, context)
     if Capabilities.ObjectStatus(region, context) ~= "accessible" then return nil end
-    local originals = frame.SNPOriginalArtwork or {}
-    frame.SNPOriginalArtwork = originals
+    local originals = frame.RPSNOriginalArtwork or {}
+    frame.RPSNOriginalArtwork = originals
     local original = originals[region]
     if not original then
         original = {}
@@ -304,15 +304,15 @@ end
 local function HealthTextLayoutState(frame, bar, context)
     local labels, signature = {}, ""
     local threat
-    if bar and frame.SNPThreatTextBar == bar
-        and frame.SNPThreatStatus == "displayed scaled percentage" then
-        threat = frame.SNPThreatText
+    if bar and frame.RPSNThreatTextBar == bar
+        and frame.RPSNThreatStatus == "displayed scaled percentage" then
+        threat = frame.RPSNThreatText
     end
     signature = threat and "T" or "-"
     for _, key in ipairs({"LeftText", "RightText", "Text"}) do
         local region = Capabilities.SafeField(bar, key, context)
         if Capabilities.ObjectStatus(region, context) ~= "accessible" then region = nil end
-        local original = frame.SNPOriginalArtwork and frame.SNPOriginalArtwork[region]
+        local original = frame.RPSNOriginalArtwork and frame.RPSNOriginalArtwork[region]
         local shown = ns.AccessibleBoolean(Capabilities.ReadRegion(region, "IsShown", context))
         -- Preserve space for unknown visibility; do not inspect restricted text.
         local included = region and original and original.points and shown ~= false
@@ -380,16 +380,16 @@ local function FlattenBar(frame, bar, backgroundKey, context, isCast)
     if isCast then FlattenCastColor(frame, fill, context) end
     -- A saved fill can be replaced even when its current identifier is secret.
     FlattenFill(frame, fill, context, isCast)
-    local background = bar.SNPPlainBackground
+    local background = bar.RPSNPlainBackground
     if not background and type(bar.CreateTexture) == "function" then
         background = bar:CreateTexture(nil, "BACKGROUND", nil, -1)
         background:SetAllPoints(bar)
         background:SetColorTexture(0, 0, 0, 0.4)
-        bar.SNPPlainBackground = background
+        bar.RPSNPlainBackground = background
     end
     if background then
-        frame.SNPPlainBackgrounds = frame.SNPPlainBackgrounds or {}
-        frame.SNPPlainBackgrounds[background] = true
+        frame.RPSNPlainBackgrounds = frame.RPSNPlainBackgrounds or {}
+        frame.RPSNPlainBackgrounds[background] = true
         background:Show()
     end
 end
@@ -414,11 +414,11 @@ end
 
 local function InstallArtworkHooks(frame, bar, context)
     if Capabilities.ObjectStatus(bar, context) ~= "accessible" then return end
-    if bar.SNPArtworkHookOwner == frame then return end
+    if bar.RPSNArtworkHookOwner == frame then return end
     local function Refresh()
-        if frame.SNPRestoring or frame.SNPRestoringArtwork or frame.SNPApplyingArtwork
-            or not frame.SNPOriginalArtwork then return end
-        if frame.SNPApplyingStyle then frame.SNPArtworkPending = true; return end
+        if frame.RPSNRestoring or frame.RPSNRestoringArtwork or frame.RPSNApplyingArtwork
+            or not frame.RPSNOriginalArtwork then return end
+        if frame.RPSNApplyingStyle then frame.RPSNArtworkPending = true; return end
         local current = ns.WorldContext.Get()
         local assessment = Capabilities.InspectFrame(frame, current)
         if assessment.canAccess then ns.NameplateFrames.ApplyBarArtwork(frame, assessment, current) end
@@ -443,7 +443,7 @@ local function InstallArtworkHooks(frame, bar, context)
             end
         end
     end
-    bar.SNPArtworkHookOwner = frame
+    bar.RPSNArtworkHookOwner = frame
 end
 
 local function ApplyArtwork(frame, assessment, context)
@@ -456,8 +456,8 @@ local function ApplyArtwork(frame, assessment, context)
             or Capabilities.ReadRegion(healthBar, "GetStatusBarTexture", context)
         ns.HealthGradient.Apply(healthBar, fill, context)
         if healthBar then
-            frame.SNPGradientBars = frame.SNPGradientBars or {}
-            frame.SNPGradientBars[healthBar] = true
+            frame.RPSNGradientBars = frame.RPSNGradientBars or {}
+            frame.RPSNGradientBars[healthBar] = true
         end
     end
     for _, key in ipairs({"Text", "RightText", "LeftText"}) do
@@ -482,17 +482,17 @@ local function ApplyArtwork(frame, assessment, context)
         StyleNativeTextOutline(frame, Capabilities.SafeField(castBar, key, context), context)
     end
     LayoutHealthText(frame, healthBar, context)
-    frame.SNPArtworkPending = nil
+    frame.RPSNArtworkPending = nil
 end
 
 -- Artwork hooks can also fire while a bar or its labels are being changed.
 local function ApplyBarArtwork(frame, assessment, context)
-    if frame.SNPRestoring or frame.SNPApplyingArtwork then return end
-    frame.SNPApplyingArtwork = true
+    if frame.RPSNRestoring or frame.RPSNApplyingArtwork then return end
+    frame.RPSNApplyingArtwork = true
     local ok, err = pcall(ApplyArtwork, frame, assessment, context)
-    frame.SNPApplyingArtwork = nil
+    frame.RPSNApplyingArtwork = nil
     if not ok then error(err, 0) end
-    if not frame.SNPApplyingStyle and ns.NameplateText then
+    if not frame.RPSNApplyingStyle and ns.NameplateText then
         if ns.NameplatePresentation then ns.NameplatePresentation.RepairPendingGeometry(frame) end
         ns.NameplateText.RepairPendingNameAppearance(frame)
         ns.NameplateText.FinishCachedAppearance(frame, context)
@@ -501,7 +501,7 @@ end
 
 local unpackValues = unpack or table.unpack
 local function RestoreArtwork(frame, context)
-    for region, original in pairs(frame.SNPOriginalArtwork or {}) do
+    for region, original in pairs(frame.RPSNOriginalArtwork or {}) do
         if Capabilities.ObjectStatus(region, context) ~= "accessible" then
             error("Bar artwork restoration is temporarily inaccessible")
         end
@@ -524,27 +524,27 @@ local function RestoreArtwork(frame, context)
             if original.shadowOffset then region:SetShadowOffset(unpackValues(original.shadowOffset)) end
         end
     end
-    for region in pairs(frame.SNPPlainBackgrounds or {}) do
+    for region in pairs(frame.RPSNPlainBackgrounds or {}) do
         if Capabilities.ObjectStatus(region, context) ~= "accessible" then
             error("Plain bar background restoration is temporarily inaccessible")
         end
         region:Hide()
     end
-    for bar in pairs(frame.SNPGradientBars or {}) do
+    for bar in pairs(frame.RPSNGradientBars or {}) do
         if Capabilities.ObjectStatus(bar, context) ~= "accessible" then
             error("Gradient restoration is temporarily inaccessible")
         end
         ns.HealthGradient.Hide(bar)
     end
-    frame.SNPGradientBars = nil
-    frame.SNPArtworkPending = nil
-    frame.SNPOriginalArtwork, frame.SNPPlainBackgrounds = nil, nil
+    frame.RPSNGradientBars = nil
+    frame.RPSNArtworkPending = nil
+    frame.RPSNOriginalArtwork, frame.RPSNPlainBackgrounds = nil, nil
 end
 
 local function RestoreBarArtwork(frame, context)
-    frame.SNPRestoringArtwork = true
+    frame.RPSNRestoringArtwork = true
     local ok, err = pcall(RestoreArtwork, frame, context)
-    frame.SNPRestoringArtwork = nil
+    frame.RPSNRestoringArtwork = nil
     if not ok then error(err, 0) end
 end
 

@@ -46,7 +46,7 @@ On your first login, the addon may ask to enable the nameplate settings it needs
 
 ## Using RP Simple Nameplates
 
-Type `/snp` to open settings, or find **RP Simple Nameplates** under **Options → AddOns**.
+Type `/rpsn` to open settings, or find **RP Simple Nameplates** under **Options → AddOns**.
 
 | Page | What you can change |
 | --- | --- |
@@ -102,12 +102,12 @@ Use one nameplate addon at a time. If you see competing colors or duplicate disp
 
 | Command | Action |
 | --- | --- |
-| `/snp`, `/snp text`, `/snp appearance` | Open Text settings |
-| `/snp profiles` | Open Profiles |
-| `/snp colors` | Open Colors |
-| `/snp highlight` | Open Highlight |
-| `/snp trp3` | Open TRP3 settings |
-| `/snp about` | Open About |
+| `/rpsn`, `/rpsn text`, `/rpsn appearance` | Open Text settings |
+| `/rpsn profiles` | Open Profiles |
+| `/rpsn colors` | Open Colors |
+| `/rpsn highlight` | Open Highlight |
+| `/rpsn trp3` | Open TRP3 settings |
+| `/rpsn about` | Open About |
 
 ## Development
 

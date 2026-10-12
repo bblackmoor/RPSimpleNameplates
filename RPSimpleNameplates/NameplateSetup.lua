@@ -87,7 +87,7 @@ local function Disable()
     ns.SetStylingEnabled(false)
     ns.RestoreManagedNameSettings()
     if ns.RestoreAll then ns.RestoreAll() end
-    print("RP Simple Nameplates styling is disabled. Enable it again using Active in /snp profiles.")
+    print("RP Simple Nameplates styling is disabled. Enable it again using Active in /rpsn profiles.")
 end
 
 local function ShowReview(issues, failure)
@@ -99,19 +99,19 @@ local function ShowReview(issues, failure)
     end
     local text = table.concat(lines, "\n\n")
     if failure then text = failure .. "\n\n" .. text end
-    StaticPopupDialogs.SNP_NAMEPLATE_SETUP = {
+    StaticPopupDialogs.RPSN_NAMEPLATE_SETUP = {
         text = "|cff0cd29fRP Simple Nameplates — Setup|r\n\n%s\n\nChanged WoW settings are restored when styling is disabled.\n\nWoW may still withhold some plates, including opposite-faction players in sanctuary.",
         button1 = "Apply and enable", button2 = "Disable styling",
         OnAccept = function() Apply() end,
         OnCancel = function() Disable() end,
         timeout = 0, whileDead = true, hideOnEscape = false, preferredIndex = 3,
     }
-    StaticPopup_Show("SNP_NAMEPLATE_SETUP", text)
+    StaticPopup_Show("RPSN_NAMEPLATE_SETUP", text)
 end
 
 Restore = function()
     SetPending(false)
-    if StaticPopup_Hide then StaticPopup_Hide("SNP_NAMEPLATE_SETUP") end
+    if StaticPopup_Hide then StaticPopup_Hide("RPSN_NAMEPLATE_SETUP") end
     if InCombat() then deferredAction = "restore"; return end
     deferredAction = nil
     local originals = Originals()

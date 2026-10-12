@@ -15,7 +15,7 @@ Startup checks setting compatibility before normal styling. Events, queued refre
 7. Capture original values and save the selected state/decision. A widget-only decision suppresses actor text and returns.
 8. Apply ordinary bar/indicator visibility, name/title styling, supported health-bar color, threat text, and cast highlighting, in that order.
 
-`RefreshUnit` looks up a supplied plate before this pass; missing frames are queued for later retry. Each periodic plate reconciliation can repair current cached name styling without recollecting/classifying every entity. If cache repair cannot handle drift, it invokes a full styling pass. `/snp debug` separately collects target facts even when no plate exists, explaining why it can report Friendly for an entity that cannot be styled.
+`RefreshUnit` looks up a supplied plate before this pass; missing frames are queued for later retry. Each periodic plate reconciliation can repair current cached name styling without recollecting/classifying every entity. If cache repair cannot handle drift, it invokes a full styling pass. `/rpsn debug` separately collects target facts even when no plate exists, explaining why it can report Friendly for an entity that cannot be styled.
 
 ## Facts and classification
 
@@ -125,7 +125,7 @@ use elapsed time instead of visit counts. See the [performance plan](performance
 
 ## Optional profiling
 
-`Profiler.lua` wraps full styling, fact collection/classification, NPC-title lookup, cached text repair, periodic scheduling/native-list discovery, focused name/health-color repairs, data/name-layout updates, access assessments, bar artwork, name/title styling, health-text layout, drift checks, the per-frame callback and its reconciliation scan. The report also includes full/focused styling and queued-event reasons and reconciliation drift/repair counters. `/snp perf start`, `stop` and `report` control session-only collection; profiling is off by default and changes no refresh cadence or saved values. Rows are inclusive and overlap. See the [profiling guide](profiling.md) for command behavior and memory/timing limits.
+`Profiler.lua` wraps full styling, fact collection/classification, NPC-title lookup, cached text repair, periodic scheduling/native-list discovery, focused name/health-color repairs, data/name-layout updates, access assessments, bar artwork, name/title styling, health-text layout, drift checks, the per-frame callback and its reconciliation scan. The report also includes full/focused styling and queued-event reasons and reconciliation drift/repair counters. `/rpsn perf start`, `stop` and `report` control session-only collection; profiling is off by default and changes no refresh cadence or saved values. Rows are inclusive and overlap. See the [profiling guide](profiling.md) for command behavior and memory/timing limits.
 
 ## Fixed health gradients
 

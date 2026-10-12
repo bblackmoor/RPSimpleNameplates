@@ -23,7 +23,7 @@ local function RetryFrame(frame)
     end
     local context = GetContext()
     if CanAccessFrame(frame, context) then
-        UpdateInterruptibleHighlight(frame, context, frame.SNPPresentation)
+        UpdateInterruptibleHighlight(frame, context, frame.RPSNPresentation)
         return
     end
     return 0.25
@@ -295,12 +295,12 @@ local function InstallRegionHook(highlight, region, registry)
             DeferFrame(highlight.owner)
             return
         end
-        if highlight.owner.SNPInterruptibleHighlight ~= highlight then overlay:Hide(); return end
+        if highlight.owner.RPSNInterruptibleHighlight ~= highlight then overlay:Hide(); return end
         local bar = highlight.castBar
         local icon = Capabilities.SafeField(bar, "Icon", context)
         local shield = Capabilities.SafeField(bar, "BorderShield", context)
         if region ~= bar and region ~= icon and region ~= shield then return end
-        RefreshHighlight(highlight, context, highlight.owner.SNPPresentation)
+        RefreshHighlight(highlight, context, highlight.owner.RPSNPresentation)
     end
     local ok = true
     for _, method in ipairs({"SetShown", "Show", "Hide"}) do
@@ -323,9 +323,9 @@ local function InstallInterruptibleHighlightHooks(highlight)
     if not highlight.barVisibilityHooked then
         local function Changed()
             local context = GetContext()
-            if highlight.owner.SNPInterruptibleHighlight ~= highlight then highlight.frame:Hide(); return end
+            if highlight.owner.RPSNInterruptibleHighlight ~= highlight then highlight.frame:Hide(); return end
             if not CanAccessFrame(highlight.owner, context) then DeferFrame(highlight.owner); return end
-            RefreshHighlight(highlight, context, highlight.owner.SNPPresentation)
+            RefreshHighlight(highlight, context, highlight.owner.RPSNPresentation)
         end
         local ok = pcall(function()
             bar:HookScript("OnShow", Changed)
@@ -396,14 +396,14 @@ local function EnsureInterruptibleHighlight(frame, context)
     if not CanAccessFrame(frame, context) then return end
     local castBar = GetCastBar(frame, context)
     if not castBar then return nil end
-    local existing = frame.SNPInterruptibleHighlight
+    local existing = frame.RPSNInterruptibleHighlight
     if existing and existing.castBar == castBar then
         InstallInterruptibleHighlightHooks(existing)
         return existing
     end
     if existing and existing.frame then existing.frame:Hide() end
     local highlight = CreateHighlight(castBar, frame, GetHealthBar(frame, context))
-    frame.SNPInterruptibleHighlight = highlight
+    frame.RPSNInterruptibleHighlight = highlight
     InstallInterruptibleHighlightHooks(highlight)
     return highlight
 end
@@ -413,10 +413,10 @@ UpdateInterruptibleHighlight = function(frame, context, decision)
     if not GetStylingEnabled() or not decision or not decision.showCastBar
         or not GetInterruptibleHighlightEnabled() then
         CancelRetry(frame)
-        if CanAccessFrame(frame, context) and frame.SNPInterruptibleHighlight then
-            frame.SNPInterruptibleHighlight.interruptibleState = false
-            frame.SNPInterruptibleHighlight.interruptibleSource = "disabled"
-            frame.SNPInterruptibleHighlight.frame:Hide()
+        if CanAccessFrame(frame, context) and frame.RPSNInterruptibleHighlight then
+            frame.RPSNInterruptibleHighlight.interruptibleState = false
+            frame.RPSNInterruptibleHighlight.interruptibleSource = "disabled"
+            frame.RPSNInterruptibleHighlight.frame:Hide()
         end
         return
     end
@@ -456,14 +456,14 @@ ns.CastHighlight = {
     RecordSpellcastEvent = RecordSpellcastEvent,
     ClearUnit = ClearUnit,
     UpdatePreview = function(bar, effect)
-        if not bar.SNPCastPreview then bar.SNPCastPreview = CreateHighlight(bar) end
-        bar.SNPCastPreview.previewEffect = effect
-        bar.SNPCastPreview.previewDisabled = not GetInterruptibleHighlightEnabled()
-        bar.SNPCastPreview.frame:Show()
-        ApplyRenderer(bar.SNPCastPreview)
+        if not bar.RPSNCastPreview then bar.RPSNCastPreview = CreateHighlight(bar) end
+        bar.RPSNCastPreview.previewEffect = effect
+        bar.RPSNCastPreview.previewDisabled = not GetInterruptibleHighlightEnabled()
+        bar.RPSNCastPreview.frame:Show()
+        ApplyRenderer(bar.RPSNCastPreview)
     end,
     StopPreview = function(bar)
-        if bar and bar.SNPCastPreview then bar.SNPCastPreview.frame:Hide() end
+        if bar and bar.RPSNCastPreview then bar.RPSNCastPreview.frame:Hide() end
     end,
 }
 

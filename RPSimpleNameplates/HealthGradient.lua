@@ -13,9 +13,9 @@ local function Enabled()
 end
 
 local function Hide(bar)
-    if bar and bar.SNPHealthGradient then
-        bar.SNPHealthGradient:Hide()
-        bar.SNPHealthGradientTail:Hide()
+    if bar and bar.RPSNHealthGradient then
+        bar.RPSNHealthGradient:Hide()
+        bar.RPSNHealthGradientTail:Hide()
     end
 end
 
@@ -28,7 +28,7 @@ local function Apply(bar, fill, context)
     if cap.ObjectStatus(fill, context) ~= "accessible" then Hide(bar); return end
     local width = ns.AccessibleNumber(cap.ReadRegion(bar, "GetWidth", context))
     if not width or width <= 0 then Hide(bar); return end
-    if not bar.SNPHealthGradient then
+    if not bar.RPSNHealthGradient then
         -- Native fill anchors resolve in the renderer even with secret health.
         -- Fade to clear at 95% width; the final 5% stays clear. Only the mask shrinks.
         local mask = bar:CreateMaskTexture(nil, "ARTWORK")
@@ -47,24 +47,24 @@ local function Apply(bar, fill, context)
         tail:AddMaskTexture(mask)
         tail:SetPoint("TOPLEFT", tint, "TOPRIGHT")
         tail:SetPoint("BOTTOMLEFT", tint, "BOTTOMRIGHT")
-        bar.SNPHealthGradient, bar.SNPHealthGradientMask = tint, mask
-        bar.SNPHealthGradientTail = tail
+        bar.RPSNHealthGradient, bar.RPSNHealthGradientMask = tint, mask
+        bar.RPSNHealthGradientTail = tail
     end
-    bar.SNPHealthGradientMask:ClearAllPoints()
-    bar.SNPHealthGradientMask:SetAllPoints(fill)
-    bar.SNPHealthGradient:SetWidth(width * SHADE_KNEE)
-    bar.SNPHealthGradientTail:SetWidth(width * (1 - SHADE_KNEE))
+    bar.RPSNHealthGradientMask:ClearAllPoints()
+    bar.RPSNHealthGradientMask:SetAllPoints(fill)
+    bar.RPSNHealthGradient:SetWidth(width * SHADE_KNEE)
+    bar.RPSNHealthGradientTail:SetWidth(width * (1 - SHADE_KNEE))
     -- Scale the left endpoint directly; the clear endpoint and fade position
     -- stay fixed. Keep texture opacity full so the slider owns darkness only.
-    if bar.SNPHealthGradientOpacity ~= opacity then
-        bar.SNPHealthGradient:SetGradient("HORIZONTAL", CreateColor(0, 0, 0, SHADE_LEFT_MAX * opacity),
+    if bar.RPSNHealthGradientOpacity ~= opacity then
+        bar.RPSNHealthGradient:SetGradient("HORIZONTAL", CreateColor(0, 0, 0, SHADE_LEFT_MAX * opacity),
             CreateColor(0, 0, 0, SHADE_AT_KNEE))
-        bar.SNPHealthGradientOpacity = opacity
+        bar.RPSNHealthGradientOpacity = opacity
     end
-    bar.SNPHealthGradient:SetAlpha(1)
-    bar.SNPHealthGradientTail:SetAlpha(1)
-    bar.SNPHealthGradient:Show()
-    bar.SNPHealthGradientTail:Show()
+    bar.RPSNHealthGradient:SetAlpha(1)
+    bar.RPSNHealthGradientTail:SetAlpha(1)
+    bar.RPSNHealthGradient:Show()
+    bar.RPSNHealthGradientTail:Show()
 end
 
 ns.HealthGradient = {Enabled = Enabled, Apply = Apply, Hide = Hide}

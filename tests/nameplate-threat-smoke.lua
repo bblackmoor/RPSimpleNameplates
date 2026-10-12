@@ -72,63 +72,63 @@ local function Update(showBar)
     ns.NameplateThreat.UpdateThreatText(frame, "hostile", {}, {showHealthBar = showBar})
 end
 Update(true)
-equal(frame.SNPThreatText.text, "55%", "scaled percentage displayed")
-equal(frame.SNPThreatText.shown, true, "percentage explicitly shown")
-equal(frame.SNPThreatText.drawLevel, 7, "percentage drawn above bar artwork")
-equal(frame.SNPThreatText.r, 1, "threat stays white")
-equal(frame.SNPThreatText.size, 21, "threat matches default name size")
-equal(frame.SNPThreatText.flags, "OUTLINE", "threat has thin outline")
-assert(frame.SNPThreatText.SNPUnderlayers == nil, "threat never creates glyph copies")
+equal(frame.RPSNThreatText.text, "55%", "scaled percentage displayed")
+equal(frame.RPSNThreatText.shown, true, "percentage explicitly shown")
+equal(frame.RPSNThreatText.drawLevel, 7, "percentage drawn above bar artwork")
+equal(frame.RPSNThreatText.r, 1, "threat stays white")
+equal(frame.RPSNThreatText.size, 21, "threat matches default name size")
+equal(frame.RPSNThreatText.flags, "OUTLINE", "threat has thin outline")
+assert(frame.RPSNThreatText.RPSNUnderlayers == nil, "threat never creates glyph copies")
 assert(ns.NameplateThreat.UpdateLayerAlpha == nil, "no health-dependent threat-layer updates")
-equal(frame.SNPThreatText.shadowAlpha, 0, "native threat shadow disabled")
-equal(frame.SNPThreatText.shadowX, 0, "native shadow x cleared")
-equal(frame.SNPThreatText.shadowY, 0, "native shadow y cleared")
-equal(frame.SNPThreatText.font, "Fonts\\ARIALN.TTF", "separate threat font retained")
+equal(frame.RPSNThreatText.shadowAlpha, 0, "native threat shadow disabled")
+equal(frame.RPSNThreatText.shadowX, 0, "native shadow x cleared")
+equal(frame.RPSNThreatText.shadowY, 0, "native shadow y cleared")
+equal(frame.RPSNThreatText.font, "Fonts\\ARIALN.TTF", "separate threat font retained")
 slug = true; Update(true)
-equal(frame.SNPThreatText.flags, "SLUG,OUTLINE", "threat uses outlined Slug")
+equal(frame.RPSNThreatText.flags, "SLUG,OUTLINE", "threat uses outlined Slug")
 slug = false; Update(true)
-equal(frame.SNPThreatText.flags, "OUTLINE", "threat returns to ordinary rendering")
+equal(frame.RPSNThreatText.flags, "OUTLINE", "threat returns to ordinary rendering")
 nameSize = 36
 Update(true)
-equal(frame.SNPThreatText.r, 1, "threat remains white after size change")
-equal(frame.SNPThreatText.size, 36, "threat follows changed name size")
+equal(frame.RPSNThreatText.r, 1, "threat remains white after size change")
+equal(frame.RPSNThreatText.size, 36, "threat follows changed name size")
 scaled = 0
 Update(true)
-equal(frame.SNPThreatText.text, "0%", "readable zero displayed")
+equal(frame.RPSNThreatText.text, "0%", "readable zero displayed")
 scaled = secret
 Update(true)
-assert(rawequal(frame.SNPThreatText.argument, secret), "secret scaled percentage passed directly to display API")
-equal(frame.SNPThreatText.shown, true, "opaque scaled percentage displayed")
-local originalFontSetter = frame.SNPThreatText.SetFont
-frame.SNPThreatText.SetFont = function() error("value-only update must not configure fonts") end
+assert(rawequal(frame.RPSNThreatText.argument, secret), "secret scaled percentage passed directly to display API")
+equal(frame.RPSNThreatText.shown, true, "opaque scaled percentage displayed")
+local originalFontSetter = frame.RPSNThreatText.SetFont
+frame.RPSNThreatText.SetFont = function() error("value-only update must not configure fonts") end
 ns.NameplateThreat.UpdateThreatValue(frame, "hostile", {}, {showHealthBar = true})
-assert(rawequal(frame.SNPThreatText.argument, secret), "focused threat passes opaque percentage to the display sink")
-frame.SNPThreatText.SetFont = originalFontSetter
+assert(rawequal(frame.RPSNThreatText.argument, secret), "focused threat passes opaque percentage to the display sink")
+frame.RPSNThreatText.SetFont = originalFontSetter
 scaled, raw = nil, 255
 Update(true)
-equal(frame.SNPThreatText.text, "", "raw 255 percentage is never used")
-equal(frame.SNPThreatText.shown, false, "raw-only threat is hidden")
+equal(frame.RPSNThreatText.text, "", "raw 255 percentage is never used")
+equal(frame.RPSNThreatText.shown, false, "raw-only threat is hidden")
 raw, scaled = nil, nil
 Update(true)
-equal(frame.SNPThreatText.text, "", "absent threat never fabricated")
-equal(frame.SNPThreatText.shown, false, "absent threat hidden")
+equal(frame.RPSNThreatText.text, "", "absent threat never fabricated")
+equal(frame.RPSNThreatText.shown, false, "absent threat hidden")
 raw, scaled = 255, 100
 enabled = false
 Update(true)
-equal(frame.SNPThreatStatus, "disabled", "disabled preference honored")
+equal(frame.RPSNThreatStatus, "disabled", "disabled preference honored")
 enabled = true
 Update(false)
-equal(frame.SNPThreatText.shown, false, "name-only presentation has no threat label")
-local previousText = frame.SNPThreatText
+equal(frame.RPSNThreatText.shown, false, "name-only presentation has no threat label")
+local previousText = frame.RPSNThreatText
 frame.healthBar = Bar()
 Update(true)
 equal(previousText.shown, false, "old bar label hidden on replacement")
-equal(frame.SNPThreatText.bar, frame.healthBar, "label follows current health bar")
-equal(frame.SNPThreatText.shown, true, "replacement label shown")
+equal(frame.RPSNThreatText.bar, frame.healthBar, "label follows current health bar")
+equal(frame.RPSNThreatText.shown, true, "replacement label shown")
 fail = true
 Update(true)
-equal(frame.SNPThreatStatus, "threat API unavailable", "API failure reported")
-equal(frame.SNPThreatText.shown, false, "failed API clears stale percentage")
+equal(frame.RPSNThreatStatus, "threat API unavailable", "API failure reported")
+equal(frame.RPSNThreatText.shown, false, "failed API clears stale percentage")
 accessible = false
 ns.NameplateThreat.UpdateThreatText({}, "hostile", {}, {showHealthBar = true})
 print("Nameplate threat smoke: passed")

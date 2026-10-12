@@ -117,7 +117,7 @@ ns.NameplateFrames.ApplyBarArtwork(frame, assessment, context)
 for _, key in ipairs({"Text", "RightText", "LeftText"}) do
     assert(health[key].r == 1 and health[key].g == 1 and health[key].b == 1, "bright bar native text white")
     assert(health[key].flags == "OUTLINE", "native health text has thin outline")
-    assert(health[key].shadow[4] == 0 and health[key].SNPUnderlayers == nil, "native health text has no shadow or copies")
+    assert(health[key].shadow[4] == 0 and health[key].RPSNUnderlayers == nil, "native health text has no shadow or copies")
     assert(health[key].vr == 1, "native text tint neutral")
 end
 assert(health.LeftText.points[1][5] == -0.5, "rightmost native health label padding moves down")
@@ -156,7 +156,7 @@ cast.onShow()
 assert(castFill.atlas == nil and castFill.texture == "Interface\\Buttons\\WHITE8X8", "hidden live identifier cannot block flat fill repair")
 castFill.GetAtlas, castFill.GetTexture = getAtlas, getTexture
 assert(health.barTexture.texture == "Interface\\Buttons\\WHITE8X8")
-assert(health.SNPPlainBackground.bar == health and health.SNPPlainBackground.shown)
+assert(health.RPSNPlainBackground.bar == health and health.RPSNPlainBackground.shown)
 castFill:SetAtlas("changed-for-new-cast")
 cast.onShow()
 assert(castFill.atlas == nil, "new casts regain flat artwork")
@@ -186,13 +186,13 @@ ns.NameplateFrames.ApplyBarArtwork(frame, assessment, context)
 assert(writes == 1, "one artwork font write despite callback")
 cast.Text.SetFont = function() error("simulated artwork failure") end
 assert(not pcall(ns.NameplateFrames.ApplyBarArtwork, frame, assessment, context))
-assert(frame.SNPApplyingArtwork == nil, "artwork failure releases guard")
+assert(frame.RPSNApplyingArtwork == nil, "artwork failure releases guard")
 cast.Text.SetFont = setFont
 ns.NameplateFrames.ApplyBarArtwork(frame, assessment, context)
 -- Restoring while a decorated region is inaccessible must retain originals.
 health.bgTexture.IsForbidden = function() return true end
 assert(not pcall(ns.NameplateFrames.RestoreBarArtwork, frame, context))
-assert(frame.SNPOriginalArtwork, "failed restoration keeps backup")
+assert(frame.RPSNOriginalArtwork, "failed restoration keeps backup")
 health.bgTexture.IsForbidden = nil
 ns.NameplateFrames.RestoreBarArtwork(frame, context)
 assert(health.Text.points[1][5] == 0, "native text anchor restored")
@@ -207,7 +207,7 @@ assert(cast.Spark.alpha == 1 and cast.Flash.alpha == 1 and castFill.vr == 1 and 
 assert(health.barTexture.atlas == "native-fill" and health.barTexture.coords[1] == 0.1)
 assert(health.Text.flags == "THICKOUTLINE", "original health outline restored")
 assert(cast.Text.flags == "MONOCHROME" and cast.Text.shadow[4] == 1 and cast.Text.offset[1] == 1)
-assert(not health.SNPPlainBackground.shown and not frame.SNPOriginalArtwork)
+assert(not health.RPSNPlainBackground.shown and not frame.RPSNOriginalArtwork)
 castFill:SetAtlas("restored-native-update")
 cast.onShow()
 assert(castFill.atlas == "restored-native-update", "inactive hooks leave Blizzard alone")

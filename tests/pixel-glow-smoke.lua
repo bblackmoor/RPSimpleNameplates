@@ -84,7 +84,7 @@ local frame = {
     unit = "nameplate1",
     castBar = Region(),
     healthBar = Region(),
-    SNPPresentation = {showCastBar = true},
+    RPSNPresentation = {showCastBar = true},
 }
 frame.castBar.Icon = Region(frame.castBar)
 frame.castBar.BorderShield = Region(frame.castBar)
@@ -94,10 +94,10 @@ frame.castBar.HideIconWhenNotInterruptible = true
 assert(loadfile("RPSimpleNameplates/Profiler.lua"))("RPSimpleNameplates", ns)
 assert(loadfile("RPSimpleNameplates/PeriodicWork.lua"))("RPSimpleNameplates", ns)
 assert(loadfile("RPSimpleNameplates/CastHighlight.lua"))("RPSimpleNameplates", ns)
-local function Update() ns.CastHighlight.UpdateInterruptibleHighlight(frame, {}, frame.SNPPresentation) end
+local function Update() ns.CastHighlight.UpdateInterruptibleHighlight(frame, {}, frame.RPSNPresentation) end
 
 Update()
-local highlight = assert(frame.SNPInterruptibleHighlight, "highlight created")
+local highlight = assert(frame.RPSNInterruptibleHighlight, "highlight created")
 equal(highlight.frame.shown, true, "modern visible icon means interruptible")
 assert(highlight.pulse:IsPlaying(), "pulse starts")
 equal(#highlight.border, 4, "four-edge pulse border")
@@ -205,22 +205,22 @@ frame.castBar:Show()
 assert(highlight.frame.shown, "bar show catches initial visibility transition")
 
 -- Native Show/Hide need not dispatch through SetShown; their method hooks work.
-local direct = {unit = "nameplate2", castBar = Region(), SNPPresentation = {showCastBar = true}}
+local direct = {unit = "nameplate2", castBar = Region(), RPSNPresentation = {showCastBar = true}}
 direct.castBar.Icon = Region(direct.castBar)
 direct.castBar.HideIconWhenNotInterruptible = true
 direct.castBar.Icon.Show = function(self) self.shown = true end
 direct.castBar.Icon.Hide = function(self) self.shown = false end
-ns.CastHighlight.UpdateInterruptibleHighlight(direct, {}, direct.SNPPresentation)
-local directHighlight = direct.SNPInterruptibleHighlight
+ns.CastHighlight.UpdateInterruptibleHighlight(direct, {}, direct.RPSNPresentation)
+local directHighlight = direct.RPSNInterruptibleHighlight
 direct.castBar.Icon:Hide()
 assert(not directHighlight.frame.shown, "direct native Hide repaired")
 direct.castBar.Icon:Show()
 assert(directHighlight.frame.shown, "direct native Show repaired")
 local hooks = direct.castBar.Icon.hookCount
-ns.CastHighlight.UpdateInterruptibleHighlight(direct, {}, direct.SNPPresentation)
+ns.CastHighlight.UpdateInterruptibleHighlight(direct, {}, direct.RPSNPresentation)
 assert(direct.castBar.Icon.hookCount == hooks, "repeated setup does not duplicate hooks")
 direct.castBar.Icon.IsShown = function() return nil end
-ns.CastHighlight.UpdateInterruptibleHighlight(direct, {}, direct.SNPPresentation)
+ns.CastHighlight.UpdateInterruptibleHighlight(direct, {}, direct.RPSNPresentation)
 assert(not directHighlight.frame.shown, "unknown state does not fabricate interruptibility")
 direct.castBar.Icon.IsShown = NativeIsShown
 ns.PeriodicWork.Advance(0.25); ns.PeriodicWork.Run()

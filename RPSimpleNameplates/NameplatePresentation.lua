@@ -43,11 +43,11 @@ local function CaptureSettings(frame)
     for _, key in ipairs(optionalSettings) do
         if ns[key] then settings[key] = ns[key]() end
     end
-    frame.SNPStyleSettings = settings
+    frame.RPSNStyleSettings = settings
 end
 
 local function SettingsAreCurrent(frame)
-    local settings = frame.SNPStyleSettings
+    local settings = frame.RPSNStyleSettings
     if not settings then return false end
     for _, key in ipairs(appearanceKeys) do
         if settings[key] ~= ns.GetAppearanceSetting(key) then return false end
@@ -67,7 +67,7 @@ local function ApplyStyle(frame, context)
     context = context or GetContext()
     local assessment = Cap.InspectFrame(frame, context)
     if not assessment.canAccess then return end
-    if frame.SNPRestoring then return end
+    if frame.RPSNRestoring then return end
     if Restore.IsPending(frame) then
         if not Restore.Request(frame, context) then return end
         assessment = Cap.InspectFrame(frame, context)
@@ -75,14 +75,14 @@ local function ApplyStyle(frame, context)
     end
     local unit = ns.AccessibleValue(frame.unit)
     if type(unit) ~= "string" or not unit:match("^nameplate%d+$") then return end
-    if frame.SNPOriginalUnit and frame.SNPOriginalUnit ~= unit then
+    if frame.RPSNOriginalUnit and frame.RPSNOriginalUnit ~= unit then
         if not Restore.Request(frame, context) then return end
         assessment = Cap.InspectFrame(frame, context)
         if not assessment.canAccess then return end
     end
-    if frame.SNPOriginalVisibility and (frame.SNPOriginalHealthBar ~= assessment.healthBar
-        or frame.SNPOriginalHealthBarsContainer ~= frame.HealthBarsContainer
-        or frame.SNPOriginalName ~= assessment.name) then
+    if frame.RPSNOriginalVisibility and (frame.RPSNOriginalHealthBar ~= assessment.healthBar
+        or frame.RPSNOriginalHealthBarsContainer ~= frame.HealthBarsContainer
+        or frame.RPSNOriginalName ~= assessment.name) then
         -- Release retired regions before capturing the replacement's baseline.
         if not Restore.Request(frame, context) then return end
         assessment = Cap.InspectFrame(frame, context)
@@ -91,7 +91,7 @@ local function ApplyStyle(frame, context)
     local state, _, facts = Classify(unit, context)
     local decision = Resolve(context, facts, state, assessment, ns.GetStylingEnabled(), ns.GetHealthBarEnabled(state))
     if decision.action ~= "style" then Restore.Request(frame, context); return end
-    local previous = frame.SNPPresentation
+    local previous = frame.RPSNPresentation
     if previous and (previous.suppressText == true) ~= (decision.suppressText == true) then
         if not Restore.Request(frame, context) then return end
         assessment = Cap.InspectFrame(frame, context)
@@ -102,8 +102,8 @@ local function ApplyStyle(frame, context)
     Restore.Cancel(frame)
     Restore.Capture(frame, assessment, context)
     CaptureSettings(frame)
-    frame.SNPStyledCastBar = assessment.castBar
-    frame.SNPState, frame.SNPPresentation, frame.SNPEntityFacts = state, decision, facts
+    frame.RPSNStyledCastBar = assessment.castBar
+    frame.RPSNState, frame.RPSNPresentation, frame.RPSNEntityFacts = state, decision, facts
     InstallGeometryHook(frame, context)
     if decision.suppressText then
         Text.StyleName(frame, state, context, decision, assessment)
@@ -127,12 +127,12 @@ local function ApplySimpleStyle(frame, context, reason)
     if not Cap.CanAccessFrame(frame, context) then
         ns.Profiler.Count("Styling outcomes", "inaccessible"); return
     end
-    if frame.SNPRestoring or frame.SNPApplyingStyle or frame.SNPApplyingArtwork then
+    if frame.RPSNRestoring or frame.RPSNApplyingStyle or frame.RPSNApplyingArtwork then
         ns.Profiler.Count("Styling outcomes", "guarded"); return
     end
-    frame.SNPApplyingStyle = true
+    frame.RPSNApplyingStyle = true
     local ok, result = pcall(ApplyStyle, frame, context)
-    frame.SNPApplyingStyle = nil
+    frame.RPSNApplyingStyle = nil
     if not ok then
         ns.Profiler.Count("Styling outcomes", "failed")
         error(result, 0)
@@ -148,24 +148,24 @@ ApplySimpleStyle = ns.Profiler.Wrap("Full styling", ApplySimpleStyle)
 -- Assessments stay operation-local; inaccessible frames retain their pending
 -- work/restoration instead of borrowing a prior access decision.
 local function PresentationIsCurrent(frame, assessment, context)
-    local decision, expected = frame.SNPPresentation, frame.SNPNameStyle
-    if not decision or not expected or not frame.SNPState then return false, "not initialized" end
+    local decision, expected = frame.RPSNPresentation, frame.RPSNNameStyle
+    if not decision or not expected or not frame.RPSNState then return false, "not initialized" end
     if Restore.IsPending(frame) then return false, "restoration pending" end
     if decision.action ~= "style" then return false, "presentation action" end
     if decision.contextRevision ~= context.revision then return false, "context revision" end
-    if frame.SNPOriginalUnit ~= ns.AccessibleValue(frame.unit) then return false, "unit assignment" end
-    if frame.SNPOriginalName ~= assessment.name then return false, "name region replaced" end
-    if frame.SNPOriginalHealthBar ~= assessment.healthBar then return false, "health bar replaced" end
-    if frame.SNPOriginalHealthBarsContainer ~= frame.HealthBarsContainer then return false, "container replaced" end
-    if frame.SNPStyledCastBar ~= assessment.castBar then return false, "cast bar replaced" end
+    if frame.RPSNOriginalUnit ~= ns.AccessibleValue(frame.unit) then return false, "unit assignment" end
+    if frame.RPSNOriginalName ~= assessment.name then return false, "name region replaced" end
+    if frame.RPSNOriginalHealthBar ~= assessment.healthBar then return false, "health bar replaced" end
+    if frame.RPSNOriginalHealthBarsContainer ~= frame.HealthBarsContainer then return false, "container replaced" end
+    if frame.RPSNStyledCastBar ~= assessment.castBar then return false, "cast bar replaced" end
     if expected.presentation ~= decision then return false, "presentation cache" end
     if not SettingsAreCurrent(frame) then return false, "settings changed" end
     if not decision.suppressText then
         if expected.name ~= assessment.name or expected.bar ~= assessment.healthBar
             or not ns.FontPathMatches(expected.font, Text.NameFontPath(context))
-            or (expected.inside and (not frame.SNPInsideName
-                or frame.SNPInsideNameBar ~= assessment.healthBar)) then return false, "name cache" end
-        local showBar = assessment.hasHealthBar == true and ns.GetHealthBarEnabled(frame.SNPState) ~= false
+            or (expected.inside and (not frame.RPSNInsideName
+                or frame.RPSNInsideNameBar ~= assessment.healthBar)) then return false, "name cache" end
+        local showBar = assessment.hasHealthBar == true and ns.GetHealthBarEnabled(frame.RPSNState) ~= false
         if decision.showHealthBar ~= showBar then return false, "health-bar preference" end
     end
     local unit = ns.AccessibleValue(frame.unit)
@@ -173,7 +173,7 @@ local function PresentationIsCurrent(frame, assessment, context)
     if UnitGUID then
         local ok, value = pcall(UnitGUID, unit)
         local guid = ok and ns.AccessibleValue(value)
-        local previous = frame.SNPEntityFacts and frame.SNPEntityFacts.guid
+        local previous = frame.RPSNEntityFacts and frame.RPSNEntityFacts.guid
         if type(guid) == "string" and type(previous) == "string" and guid ~= previous then return false, "unit identity" end
     end
     if UnitNameplateShowsWidgetsOnly then
@@ -185,7 +185,7 @@ local function PresentationIsCurrent(frame, assessment, context)
 end
 
 local function RepairBarVisibility(frame, assessment, context)
-    local decision = frame.SNPPresentation
+    local decision = frame.RPSNPresentation
     if decision.suppressText then return end
     local shown = ns.AccessibleBoolean(Cap.ReadRegion(assessment.healthBar, "IsShown", context))
     if shown ~= decision.showHealthBar then SetShownSafe(assessment.healthBar, decision.showHealthBar, context) end
@@ -196,7 +196,7 @@ local function RepairBarVisibility(frame, assessment, context)
 end
 
 local function RepairBarColor(frame, assessment, context)
-    local decision = frame.SNPPresentation
+    local decision = frame.RPSNPresentation
     if decision.suppressText then return end
     RepairBarVisibility(frame, assessment, context)
     if decision.showHealthBar then
@@ -205,14 +205,14 @@ local function RepairBarColor(frame, assessment, context)
 end
 
 local function LayoutHasChanged(frame, context)
-    local expected = frame.SNPNameStyle
+    local expected = frame.RPSNNameStyle
     if expected.suppressed then return false end
     local inset, signature = ns.NameplateFrames.GetHealthTextInsetRegion(frame, expected.bar, context)
     return inset ~= expected.rightRegion or signature ~= expected.healthTextSignature
 end
 
 local function PerformDataUpdate(frame, assessment, context, work)
-    local state, decision = frame.SNPState, frame.SNPPresentation
+    local state, decision = frame.RPSNState, frame.RPSNPresentation
     local nameChanged, colorChanged = work.name, false
     if work.classify then
         local unit = ns.AccessibleValue(frame.unit)
@@ -223,12 +223,12 @@ local function PerformDataUpdate(frame, assessment, context, work)
         if nextDecision.action ~= "style" or nextDecision.suppressText ~= decision.suppressText
             or nextDecision.showHealthBar ~= decision.showHealthBar
             or nextDecision.nameOnly ~= decision.nameOnly then return "full" end
-        local oldFacts = frame.SNPEntityFacts
+        local oldFacts = frame.RPSNEntityFacts
         colorChanged = nextState ~= state
         nameChanged = nameChanged or colorChanged or facts.npcTitle ~= (oldFacts and oldFacts.npcTitle)
         -- Keep the cached presentation identity when its structure is unchanged.
         decision.state, decision.colorState = nextState, nextState
-        frame.SNPState, frame.SNPEntityFacts = nextState, facts
+        frame.RPSNState, frame.RPSNEntityFacts = nextState, facts
         state = nextState
     end
     if work.threat and not decision.suppressText then
@@ -248,7 +248,7 @@ end
 
 local function PerformNameRepair(frame, assessment, context)
     local source = ns.AccessibleValue(UnitName(frame.unit))
-    local expected = frame.SNPNameStyle
+    local expected = frame.RPSNNameStyle
     local previous = ns.AccessibleValue(expected.unitName)
     if not expected.suppressed and type(source) == "string" and type(previous) == "string"
         and source ~= previous then
@@ -256,7 +256,7 @@ local function PerformNameRepair(frame, assessment, context)
     end
     Text.RepairNameOnly(frame, context, assessment)
     RepairBarVisibility(frame, assessment, context)
-    if LayoutHasChanged(frame, context) then Text.UpdateNameLayout(frame, context, frame.SNPPresentation, assessment) end
+    if LayoutHasChanged(frame, context) then Text.UpdateNameLayout(frame, context, frame.RPSNPresentation, assessment) end
 end
 
 local function FocusedUpdate(frame, context, work, kind)
@@ -271,7 +271,7 @@ local function FocusedUpdate(frame, context, work, kind)
     end
     local assessment = Cap.InspectFrame(frame, context)
     if not assessment.canAccess then ns.Profiler.Count("Focused outcomes", "inaccessible"); return end
-    if frame.SNPRestoring or frame.SNPApplyingStyle or frame.SNPApplyingArtwork then
+    if frame.RPSNRestoring or frame.RPSNApplyingStyle or frame.RPSNApplyingArtwork then
         ns.Profiler.Count("Focused outcomes", "guarded"); return
     end
     if not ns.GetStylingEnabled() then
@@ -285,12 +285,12 @@ local function FocusedUpdate(frame, context, work, kind)
         ns.Profiler.Count("Focused cache invalidation", reason)
         return ApplySimpleStyle(frame, context, kind .. " fallback")
     end
-    frame.SNPApplyingStyle = true
+    frame.RPSNApplyingStyle = true
     local ok, result
     if kind == "name hook" then ok, result = pcall(PerformNameRepair, frame, assessment, context)
     elseif kind == "health-color hook" then ok, result = pcall(RepairBarColor, frame, assessment, context)
     else ok, result = pcall(PerformDataUpdate, frame, assessment, context, work) end
-    frame.SNPApplyingStyle = nil
+    frame.RPSNApplyingStyle = nil
     if not ok then
         ns.Profiler.Count("Focused outcomes", "failed")
         error(result, 0)
@@ -301,7 +301,7 @@ local function FocusedUpdate(frame, context, work, kind)
     end
     -- A real native layout/show callback can reset artwork during a focused
     -- write. Service that callback after releasing the shared reentry guard.
-    if frame.SNPArtworkPending then
+    if frame.RPSNArtworkPending then
         local current = Cap.InspectFrame(frame, context)
         if current.canAccess then ns.NameplateFrames.ApplyBarArtwork(frame, current, context) end
     end
@@ -317,9 +317,9 @@ local function UpdateData(frame, context, work) return FocusedUpdate(frame, cont
 local function RepairGeometry(frame, sourceBar)
     local context = GetContext()
     local assessment = Cap.InspectFrame(frame, context)
-    if not assessment.canAccess or frame.SNPRestoring or not ns.GetStylingEnabled() then return end
+    if not assessment.canAccess or frame.RPSNRestoring or not ns.GetStylingEnabled() then return end
     if sourceBar and sourceBar ~= assessment.healthBar and sourceBar ~= frame.HealthBarsContainer then return end
-    if frame.SNPApplyingStyle or frame.SNPApplyingArtwork then frame.SNPGeometryPending = true; return end
+    if frame.RPSNApplyingStyle or frame.RPSNApplyingArtwork then frame.RPSNGeometryPending = true; return end
     if not PresentationIsCurrent(frame, assessment, context) then return end
     ns.Profiler.Count("Geometry hook", "current presentation")
     Text.RepairBarGeometry(frame, context, assessment)
@@ -328,10 +328,10 @@ RepairGeometry = ns.Profiler.Wrap("Geometry hook repair", RepairGeometry)
 local visibilityHookOwners = setmetatable({}, {__mode = "k"})
 local alphaHookOwners = setmetatable({}, {__mode = "k"})
 InstallGeometryHook = function(frame, context)
-    if not frame.SNPGeometryHookInstalled and hooksecurefunc
+    if not frame.RPSNGeometryHookInstalled and hooksecurefunc
         and type(Cap.SafeField(frame, "UpdateAnchors", context)) == "function" then
         hooksecurefunc(frame, "UpdateAnchors", function() RepairGeometry(frame) end)
-        frame.SNPGeometryHookInstalled = true
+        frame.RPSNGeometryHookInstalled = true
     end
     local bar = Cap.SafeField(frame, "healthBar", context)
         or Cap.SafeField(Cap.SafeField(frame, "HealthBarsContainer", context), "healthBar", context)
@@ -350,8 +350,8 @@ InstallGeometryHook = function(frame, context)
     end
 end
 RepairPendingGeometry = function(frame)
-    if not frame.SNPGeometryPending then return end
-    frame.SNPGeometryPending = nil
+    if not frame.RPSNGeometryPending then return end
+    frame.RPSNGeometryPending = nil
     RepairGeometry(frame)
 end
 

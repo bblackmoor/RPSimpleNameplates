@@ -13,17 +13,17 @@ local PRESENTATION_LIMITS = {
 }
 
 local function RegisterWorldLabelPopups()
-    StaticPopupDialogs["SNP_BLIZZARD_OVERHEAD_INFO"] = {
+    StaticPopupDialogs["RPSN_BLIZZARD_OVERHEAD_INFO"] = {
         text = "In the sanctuary contexts listed here, nonattackable opposite-faction PCs have native overhead names without an accessible nameplate. The addon cannot style those names.\n\nPet, guardian, totem and minion world labels are also separate; their accessible nameplates can still be styled.",
         button1 = OKAY or "Okay", timeout = 0, whileDead = true,
         hideOnEscape = true, preferredIndex = 3,
     }
-    StaticPopupDialogs["SNP_BLIZZARD_INTERACTIVE_INFO"] = {
+    StaticPopupDialogs["RPSN_BLIZZARD_INTERACTIVE_INFO"] = {
         text = "Native world labels use Blizzard's colors. Enable Friendly NPC Nameplates to allow styling of separate accessible plates and verified service titles.",
         button1 = OKAY or "Okay", timeout = 0, whileDead = true,
         hideOnEscape = true, preferredIndex = 3,
     }
-    StaticPopupDialogs["SNP_BLIZZARD_VENDOR_INFO"] = {
+    StaticPopupDialogs["RPSN_BLIZZARD_VENDOR_INFO"] = {
         text = "Native vendor world labels use Blizzard's colors. Enable Friendly NPC Nameplates to allow styling of separate accessible plates and verified service titles.",
         button1 = OKAY or "Okay", timeout = 0, whileDead = true,
         hideOnEscape = true, preferredIndex = 3,
@@ -48,7 +48,7 @@ end
 
 local function CreateAboutPanel()
     local panel, content, layout = CreateScrollablePanel("About")
-    StaticPopupDialogs["SNP_COPY_SOURCE"] = {
+    StaticPopupDialogs["RPSN_COPY_SOURCE"] = {
         text = "Press Ctrl+C to copy the source URL.", button1 = CLOSE or "Close",
         hasEditBox = true, maxLetters = 255, editBoxWidth = 340,
         OnShow = function(self, url)
@@ -71,7 +71,7 @@ local function CreateAboutPanel()
 
     AddDescription(content, layout, "Source:")
     local sourceLink = Widgets.CreateLink(content, SOURCE_URL, function()
-        StaticPopup_Show("SNP_COPY_SOURCE", nil, nil, SOURCE_URL)
+        StaticPopup_Show("RPSN_COPY_SOURCE", nil, nil, SOURCE_URL)
     end)
     local sourceFrame = sourceLink:GetFrame()
     sourceFrame.LayoutFullWidth = true
@@ -82,16 +82,16 @@ local function CreateAboutPanel()
 
     UI.AddSection(content, layout, "Commands")
     AddDescription(content, layout,
-        "/snp or /snp text — Text settings\n" ..
-        "/snp profiles — Manage appearance profiles\n" ..
-        "/snp colors — Color settings\n" ..
-        "/snp highlight — Interruptible border settings\n" ..
-        "/snp trp3 — TRP3 settings\n" ..
-        "/snp debug — Explain the current target\n" ..
-        "/snp debug mouseover — Inspect without targeting\n" ..
-        "/snp debug nearby [name] — Snapshot existing plates without targeting or hovering\n" ..
-        "/snp perf [start|stop|report] — Record or report performance\n" ..
-        "/snp about — This page")
+        "/rpsn or /rpsn text — Text settings\n" ..
+        "/rpsn profiles — Manage appearance profiles\n" ..
+        "/rpsn colors — Color settings\n" ..
+        "/rpsn highlight — Interruptible border settings\n" ..
+        "/rpsn trp3 — TRP3 settings\n" ..
+        "/rpsn debug — Explain the current target\n" ..
+        "/rpsn debug mouseover — Inspect without targeting\n" ..
+        "/rpsn debug nearby [name] — Snapshot existing plates without targeting or hovering\n" ..
+        "/rpsn perf [start|stop|report] — Record or report performance\n" ..
+        "/rpsn about — This page")
     UI.AddSection(content, layout, "Presentation limits")
     AddDescription(content, layout,
         "No accessible nameplate was found in these contexts despite enabled visibility settings; " ..
@@ -107,11 +107,11 @@ local function CreateAboutPanel()
         "Read-only examples of Blizzard's separate world labels. Accessible NPC and minion nameplates can still be styled.")
     local context = {content = content, layout = layout}
     CreateLockedColorRow(context, "Opposite-faction PC labels in sanctuary",
-        102 / 255, 102 / 255, 1, "SNP_BLIZZARD_OVERHEAD_INFO")
+        102 / 255, 102 / 255, 1, "RPSN_BLIZZARD_OVERHEAD_INFO")
     CreateLockedColorRow(context, "Native interactive-NPC world labels",
-        1, 1, 0, "SNP_BLIZZARD_INTERACTIVE_INFO")
+        1, 1, 0, "RPSN_BLIZZARD_INTERACTIVE_INFO")
     CreateLockedColorRow(context, "Native vendor-NPC world labels",
-        0, 1, 0, "SNP_BLIZZARD_VENDOR_INFO")
+        0, 1, 0, "RPSN_BLIZZARD_VENDOR_INFO")
     layout:Finish()
     return panel
 end

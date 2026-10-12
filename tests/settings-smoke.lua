@@ -209,7 +209,7 @@ equal(table.concat({categories[1].name,categories[2].name,categories[3].name,cat
     "RP Simple Nameplates,Profiles,Text,Colors,Highlight,TRP3", "tab order")
 ns.RegisterSettingsPanels()
 equal(#categories, 6, "one-time registration")
-equal(SLASH_SNP1, "/snp", "slash registration")
+equal(SLASH_RPSN1, "/rpsn", "slash registration")
 local debugUnits = {}
 ns.DebugUnit = function(unit) debugUnits[#debugUnits + 1] = unit end
 for _, route in ipairs({
@@ -217,20 +217,20 @@ for _, route in ipairs({
     {"debug mouseover", "mouseover"}, {"  DIAGNOSE   MOUSEOVER  ", "mouseover"},
 }) do
     local openedBefore = #opened
-    SlashCmdList.SNP(route[1])
+    SlashCmdList.RPSN(route[1])
     equal(debugUnits[#debugUnits], route[2], "diagnostic route " .. route[1])
     equal(#opened, openedBefore, "diagnostics do not open settings")
 end
 local debugCount = #debugUnits
-SlashCmdList.SNP("debug invalid")
+SlashCmdList.RPSN("debug invalid")
 equal(#debugUnits, debugCount, "invalid diagnostic unit is not inspected")
 
 for _, route in ipairs({{"",3},{"about",1},{"profiles",2},{"appearance",3},{"colors",4},{"text",3},{"highlight",5},{"trp3",6}}) do
-    SlashCmdList.SNP(route[1])
+    SlashCmdList.RPSN(route[1])
     equal(opened[#opened], route[2], "route " .. route[1])
 end
 local openedBeforeObsoleteCommand = #opened
-SlashCmdList.SNP("behavior")
+SlashCmdList.RPSN("behavior")
 equal(#opened, openedBeforeObsoleteCommand, "obsolete behavior command does not open a page")
 
 for _, c in ipairs(categories) do
@@ -313,19 +313,19 @@ equal(fullTitle:GetChecked(), false, "disabled integration preserves title choic
 assert(button("Create") and button("Copy") and button("Rename") and button("Delete"),
     "Profile action buttons")
 button("Create"):Click()
-equal(popups[#popups].key, "SNP_PROFILE_NAME", "create dialog")
+equal(popups[#popups].key, "RPSN_PROFILE_NAME", "create dialog")
 local data = popups[#popups].data
 local dialog = region("Dialog")
 dialog.editBox = region("EditBox", dialog)
 dialog.editBox:SetText("New profile")
-StaticPopupDialogs.SNP_PROFILE_NAME.OnAccept(dialog, data)
+StaticPopupDialogs.RPSN_PROFILE_NAME.OnAccept(dialog, data)
 equal(active, "New profile", "create callback")
 assert(refreshes > 0, "Profile change refreshes nameplates")
 button("Restore bundled profiles"):Click()
-equal(popups[#popups].key, "SNP_RESTORE_BUNDLED_PROFILES", "restore confirmation")
-StaticPopupDialogs.SNP_RESTORE_BUNDLED_PROFILES.OnAccept(nil, popups[#popups].data)
+equal(popups[#popups].key, "RPSN_RESTORE_BUNDLED_PROFILES", "restore confirmation")
+StaticPopupDialogs.RPSN_RESTORE_BUNDLED_PROFILES.OnAccept(nil, popups[#popups].data)
 equal(active, "Default", "restore callback")
-equal(StaticPopupDialogs.SNP_BLIZZARD_VENDOR_INFO ~= nil, true, "Blizzard info popup")
+equal(StaticPopupDialogs.RPSN_BLIZZARD_VENDOR_INFO ~= nil, true, "Blizzard info popup")
 local stylingSwitch
 for _, item in ipairs(frames) do
     if item.kind == "Button" and item.width == 44 then
@@ -577,7 +577,7 @@ local originalCommand = ns.Profiler.Command
 ns.Profiler.Command = function(argument) perfArgument = argument end
 local originalCombat = InCombatLockdown
 InCombatLockdown = function() return true end
-SlashCmdList.SNP("perf start")
+SlashCmdList.RPSN("perf start")
 equal(perfArgument, "start", "profiling slash routing works in combat")
 ns.Profiler.Command = originalCommand
 InCombatLockdown = originalCombat

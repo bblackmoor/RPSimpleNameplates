@@ -42,14 +42,14 @@ assert(loadfile("RPSimpleNameplates/Defaults.lua"))("RPSimpleNameplates", ns)
 for _, module in ipairs({"Profiler", "PeriodicWork", "CastHighlight"}) do
     assert(loadfile("RPSimpleNameplates/"..module..".lua"))("RPSimpleNameplates", ns)
 end
-local owner = {unit = "nameplate1", castBar = CreateFrame("StatusBar"), SNPPresentation = {showCastBar = true}}
+local owner = {unit = "nameplate1", castBar = CreateFrame("StatusBar"), RPSNPresentation = {showCastBar = true}}
 owner.castBar.Icon = CreateFrame("Frame", nil, owner.castBar)
 owner.castBar.GetSize = function() error("native cast geometry read") end
-local function Update() ns.CastHighlight.UpdateInterruptibleHighlight(owner, {}, owner.SNPPresentation) end
+local function Update() ns.CastHighlight.UpdateInterruptibleHighlight(owner, {}, owner.RPSNPresentation) end
 local h
 for _, style in ipairs({"ALERT", "SOLID", "ALERT", "SOLID"}) do
     effect = style; Update()
-    h = owner.SNPInterruptibleHighlight
+    h = owner.RPSNInterruptibleHighlight
     assert(h.frame:IsShown() and h.activeEffect == style, style.." renders")
     assert(h.alert:IsPlaying() == (style == "ALERT"), "only pulse animates")
     assert(h.border[1].height == 4 and h.border[2].height == 4)
@@ -141,24 +141,24 @@ assert(not h.frame:IsShown(), "noninterruptible hides selected effect")
 local preview = CreateFrame("StatusBar")
 effect = "PULSE"; enabled = false
 ns.CastHighlight.UpdatePreview(preview)
-assert(preview.SNPCastPreview.activeEffect == "PULSE", "inactive preview retains selected effect")
-assert(not preview.SNPCastPreview.pulse:IsPlaying() and not preview.SNPCastPreview.alert:IsPlaying(), "disabled Pulse preview is inert")
-assert(preview.SNPCastPreview.previewDisabled and preview.SNPCastPreview.border[1].color[1] == 0.5
-    and preview.SNPCastPreview.border[1].color[2] == 0.5, "inactive preview border is grey")
+assert(preview.RPSNCastPreview.activeEffect == "PULSE", "inactive preview retains selected effect")
+assert(not preview.RPSNCastPreview.pulse:IsPlaying() and not preview.RPSNCastPreview.alert:IsPlaying(), "disabled Pulse preview is inert")
+assert(preview.RPSNCastPreview.previewDisabled and preview.RPSNCastPreview.border[1].color[1] == 0.5
+    and preview.RPSNCastPreview.border[1].color[2] == 0.5, "inactive preview border is grey")
 effect = "ALERT"; ns.CastHighlight.UpdatePreview(preview)
-assert(not preview.SNPCastPreview.pulse:IsPlaying() and not preview.SNPCastPreview.alert:IsPlaying(), "disabled Alert preview is inert")
-local gray = preview.SNPCastPreview.alertBorder[1].halves[1].gradient[3]
+assert(not preview.RPSNCastPreview.pulse:IsPlaying() and not preview.RPSNCastPreview.alert:IsPlaying(), "disabled Alert preview is inert")
+local gray = preview.RPSNCastPreview.alertBorder[1].halves[1].gradient[3]
 assert(gray.r == 0.5 and gray.g == 0.5 and gray.b == 0.5, "inactive Alert gradient is grey")
 enabled = true; ns.CastHighlight.UpdatePreview(preview)
-assert(not preview.SNPCastPreview.previewDisabled, "reenabled preview restores chosen color")
-assert(preview.SNPCastPreview.alert:IsPlaying(), "reenabling resumes Alert")
+assert(not preview.RPSNCastPreview.previewDisabled, "reenabled preview restores chosen color")
+assert(preview.RPSNCastPreview.alert:IsPlaying(), "reenabling resumes Alert")
 enabled = false; ns.CastHighlight.UpdatePreview(preview)
-assert(not preview.SNPCastPreview.alert:IsPlaying(), "disabling a running Alert stops it")
+assert(not preview.RPSNCastPreview.alert:IsPlaying(), "disabling a running Alert stops it")
 enabled = true; ns.CastHighlight.UpdatePreview(preview)
-local color = preview.SNPCastPreview.alertBorder[1].halves[1].gradient[3]
+local color = preview.RPSNCastPreview.alertBorder[1].halves[1].gradient[3]
 assert(color.r == 0.2 and color.g == 0.8 and color.b == 1, "active preview shows configured color")
 effect = "SOLID"; ns.CastHighlight.UpdatePreview(preview)
-assert(not preview.SNPCastPreview.pulse:IsPlaying(), "preview stops pulse on selection change")
+assert(not preview.RPSNCastPreview.pulse:IsPlaying(), "preview stops pulse on selection change")
 ns.CastHighlight.StopPreview(preview)
-assert(not preview.SNPCastPreview.frame:IsShown())
+assert(not preview.RPSNCastPreview.frame:IsShown())
 print("Cast border effects smoke: passed")

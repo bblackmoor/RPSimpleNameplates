@@ -70,13 +70,13 @@ local function CaptureNativePresentation(frame, assessment, context)
         original.points = points
     end
     original.barColor = ReadValues(assessment.healthBar, "GetStatusBarColor", context)
-    frame.SNPOriginalPresentation = original
+    frame.RPSNOriginalPresentation = original
 end
 
 local function RestoreNativePresentation(frame, assessment, context, removedUnit)
-    local original = frame.SNPOriginalPresentation
+    local original = frame.RPSNOriginalPresentation
     if not original then return end
-    local name = frame.SNPOriginalName or assessment.name
+    local name = frame.RPSNOriginalName or assessment.name
     if name then
         for _, property in ipairs(nameProperties) do
             local values = original.name[property[2]]
@@ -94,13 +94,13 @@ local function RestoreNativePresentation(frame, assessment, context, removedUnit
             name:SetText(UnitName(unit))
         end
     end
-    if frame.SNPOriginalHealthBar and original.barColor then
-        frame.SNPOriginalHealthBar:SetStatusBarColor(unpackValues(original.barColor))
+    if frame.RPSNOriginalHealthBar and original.barColor then
+        frame.RPSNOriginalHealthBar:SetStatusBarColor(unpackValues(original.barColor))
     end
 end
 
 local function Capture(frame, assessment, context)
-    if frame.SNPOriginalVisibility then return end
+    if frame.RPSNOriginalVisibility then return end
     CaptureNativePresentation(frame, assessment, context)
     local values = {}
     for _, key in ipairs(visibilityKeys) do
@@ -110,51 +110,51 @@ local function Capture(frame, assessment, context)
     values.barAlpha = ns.AccessibleNumber(Cap.ReadRegion(assessment.healthBar, "GetAlpha", context))
     values.containerAlpha = ns.AccessibleNumber(Cap.ReadRegion(frame.HealthBarsContainer, "GetAlpha", context))
     values.nameAlpha = ns.AccessibleNumber(Cap.ReadRegion(assessment.name, "GetAlpha", context))
-    frame.SNPOriginalVisibility = values
-    frame.SNPOriginalName = assessment.name
-    frame.SNPOriginalUnit = ns.AccessibleValue(frame.unit)
-    frame.SNPOriginalHealthBar = assessment.healthBar
-    frame.SNPOriginalHealthBarsContainer = frame.HealthBarsContainer
+    frame.RPSNOriginalVisibility = values
+    frame.RPSNOriginalName = assessment.name
+    frame.RPSNOriginalUnit = ns.AccessibleValue(frame.unit)
+    frame.RPSNOriginalHealthBar = assessment.healthBar
+    frame.RPSNOriginalHealthBarsContainer = frame.HealthBarsContainer
 end
 
 local function RestoreAccessibleFrame(frame, assessment, context, removedUnit)
-    frame.SNPThreatStatus = nil
-    if frame.SNPThreatText then
-        frame.SNPThreatText:SetText("")
-        frame.SNPThreatText:Hide()
+    frame.RPSNThreatStatus = nil
+    if frame.RPSNThreatText then
+        frame.RPSNThreatText:SetText("")
+        frame.RPSNThreatText:Hide()
     end
-    if frame.SNPFullTitleText then frame.SNPFullTitleText:SetText(""); frame.SNPFullTitleText:Hide() end
-    frame.SNPFullTitleAvailable = nil
+    if frame.RPSNFullTitleText then frame.RPSNFullTitleText:SetText(""); frame.RPSNFullTitleText:Hide() end
+    frame.RPSNFullTitleAvailable = nil
     Text.RestoreNameDisplay(frame, context, assessment)
-    if frame.SNPInterruptibleHighlight then frame.SNPInterruptibleHighlight.frame:Hide() end
+    if frame.RPSNInterruptibleHighlight then frame.RPSNInterruptibleHighlight.frame:Hide() end
     Text.RestoreOriginalBarHeight(frame, assessment.healthBar, context, assessment)
     ns.NameplateFrames.RestoreBarArtwork(frame, context)
     ns.NameplateFrames.RestoreBarWidth(frame, assessment)
     ns.NameplateFrames.RestoreSizeAnchors(frame, context)
-    local original = frame.SNPOriginalVisibility or {}
+    local original = frame.RPSNOriginalVisibility or {}
     for _, key in ipairs(visibilityKeys) do
         local region = frame[key]
-        if key == "name" then region = frame.SNPOriginalName end
-        if key == "HealthBarsContainer" then region = frame.SNPOriginalHealthBarsContainer end
+        if key == "name" then region = frame.RPSNOriginalName end
+        if key == "HealthBarsContainer" then region = frame.RPSNOriginalHealthBarsContainer end
         if original[key] ~= nil then SetShownSafe(region, original[key], context) end
     end
-    if original.healthBar ~= nil then SetShownSafe(frame.SNPOriginalHealthBar, original.healthBar, context) end
-    if original.barAlpha ~= nil and frame.SNPOriginalHealthBar then frame.SNPOriginalHealthBar:SetAlpha(original.barAlpha) end
-    if original.containerAlpha ~= nil and frame.SNPOriginalHealthBarsContainer then
-        frame.SNPOriginalHealthBarsContainer:SetAlpha(original.containerAlpha)
+    if original.healthBar ~= nil then SetShownSafe(frame.RPSNOriginalHealthBar, original.healthBar, context) end
+    if original.barAlpha ~= nil and frame.RPSNOriginalHealthBar then frame.RPSNOriginalHealthBar:SetAlpha(original.barAlpha) end
+    if original.containerAlpha ~= nil and frame.RPSNOriginalHealthBarsContainer then
+        frame.RPSNOriginalHealthBarsContainer:SetAlpha(original.containerAlpha)
     end
-    if original.nameAlpha ~= nil and frame.SNPOriginalName then frame.SNPOriginalName:SetAlpha(original.nameAlpha) end
+    if original.nameAlpha ~= nil and frame.RPSNOriginalName then frame.RPSNOriginalName:SetAlpha(original.nameAlpha) end
     RestoreNativePresentation(frame, assessment, context, removedUnit)
-    frame.SNPNameStyle, frame.SNPState, frame.SNPPresentation, frame.SNPEntityFacts = nil, nil, nil, nil
-    frame.SNPNameAppearancePending = nil
-    frame.SNPNameColorPending = nil
-    frame.SNPNameAlphaPending = nil
-    frame.SNPGeometryPending = nil
-    frame.SNPOriginalVisibility, frame.SNPOriginalUnit, frame.SNPOriginalPresentation = nil, nil, nil
-    frame.SNPOriginalHealthBar, frame.SNPOriginalHealthBarsContainer = nil, nil
-    frame.SNPTitleVisibilityPending = nil
-    frame.SNPTitleDesiredRegion, frame.SNPTitleDesired, frame.SNPTitleVisibilityRetry = nil, nil, nil
-    frame.SNPOriginalName, frame.SNPStyleSettings, frame.SNPStyledCastBar = nil, nil, nil
+    frame.RPSNNameStyle, frame.RPSNState, frame.RPSNPresentation, frame.RPSNEntityFacts = nil, nil, nil, nil
+    frame.RPSNNameAppearancePending = nil
+    frame.RPSNNameColorPending = nil
+    frame.RPSNNameAlphaPending = nil
+    frame.RPSNGeometryPending = nil
+    frame.RPSNOriginalVisibility, frame.RPSNOriginalUnit, frame.RPSNOriginalPresentation = nil, nil, nil
+    frame.RPSNOriginalHealthBar, frame.RPSNOriginalHealthBarsContainer = nil, nil
+    frame.RPSNTitleVisibilityPending = nil
+    frame.RPSNTitleDesiredRegion, frame.RPSNTitleDesired, frame.RPSNTitleVisibilityRetry = nil, nil, nil
+    frame.RPSNOriginalName, frame.RPSNStyleSettings, frame.RPSNStyledCastBar = nil, nil, nil
 end
 
 Request = function(frame, context, removedUnit)
@@ -167,26 +167,26 @@ Request = function(frame, context, removedUnit)
         DeferFrame(frame)
         return false
     end
-    if frame.SNPRestoring then return false end
+    if frame.RPSNRestoring then return false end
     local pending = pendingFrames[frame]
     if not removedUnit and type(pending) == "string" then removedUnit = pending end
-    if not pending and not frame.SNPState and not frame.SNPNameStyle
-        and not frame.SNPOriginalVisibility then return true end
-    frame.SNPRestoring = true
+    if not pending and not frame.RPSNState and not frame.RPSNNameStyle
+        and not frame.RPSNOriginalVisibility then return true end
+    frame.RPSNRestoring = true
     -- Blizzard updates can invoke our repair hooks or throw. Always release
     -- the reentry guard, including when caches were already cleared.
     local ok, err = pcall(RestoreAccessibleFrame, frame, assessment, context, removedUnit)
-    frame.SNPRestoring = nil
+    frame.RPSNRestoring = nil
     if not ok then
         pendingFrames[frame] = removedUnit or true
         DeferFrame(frame)
         local message = tostring(ns.AccessibleValue(err) or "Unavailable restoration error")
-        local previous = frame.SNPRestoreError
-        frame.SNPRestoreError = message
+        local previous = frame.RPSNRestoreError
+        frame.RPSNRestoreError = message
         if message ~= previous and geterrorhandler then geterrorhandler()(message) end
         return false
     end
-    pendingFrames[frame], frame.SNPRestoreError = nil, nil
+    pendingFrames[frame], frame.RPSNRestoreError = nil, nil
     Periodic.Cancel("restoration frame", frame)
     return true
 end

@@ -51,6 +51,6 @@ assert(created == #keys and #registered == #keys and registered[1] == firstRoot,
 local opened
 Settings.OpenToCategory = function(id) opened = id end
 for _, route in ipairs({{"about", 1}, {"profiles", 2}, {"", 3}, {"colors", 4}, {"text", 3}, {"highlight", 5}, {"trp3", 6}}) do
-    SlashCmdList.SNP(route[1]); assert(opened == route[2], "slash routing")
+    SlashCmdList.RPSN(route[1]); assert(opened == route[2], "slash routing")
 end
 print("PASS settings registration preflight, retry, order, routing and duplicate protection")

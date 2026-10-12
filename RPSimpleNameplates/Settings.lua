@@ -37,8 +37,8 @@ local function RegisterSettingsPanels()
         local page = pageOrder[index]
         categories[page.key] = Settings.RegisterCanvasLayoutSubcategory(rootCategory, panels[page.key], page.label)
     end
-    SLASH_SNP1 = "/snp"
-    SlashCmdList.SNP = function(message)
+    SLASH_RPSN1 = "/rpsn"
+    SlashCmdList.RPSN = function(message)
         local command = string.lower(strtrim(message or ""))
         local verb, argument = command:match("^(%S+)%s*(.-)$")
         if verb == "perf" then addon.Profiler.Command(argument); return end
@@ -50,7 +50,7 @@ local function RegisterSettingsPanels()
             end
             local unit = argument == "" and "target" or argument
             if unit ~= "target" and unit ~= "mouseover" then
-                print("|cff0cd29fRP Simple Nameplates:|r /snp debug [target|mouseover|nearby [name]]")
+                print("|cff0cd29fRP Simple Nameplates:|r /rpsn debug [target|mouseover|nearby [name]]")
                 return
             end
             if addon.DebugUnit then addon.DebugUnit(unit) end
@@ -62,7 +62,7 @@ local function RegisterSettingsPanels()
         end
         local category = aliases[command] and categories[aliases[command]]
         if category then Settings.OpenToCategory(category:GetID())
-        else print("|cff0cd29fRP Simple Nameplates:|r /snp, /snp profiles, /snp text, /snp colors, /snp highlight, /snp trp3, /snp debug [target|mouseover|nearby [name]], /snp perf [start|stop|report], /snp about") end
+        else print("|cff0cd29fRP Simple Nameplates:|r /rpsn, /rpsn profiles, /rpsn text, /rpsn colors, /rpsn highlight, /rpsn trp3, /rpsn debug [target|mouseover|nearby [name]], /rpsn perf [start|stop|report], /rpsn about") end
     end
 end
 addon.RegisterSettingsPanels = RegisterSettingsPanels

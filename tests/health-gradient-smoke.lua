@@ -21,8 +21,8 @@ bar:SetWidth(200)
 bar:SetStatusBarTexture("native")
 local fill = bar:GetStatusBarTexture()
 ns.HealthGradient.Apply(bar, fill, {})
-local tint, mask = bar.SNPHealthGradient, bar.SNPHealthGradientMask
-local tail = bar.SNPHealthGradientTail
+local tint, mask = bar.RPSNHealthGradient, bar.RPSNHealthGradientMask
+local tail = bar.RPSNHealthGradientTail
 assert(tint.width == 190 and math.abs(tail.width - 10) < 0.00001, "fade spans first 95% and clear tail spans final 5%")
 assert(mask.textureSampling[1] == "CLAMPTOBLACKADDITIVE"
     and mask.textureSampling[2] == "CLAMPTOBLACKADDITIVE"
@@ -39,7 +39,7 @@ for _, remainingWidth in ipairs({200, 160, 100, 20}) do
 end
 local replacement = bar:CreateTexture()
 ns.HealthGradient.Apply(bar, replacement, {})
-assert(mask.allPoints == replacement and bar.SNPHealthGradient == tint, "replacement fill reuses/reanchors tint")
+assert(mask.allPoints == replacement and bar.RPSNHealthGradient == tint, "replacement fill reuses/reanchors tint")
 bar:SetWidth(250)
 ns.HealthGradient.Apply(bar, replacement, {})
 assert(tint.width == 237.5 and math.abs(tail.width - 12.5) < 0.00001, "configured width preserves fade and clear tail proportions")

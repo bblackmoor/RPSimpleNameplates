@@ -8,23 +8,23 @@ local GetAppearanceSetting, GetThreatEnabled = ns.GetAppearanceSetting, ns.GetTh
 local GetHealthBar = ns.NameplateFrames.GetHealthBar
 
 local function ClearThreatText(frame, reason)
-    frame.SNPThreatStatus = reason
-    if frame.SNPThreatText then
-        frame.SNPThreatText:SetText("")
-        frame.SNPThreatText:Hide()
+    frame.RPSNThreatStatus = reason
+    if frame.RPSNThreatText then
+        frame.RPSNThreatText:SetText("")
+        frame.RPSNThreatText:Hide()
     end
 end
 
 local function EnsureThreatText(frame, bar)
-    if frame.SNPThreatText and frame.SNPThreatTextBar == bar then return frame.SNPThreatText, false end
-    if frame.SNPThreatText then frame.SNPThreatText:Hide() end
+    if frame.RPSNThreatText and frame.RPSNThreatTextBar == bar then return frame.RPSNThreatText, false end
+    if frame.RPSNThreatText then frame.RPSNThreatText:Hide() end
     local text = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     text:SetDrawLayer("OVERLAY", 7)
     text:SetPoint("RIGHT", bar, "RIGHT", -3, -0.5)
     text:SetJustifyH("RIGHT")
     text:SetWordWrap(false)
     text:SetMaxLines(1)
-    frame.SNPThreatText, frame.SNPThreatTextBar = text, bar
+    frame.RPSNThreatText, frame.RPSNThreatTextBar = text, bar
     return text, true
 end
 
@@ -57,7 +57,7 @@ local function UpdateThreatText(frame, state, context, decision, configure)
     if not ok then ClearThreatText(frame, "threat API unavailable"); return end
     -- scaledPercentage is the useful 0-100 "how close am I to pulling aggro"
     -- value. rawPercentage can pin at 255 once the player is tanking.
-    if RenderPercent(text, scaled) then frame.SNPThreatStatus = "displayed scaled percentage"
+    if RenderPercent(text, scaled) then frame.RPSNThreatStatus = "displayed scaled percentage"
     else ClearThreatText(frame, "no displayable threat percentage"); return end
     text:Show()
 end

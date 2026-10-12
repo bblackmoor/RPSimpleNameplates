@@ -7,18 +7,18 @@ Available since 1.0.163. Profiling is an optional diagnostic, off by default. It
 ## Run a session
 
 1. Choose a representative scene, such as a crowded area or combat with several visible plates.
-2. Enter `/snp perf start`.
+2. Enter `/rpsn perf start`.
 3. Play normally for a short, consistent interval, for example 30 seconds.
-4. Enter `/snp perf stop`, then `/snp perf report`.
+4. Enter `/rpsn perf stop`, then `/rpsn perf report`.
 5. Capture the entire chat output with consecutive screenshots, including the timing and reason rows, alongside the addon version, client build, scene, approximate plate count, combat state and other enabled nameplate addons.
 
 These commands also work during combat. No target is required.
 
 | Command | Behavior |
 | --- | --- |
-| `/snp perf start` | Starts a fresh session, replacing the previous stopped results; an already-running session is left intact |
-| `/snp perf stop` | Stops collection and captures the end memory reading; repeated stops leave results intact |
-| `/snp perf report` or `/snp perf` | Prints the running or last stopped session; does not stop collection |
+| `/rpsn perf start` | Starts a fresh session, replacing the previous stopped results; an already-running session is left intact |
+| `/rpsn perf stop` | Stops collection and captures the end memory reading; repeated stops leave results intact |
+| `/rpsn perf report` or `/rpsn perf` | Prints the running or last stopped session; does not stop collection |
 
 Results remain available until a new session or UI reload. There is no saved setting, automatic startup, periodic memory scan, log file or new library dependency. A missing or unreadable precise timer prevents starting; unavailable memory readings do not prevent timing.
 

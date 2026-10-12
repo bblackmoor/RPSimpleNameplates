@@ -5,7 +5,7 @@ local AddDescription, RefreshNameplates = UI.AddDescription, UI.RefreshNameplate
 
 local function CreateProfileButtons(content, layout, changed)
     local function OpenNameDialog(action, initial, profileName)
-        StaticPopup_Show("SNP_PROFILE_NAME", nil, nil,
+        StaticPopup_Show("RPSN_PROFILE_NAME", nil, nil,
             {action = action, initial = initial, target = profileName and UI.CaptureProfileDialogTarget(profileName), onChanged = changed})
     end
     local function OpenActiveNameDialog(action, suffix)
@@ -17,7 +17,7 @@ local function CreateProfileButtons(content, layout, changed)
         {"Copy", function() OpenActiveNameDialog(addon.CopyActiveProfile, " Copy") end},
         {"Rename", function() OpenActiveNameDialog(addon.RenameActiveProfile, "") end},
         {"Delete", function()
-            StaticPopup_Show("SNP_DELETE_PROFILE", addon.GetActiveProfileName(), nil,
+            StaticPopup_Show("RPSN_DELETE_PROFILE", addon.GetActiveProfileName(), nil,
                 {target = UI.CaptureProfileDialogTarget(addon.GetActiveProfileName()), onChanged = changed})
         end},
     }
@@ -85,7 +85,7 @@ local function CreateProfilesPanel()
     AddDescription(content, layout,
         "Resets Default and High Contrast, recreating High Contrast if missing. Custom profiles are unchanged.")
     UI.AddPageAction(content, layout, "Restore bundled profiles", function()
-        StaticPopup_Show("SNP_RESTORE_BUNDLED_PROFILES", nil, nil, {targets = UI.CaptureBundledProfileDialogTargets(), onChanged = Changed})
+        StaticPopup_Show("RPSN_RESTORE_BUNDLED_PROFILES", nil, nil, {targets = UI.CaptureBundledProfileDialogTargets(), onChanged = Changed})
     end, 210)
     panel.Refresh = Refresh
     panel:SetScript("OnShow", panel.Refresh)

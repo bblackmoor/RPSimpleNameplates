@@ -5,7 +5,7 @@
 - Use the author’s current 64-pixel icon in the addon list and check its packaged metadata.
 
 - Complete the rename to RP Simple Nameplates: use `RPSimpleNameplates` for the addon folder, TOC filename, build artifacts and installable ZIP; update source links, display names, packaging, release checks, tests and developer paths.
-- Retain `/snp` commands and current nameplate styling and settings behavior. Installation instructions describe a first release.
+- Retain `/rpsn` commands and current nameplate styling and settings behavior. Installation instructions describe a first release.
 
 - Connect release metadata to CurseForge project 1740403 and add tag-triggered uploads of the same verified ZIP published on GitHub.
 - Include the current release notes, exact supported Retail versions, and embedded-library relations in CurseForge uploads. Configure the CF_API_TOKEN repository secret to enable publishing.
@@ -52,7 +52,7 @@
 
 ## 1.0.239 — 2026-10-09
 
-- Rename the Appearance tab to Text; add Highlight between Colors and TRP3, with `/snp text` and `/snp highlight` routes. Keep `/snp appearance` as an alias.
+- Rename the Appearance tab to Text; add Highlight between Colors and TRP3, with `/rpsn text` and `/rpsn highlight` routes. Keep `/rpsn appearance` as an alias.
 - Keep interruptible color/Active on Colors; move effect, shared thickness/offset, Pulse and Alert settings to Highlight. Both pages have previews. Highlight has a selected-profile control and a scoped reset preserving color/Active.
 - Default Pulse Fade in/Fade out to 0.1 seconds each, and factory interruptible color to #3300FF. Preserve valid saved timing/color choices; Alert timing remains 0.2 seconds each way.
 - Preserve profile-switch, page-hide and combat draft cancellation for moved controls; update current documentation and UI regression coverage.
@@ -120,7 +120,7 @@
 
 ## 1.0.227 — 2026-10-09
 
-- Add `/snp debug nearby [name]` to capture disappearing names before target/mouseover refresh can conceal the failed state. Enumerates existing plates directly without direct unit lookup, classification, tooltip collection or presentation writes.
+- Add `/rpsn debug nearby [name]` to capture disappearing names before target/mouseover refresh can conceal the failed state. Enumerates existing plates directly without direct unit lookup, classification, tooltip collection or presentation writes.
 - Reports shown/visible state, local/effective alpha and dimensions across the base plate, unit frame, health container/bar, native name, inside name and additional inside-name ancestors. Deduplicates frames and bounds output to 20 matches.
 - All 23 smoke suites pass, including read-only failure preservation, inherited alpha reporting and literal name filtering.
 - The reported hostile NPC disappearance persists after 1.0.226. Its cause remains unconfirmed; this build collects the missing failure-state evidence rather than changing additional native fades without evidence.
@@ -413,7 +413,7 @@ Entries describe their recorded releases; later fixes and the current guides sup
 
 ## 1.0.180
 
-* Fixes /snp debug cast-hook reporting to read the current icon's entry in the registered-hook table instead of the obsolete single-icon field. Replacement and missing icons report no hook until registered; returning hooked icons report correctly. Diagnostics remain read-only.
+* Fixes /rpsn debug cast-hook reporting to read the current icon's entry in the registered-hook table instead of the obsolete single-icon field. Replacement and missing icons report no hook until registered; returning hooked icons report correctly. Diagnostics remain read-only.
 * Adds real-hook, replacement, returning-icon and missing-icon diagnostic regressions; updates documentation. All twenty smoke suites and whitespace checks pass. Native WoW verification remains pending.
 
 ## 1.0.179
@@ -460,7 +460,7 @@ Entries describe their recorded releases; later fixes and the current guides sup
 
 ## 1.0.163
 
-* Adds session-only, off-by-default `/snp perf start`, `stop` and `report` commands. Measures full styling, classification, NPC-title lookup, cached text repair, runtime updates and reconciliation without changing refresh behavior or saved settings.
+* Adds session-only, off-by-default `/rpsn perf start`, `stop` and `report` commands. Measures full styling, classification, NPC-title lookup, cached text repair, runtime updates and reconciliation without changing refresh behavior or saved settings.
 * Reports call count and total/average/longest elapsed time, explicitly labels overlapping inclusive timings, and samples addon memory only at start/stop. Disabled wrappers perform no timing or memory work.
 * Adds deterministic lifecycle, return/error preservation and real runtime/slash integration coverage. All eighteen smoke suites and whitespace checks pass; native-client profiling and security checks remain pending.
 
@@ -629,7 +629,7 @@ Entries describe their recorded releases; later fixes and the current guides sup
 
 ## 1.0.132
 
-* Adds `/snp debug mouseover` to inspect hovered creatures without changing the target or their nameplate presentation. Existing `/snp debug` continues to inspect the target.
+* Adds `/rpsn debug mouseover` to inspect hovered creatures without changing the target or their nameplate presentation. Existing `/rpsn debug` continues to inspect the target.
 * Identifies the inspected token in reports and handles missing mouseover units explicitly.
 
 ## 1.0.131
@@ -659,7 +659,7 @@ Entries describe their recorded releases; later fixes and the current guides sup
 
 * Moves global Active/Inactive category handling to thumb switches beside their colors, including synchronized sanctuary copies. Colors remain profile-specific.
 * Moves global Enable styling and Hide critter/companion switches above Reset text and layout on Appearance, preserving startup compatibility checks and restoration behavior.
-* Removes the empty Behavior tab; `/snp` and the existing behavior/general/settings aliases open Appearance. Reset actions do not alter the global switches.
+* Removes the empty Behavior tab; `/rpsn` and the existing behavior/general/settings aliases open Appearance. Reset actions do not alter the global switches.
 
 ## 1.0.125
 
@@ -717,7 +717,7 @@ Entries describe their recorded releases; later fixes and the current guides sup
 
 ## 1.0.116
 
-* Limits `/snp debug` plate details to the target, its direct lookup, and plates with the same readable unit name. Nearby unrelated units no longer flood the chat history.
+* Limits `/rpsn debug` plate details to the target, its direct lookup, and plates with the same readable unit name. Nearby unrelated units no longer flood the chat history.
 * Distinguishes same-name diagnostic candidates from verified target identity, retains widget-only and subtitle reports, and prints each relevant frame only once.
 * Added regression coverage for unrelated plates, duplicate enumeration, multiple same-name presentations, and unavailable names.
 
@@ -725,7 +725,7 @@ Entries describe their recorded releases; later fixes and the current guides sup
 
 * Tries a structured `unit:<GUID>` hyperlink tooltip first for confirmed NPC subtitles, then retains the working unit-token and GUID/name cache fallbacks. Missing, failed, restricted, or rejected hyperlink data does not prevent fallback.
 * Preserves affirmative interaction evidence learned with a subtitle so direct hyperlink extraction does not revert a useful nameplate to the useless-NPC color.
-* `/snp debug` reports hyperlink title/extraction results, each unit's soft-interaction match and widget-only flag, and the `nameplateShowFriendlyNpcs` CVar. These reads do not alter name visibility or suppress duplicate world labels.
+* `/rpsn debug` reports hyperlink title/extraction results, each unit's soft-interaction match and widget-only flag, and the `nameplateShowFriendlyNpcs` CVar. These reads do not alter name visibility or suppress duplicate world labels.
 * Added regressions for hyperlink precedence, failed/restricted reads, rejected layouts, secret GUIDs, player exclusion, useful title/color presentation, and interaction-plate diagnostics.
 
 ## 1.0.114
@@ -751,7 +751,7 @@ Entries describe their recorded releases; later fixes and the current guides sup
 ## 1.0.111
 
 * NPC title diagnostics now distinguish missing APIs/data, failed reads, restricted fields, rejected line layouts, and unsupported or empty subtitles.
-* `/snp debug` reports up to twelve readable tooltip line types and left/right texts for the target and each scanned NPC nameplate, with explicit field-access status. Diagnostic text escapes tooltip markup; no visible tooltip is created or changed.
+* `/rpsn debug` reports up to twelve readable tooltip line types and left/right texts for the target and each scanned NPC nameplate, with explicit field-access status. Diagnostic text escapes tooltip markup; no visible tooltip is created or changed.
 
 ## 1.0.110
 
@@ -761,12 +761,12 @@ Entries describe their recorded releases; later fixes and the current guides sup
 
 ## 1.0.109
 
-* `/snp debug` now reports every enumerated nameplate, including frames that do not match the target: current unit token/name, displayed name text, visibility, addon markers, original unit, and cached name/presentation.
+* `/rpsn debug` now reports every enumerated nameplate, including frames that do not match the target: current unit token/name, displayed name text, visibility, addon markers, original unit, and cached name/presentation.
 * Keeps unknown identities and inaccessible frames explicit; these read-only diagnostics do not change nameplate presentation.
 
 ## 1.0.108
 
-* Expanded `/snp debug` to search existing nameplates for the selected unit when direct lookup misses it, using readable unit identity rather than displayed names.
+* Expanded `/rpsn debug` to search existing nameplates for the selected unit when direct lookup misses it, using readable unit identity rather than displayed names.
 * Reports matching frames, lookup restrictions, Simple Nameplates styling markers, cached text/presentation, and inside-name/long-title regions to investigate duplicate labels without changing name visibility.
 
 ## 1.0.107
@@ -801,13 +801,13 @@ Entries describe their recorded releases; later fixes and the current guides sup
 
 * Completed runtime refactor phase 2: added cached, event-driven world context, including independent player-combat and combat-lockdown facts and desired versus active War Mode. Unknown values remain distinct from false.
 * Centralized frame and region access assessment for refresh, hooks, styling, restoration, cleanup, drift repair, and cast effects.
-* Expanded read-only `/snp debug` reporting for world context, frame capabilities, and observed visibility; diagnostics no longer creates cast overlays or hooks.
+* Expanded read-only `/rpsn debug` reporting for world context, frame capabilities, and observed visibility; diagnostics no longer creates cast overlays or hooks.
 * Added context/access regression checks and the phase-2 client checklist. Existing categories, settings, and health-bar policy remain unchanged.
 
 ## 1.0.102
 
 * Completed runtime refactor phase 1: separated frame access, name/title layout and repair, threat text, cast highlighting, presentation/restoration, runtime events, and diagnostics into focused modules.
-* Fixed `/snp debug` calling an unavailable targeting helper by sharing the classification predicate explicitly.
+* Fixed `/rpsn debug` calling an unavailable targeting helper by sharing the classification predicate explicitly.
 * Extended runtime checks for presentation, TRP3 titles, inside-bar sizing, drift repair, restoration, diagnostics, and module load order. Current category and combat behavior remain unchanged.
 
 ## 1.0.101
@@ -873,7 +873,7 @@ Entries describe their recorded releases; later fixes and the current guides sup
 * Added named appearance profiles shared account-wide with per-character active-profile selection.
 * Added editable bundled Default and High Contrast profiles plus Create, Copy, Rename, Delete, and Restore Bundled Profiles controls.
 * Protected Default as the permanent fallback; deleting another profile returns assigned characters to Default.
-* Combined profile management, text and layout, colors, and visual effects on one Appearance tab; `/snp colors` remains an alias for it.
+* Combined profile management, text and layout, colors, and visual effects on one Appearance tab; `/rpsn colors` remains an alias for it.
 * Replaced the one-shot High Contrast preset with the editable High Contrast profile.
 
 ## 1.0.74
@@ -909,7 +909,7 @@ Entries describe their recorded releases; later fixes and the current guides sup
 * Added an experimental toggle that hides selected Blizzard overhead player, minion, and NPC names while requesting colorable Blizzard nameplates in their place.
 * Combined Midnight's forced-name and friendly-player name-only CVars so hidden world-name settings do not also suppress replacement nameplate text.
 * Restores every affected WoW CVar when the experiment or Simple Nameplates styling is disabled.
-* Reports the replacement state through `/snp debug`.
+* Reports the replacement state through `/rpsn debug`.
 
 ## 1.0.69
 
@@ -977,7 +977,7 @@ Entries describe their recorded releases; later fixes and the current guides sup
 ## 1.0.56
 
 * Fixed some friendly-player names disappearing when name-only styling hid Blizzard's containing health-bar frame.
-* Expanded `/snp debug` with the name region's text, shown state, effective visibility, alpha, and immediate-parent visibility.
+* Expanded `/rpsn debug` with the name region's text, shown state, effective visibility, alpha, and immediate-parent visibility.
 
 ## 1.0.50
 
@@ -990,7 +990,7 @@ Entries describe their recorded releases; later fixes and the current guides sup
 
 ## 1.0.48
 
-* Added cast-highlight state to `/snp debug`.
+* Added cast-highlight state to `/rpsn debug`.
 * Added versioned SavedVariables migrations and separated unit-state colors from effect colors internally.
 * Made every settings page scrollable and replaced fixed vertical coordinates with a layout cursor.
 * Moved release history out of the README and removed the redundant packaged `README.txt`.
@@ -1044,12 +1044,12 @@ Entries describe their recorded releases; later fixes and the current guides sup
 
 * Removed the ineffective replacement-name toggle and ongoing CVar enforcement.
 * Restores saved WoW nameplate settings once for users who enabled the removed option.
-* Retained nameplate-frame availability in `/snp debug` for diagnosing engine-drawn names.
+* Retained nameplate-frame availability in `/rpsn debug` for diagnosing engine-drawn names.
 
 ## 1.0.37
 
 * Made replacement names persistent by temporarily enabling Always Show Nameplates and forcing nameplate names to appear.
-* Added nameplate-frame availability to `/snp debug` output.
+* Added nameplate-frame availability to `/rpsn debug` output.
 
 ## 1.0.36
 
@@ -1072,7 +1072,7 @@ Entries describe their recorded releases; later fixes and the current guides sup
 ## 1.0.32
 
 * Added a master styling switch that restores Blizzard nameplates and friendly-color settings when disabled.
-* Added `/snp debug` diagnostics for the current target.
+* Added `/rpsn debug` diagnostics for the current target.
 * Labeled every color row as a colored name or health bar and added individual reset buttons.
 * Added a threat-percentage display toggle, enabled by default.
 * Clarified that PC glow applies only to PCs with visible health bars.
@@ -1114,7 +1114,7 @@ Entries describe their recorded releases; later fixes and the current guides sup
 
 * Added an optional `TRP3.lua` integration skeleton using public TRP3 APIs.
 * Added a TRP3 settings page with a master profile-display toggle, disabled by default.
-* Added TRP3 availability status and `/snp trp3`.
+* Added TRP3 availability status and `/rpsn trp3`.
 * No TRP3 profile fields are displayed yet.
 
 ## 1.0.25
@@ -1123,7 +1123,7 @@ Entries describe their recorded releases; later fixes and the current guides sup
 * Changed both default fonts to Arial Narrow with a normal outline.
 * Added Above Bar and Inside Bar placement for names on hostile-unit health bars.
 * Inside-bar names automatically shrink and reserve space for the threat percentage.
-* Added `/snp text`.
+* Added `/rpsn text`.
 
 ## 1.0.24
 
@@ -1135,4 +1135,4 @@ Entries describe their recorded releases; later fixes and the current guides sup
 
 * Fresh standalone release with no previous-version or legacy-settings handling.
 * Warns at login when another enabled third-party “plate” addon may conflict.
-* Uses `/snp` for settings and About commands.
+* Uses `/rpsn` for settings and About commands.

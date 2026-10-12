@@ -51,12 +51,12 @@ local function ShowNameplateConflictWarning()
     local conflicts = FindOtherPlateAddOns()
     if #conflicts == 0 then return end
 
-    StaticPopupDialogs["SNP_NAMEPLATE_CONFLICT"] = {
+    StaticPopupDialogs["RPSN_NAMEPLATE_CONFLICT"] = {
         text = "|cff0cd29fRP Simple Nameplates|r\n\nOther enabled addons whose names contain ‘plate’ were found:\n\n%s\n\nRunning more than one nameplate addon can cause conflicting colors or duplicate nameplates. Disable the others and reload the UI if you see problems.",
         button1 = OKAY or "Okay",
         timeout = 0, whileDead = true, hideOnEscape = true, preferredIndex = 3,
     }
-    StaticPopup_Show("SNP_NAMEPLATE_CONFLICT", table.concat(conflicts, "\n"))
+    StaticPopup_Show("RPSN_NAMEPLATE_CONFLICT", table.concat(conflicts, "\n"))
 end
 
 local function AccessibleNumber(v)

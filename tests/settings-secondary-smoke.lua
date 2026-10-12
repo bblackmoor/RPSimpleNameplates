@@ -89,12 +89,12 @@ ns.CancelAppearanceEdits=function(quiet) assert(quiet); canceled=canceled+1 end
 Choose("High Contrast")
 assert(canceled==1 and selector.MyObject.myvalue=="High Contrast" and rename:IsEnabled())
 Click(Button("Create"))
-assert(popup.key=="SNP_PROFILE_NAME" and popup.data.initial=="")
+assert(popup.key=="RPSN_PROFILE_NAME" and popup.data.initial=="")
 -- Opening/canceling a native dialog has no database side effect.
 before=Snapshot(SimpleNameplatesDB)
 local dialog=CreateFrame("Frame"); dialog.editBox=CreateFrame("EditBox", nil, dialog)
-StaticPopupDialogs.SNP_PROFILE_NAME.OnShow(dialog, popup.data)
-StaticPopupDialogs.SNP_PROFILE_NAME.EditBoxOnEscapePressed(dialog.editBox)
+StaticPopupDialogs.RPSN_PROFILE_NAME.OnShow(dialog, popup.data)
+StaticPopupDialogs.RPSN_PROFILE_NAME.EditBoxOnEscapePressed(dialog.editBox)
 assert(Snapshot(SimpleNameplatesDB)==before)
 AcceptName(" Custom ")
 assert(ns.GetActiveProfileName()=="Custom" and ns.GetAppearanceSetting("nameSize")==18)
@@ -110,7 +110,7 @@ before=Snapshot(SimpleNameplatesDB)
 Click(rename); AcceptName("custom")
 assert(Snapshot(SimpleNameplatesDB)==before, "duplicate rejection preserves data")
 Click(delete)
-assert(popup.key=="SNP_DELETE_PROFILE" and popup.text=="Renamed")
+assert(popup.key=="RPSN_DELETE_PROFILE" and popup.text=="Renamed")
 assert(Snapshot(SimpleNameplatesDB)==before, "delete requires acceptance")
 StaticPopupDialogs[popup.key].OnAccept(nil, popup.data)
 assert(ns.GetActiveProfileName()=="Default" and ns.EnsureDB().profileKeys["Player-Two"]=="Default")
@@ -151,9 +151,9 @@ Click(master); assert(not ns.GetTRP3Enabled() and not dependent:IsEnabled())
 available=true; Show(panels[2]); Row("Total RP 3 detected.")
 available=false; Show(panels[2]); Row("Requires Total RP 3 to be installed and enabled.")
 -- About displays never enable color editing, dim their RGB, or use Details assets.
-local colors={{"Opposite-faction PC labels in sanctuary",102/255,102/255,1,"SNP_BLIZZARD_OVERHEAD_INFO"},
-    {"Native interactive-NPC world labels",1,1,0,"SNP_BLIZZARD_INTERACTIVE_INFO"},
-    {"Native vendor-NPC world labels",0,1,0,"SNP_BLIZZARD_VENDOR_INFO"}}
+local colors={{"Opposite-faction PC labels in sanctuary",102/255,102/255,1,"RPSN_BLIZZARD_OVERHEAD_INFO"},
+    {"Native interactive-NPC world labels",1,1,0,"RPSN_BLIZZARD_INTERACTIVE_INFO"},
+    {"Native vendor-NPC world labels",0,1,0,"RPSN_BLIZZARD_VENDOR_INFO"}}
 for _, case in ipairs(colors) do
     local row=Row(case[1]); local swatch=Control(case[1], "button")
     assert(swatch.mouseEnabled==false and swatch:GetWidth()==26 and swatch:GetHeight()==26)
@@ -167,11 +167,11 @@ for _, case in ipairs(colors) do
     row:GetScript("OnEnter")(row); assert(GameTooltip.owner==row)
 end
 local link=Button(ns.SOURCE_URL)
-Click(link); assert(popup.key=="SNP_COPY_SOURCE" and popup.data==ns.SOURCE_URL)
+Click(link); assert(popup.key=="RPSN_COPY_SOURCE" and popup.data==ns.SOURCE_URL)
 local copyDialog=CreateFrame("Frame"); copyDialog.editBox=CreateFrame("EditBox", nil, copyDialog)
-StaticPopupDialogs.SNP_COPY_SOURCE.OnShow(copyDialog, popup.data)
+StaticPopupDialogs.RPSN_COPY_SOURCE.OnShow(copyDialog, popup.data)
 assert(copyDialog.editBox:GetText()==ns.SOURCE_URL)
-StaticPopupDialogs.SNP_COPY_SOURCE.EditBoxOnEnterPressed(copyDialog.editBox)
+StaticPopupDialogs.RPSN_COPY_SOURCE.EditBoxOnEnterPressed(copyDialog.editBox)
 assert(copyDialog.shown==false)
 assert(link.backdropColor[4]==0 and link.backdropBorderColor[4]==0, "source link has no button background")
 link:GetScript("OnEnter")(link); assert(link.text.textColor[1]==0.65)
@@ -189,7 +189,7 @@ Choose("Custom"); Click(delete)
 local staleDelete = popup
 Choose("High Contrast")
 before=Snapshot(SimpleNameplatesDB)
-StaticPopupDialogs.SNP_DELETE_PROFILE.OnAccept(nil, staleDelete.data)
+StaticPopupDialogs.RPSN_DELETE_PROFILE.OnAccept(nil, staleDelete.data)
 assert(Snapshot(SimpleNameplatesDB)==before, "stale confirmation cannot delete the newly selected profile")
 for _, action in ipairs({"Copy", "Rename"}) do
     Choose("Custom"); Click(Button(action))
@@ -207,16 +207,16 @@ local keyboardEdit = CreateFrame("EditBox", nil, keyboardDialog)
 keyboardEdit:SetText("Keyboard profile")
 keyboardDialog.GetEditBox = function() return keyboardEdit end
 local accept = CreateFrame("Button", nil, keyboardDialog)
-accept.Click = function() StaticPopupDialogs.SNP_PROFILE_NAME.OnAccept(keyboardDialog, keyboardData) end
+accept.Click = function() StaticPopupDialogs.RPSN_PROFILE_NAME.OnAccept(keyboardDialog, keyboardData) end
 keyboardDialog.GetButton1 = function() return accept end
-StaticPopupDialogs.SNP_PROFILE_NAME.EditBoxOnEnterPressed(keyboardEdit)
+StaticPopupDialogs.RPSN_PROFILE_NAME.EditBoxOnEnterPressed(keyboardEdit)
 assert(ns.GetActiveProfileName() == "Keyboard profile", "Enter accepts a modern profile dialog")
 Click(Button("Create")); keyboardData = popup.data
 keyboardEdit:SetText("Blocked keyboard profile"); accept:Disable()
-StaticPopupDialogs.SNP_PROFILE_NAME.EditBoxOnEnterPressed(keyboardEdit)
+StaticPopupDialogs.RPSN_PROFILE_NAME.EditBoxOnEnterPressed(keyboardEdit)
 assert(not ns.EnsureDB().profiles["Blocked keyboard profile"], "Enter respects a disabled accept button")
 accept:Enable(); keyboardDialog.GetButton1 = nil; keyboardDialog.button1 = accept
-StaticPopupDialogs.SNP_PROFILE_NAME.EditBoxOnEnterPressed(keyboardEdit)
+StaticPopupDialogs.RPSN_PROFILE_NAME.EditBoxOnEnterPressed(keyboardEdit)
 assert(ns.GetActiveProfileName() == "Blocked keyboard profile", "legacy accept field remains supported")
 -- Setup approval resumes effective styling while Profiles is already visible.
 ns.CheckNameplateSetup = realSetupCheck
@@ -228,8 +228,8 @@ C_CVar.SetCVar = function(name, value) cvars[name] = value end
 ns.SetStylingEnabled(false); Show(panels[1])
 Click(styling)
 assert(ns.nameplateSetupPending and not styling.MyObject:GetValue())
-assert(popup.key == "SNP_NAMEPLATE_SETUP")
-StaticPopupDialogs.SNP_NAMEPLATE_SETUP.OnAccept()
+assert(popup.key == "RPSN_NAMEPLATE_SETUP")
+StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnAccept()
 assert(ns.GetStylingEnabled() and styling.MyObject:GetValue(), "visible styling control refreshes after setup approval")
 local activationStatus
 for _, object in ipairs(ui.objects) do
@@ -239,15 +239,15 @@ assert(activationStatus)
 cvars.nameplateShowFriendlyNpcs = "0"
 ns.CheckNameplateSetup()
 assert(not styling.MyObject:GetValue() and activationStatus:GetText() == "Inactive", "external setup suspension refreshes the visible switch/status")
-StaticPopupDialogs.SNP_NAMEPLATE_SETUP.OnCancel()
+StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnCancel()
 assert(not ns.GetStylingEnabled() and not styling.MyObject:GetValue())
 local blocked, combat = true, false
 C_CVar.SetCVar = function(name, value) if not blocked then cvars[name] = value end end
 InCombatLockdown = function() return combat end
-Click(styling); StaticPopupDialogs.SNP_NAMEPLATE_SETUP.OnAccept()
+Click(styling); StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnAccept()
 assert(ns.nameplateSetupPending and not styling.MyObject:GetValue(), "rejected writes remain inactive")
 blocked, combat = false, true
-StaticPopupDialogs.SNP_NAMEPLATE_SETUP.OnAccept()
+StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnAccept()
 assert(ns.nameplateSetupPending and not styling.MyObject:GetValue(), "combat-deferred approval remains inactive")
 combat = false; ns.RetryNameplateSetup()
 assert(ns.GetStylingEnabled() and styling.MyObject:GetValue() and activationStatus:GetText() == "Active", "deferred completion refreshes switch/status")
@@ -297,7 +297,7 @@ do
 end
 local perfFound = false
 for _, object in ipairs(ui.objects) do
-    if object.kind == "FontString" and (object:GetText() or ""):find("/snp perf [start|stop|report]", 1, true) then perfFound = true end
+    if object.kind == "FontString" and (object:GetText() or ""):find("/rpsn perf [start|stop|report]", 1, true) then perfFound = true end
 end
 assert(perfFound, "About documents profiling")
 
@@ -308,7 +308,7 @@ for _, action in ipairs({"Copy", "Rename", "Delete"}) do
     ns.RestoreBundledProfiles()
     local saved = Snapshot(SimpleNameplatesDB)
     popup = pending
-    if action == "Delete" then StaticPopupDialogs.SNP_DELETE_PROFILE.OnAccept(nil, pending.data)
+    if action == "Delete" then StaticPopupDialogs.RPSN_DELETE_PROFILE.OnAccept(nil, pending.data)
     else AcceptName("Replaced target " .. action) end
     assert(Snapshot(SimpleNameplatesDB) == saved, "same-name replacement invalidates " .. action)
 end
@@ -317,13 +317,13 @@ local pending = popup
 ns.RestoreBundledProfiles()
 ns.SetAppearanceSetting("nameSize", 29)
 local saved = Snapshot(SimpleNameplatesDB)
-StaticPopupDialogs.SNP_RESTORE_BUNDLED_PROFILES.OnAccept(nil, pending.data)
+StaticPopupDialogs.RPSN_RESTORE_BUNDLED_PROFILES.OnAccept(nil, pending.data)
 assert(Snapshot(SimpleNameplatesDB) == saved, "stale bundled restore cannot overwrite a replacement")
 Choose("High Contrast"); assert(ns.DeleteActiveProfile())
 Show(panels[1]); Click(Button("Restore bundled profiles")); pending = popup
 assert(ns.CopyActiveProfile("High Contrast"))
 ns.SetAppearanceSetting("nameSize", 30)
 saved = Snapshot(SimpleNameplatesDB)
-StaticPopupDialogs.SNP_RESTORE_BUNDLED_PROFILES.OnAccept(nil, pending.data)
+StaticPopupDialogs.RPSN_RESTORE_BUNDLED_PROFILES.OnAccept(nil, pending.data)
 assert(Snapshot(SimpleNameplatesDB) == saved, "new object under a previously missing bundled name is protected")
 print("PASS profile dialog replacement identity and missing-target guards")

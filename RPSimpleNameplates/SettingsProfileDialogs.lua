@@ -47,12 +47,12 @@ function UI.RegisterProfileDialogs()
     local function GetAcceptButton(popup)
         return popup.GetButton1 and popup:GetButton1() or popup.button1
     end
-    StaticPopupDialogs["SNP_PROFILE_NAME"] = {
+    StaticPopupDialogs["RPSN_PROFILE_NAME"] = {
         text = "Enter a profile name.", button1 = ACCEPT or "Accept",
         button2 = CANCEL or "Cancel", hasEditBox = true, maxLetters = 64,
         editBoxWidth = 260,
         OnShow = function(self, data)
-            TrackDialog("SNP_PROFILE_NAME", data)
+            TrackDialog("RPSN_PROFILE_NAME", data)
             local editBox = GetEditBox(self)
             editBox:SetText(data and data.initial or "")
             editBox:SetFocus()
@@ -73,10 +73,10 @@ function UI.RegisterProfileDialogs()
         EditBoxOnEscapePressed = function(self) self:GetParent():Hide() end,
         timeout = 0, whileDead = true, hideOnEscape = true, preferredIndex = 3,
     }
-    StaticPopupDialogs["SNP_DELETE_PROFILE"] = {
+    StaticPopupDialogs["RPSN_DELETE_PROFILE"] = {
         text = "Delete the profile |cffffffff%s|r? Characters using it will switch to Default.",
         button1 = DELETE or "Delete", button2 = CANCEL or "Cancel",
-        OnShow = function(_, data) TrackDialog("SNP_DELETE_PROFILE", data) end,
+        OnShow = function(_, data) TrackDialog("RPSN_DELETE_PROFILE", data) end,
         OnAccept = function(_, data)
             if not CanAccept(data) or not CheckDialogTarget(data.target) then return end
             local ok, message = addon.DeleteActiveProfile()
@@ -85,10 +85,10 @@ function UI.RegisterProfileDialogs()
         end,
         timeout = 0, whileDead = true, hideOnEscape = true, preferredIndex = 3,
     }
-    StaticPopupDialogs["SNP_RESTORE_BUNDLED_PROFILES"] = {
+    StaticPopupDialogs["RPSN_RESTORE_BUNDLED_PROFILES"] = {
         text = "Restore factory settings for Default and High Contrast? Their changes will be lost; missing bundled profiles will be recreated.",
         button1 = "Restore", button2 = CANCEL or "Cancel",
-        OnShow = function(_, data) TrackDialog("SNP_RESTORE_BUNDLED_PROFILES", data) end,
+        OnShow = function(_, data) TrackDialog("RPSN_RESTORE_BUNDLED_PROFILES", data) end,
         OnAccept = function(_, data)
             if not CanAccept(data) then return end
             for _, target in ipairs(data.targets or {}) do

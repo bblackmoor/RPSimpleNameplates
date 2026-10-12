@@ -48,10 +48,10 @@ Native icon/shield visibility supplies initial interruptibility; explicit interr
 
 | Command | Scope |
 | --- | --- |
-| `/snp debug` | Cached world context and target assessment |
-| `/snp debug mouseover` | Hovered unit without targeting; suitable for a keybound macro |
-| `/snp debug nearby [name]` | Existing-plate snapshot; literal case-insensitive substring filter; at most 20 matches |
-| `/snp perf start`, `/snp perf stop`, `/snp perf report` | Session-only timing capture; see the profiling guide |
+| `/rpsn debug` | Cached world context and target assessment |
+| `/rpsn debug mouseover` | Hovered unit without targeting; suitable for a keybound macro |
+| `/rpsn debug nearby [name]` | Existing-plate snapshot; literal case-insensitive substring filter; at most 20 matches |
+| `/rpsn perf start`, `/rpsn perf stop`, `/rpsn perf report` | Session-only timing capture; see the profiling guide |
 
 Target diagnostics distinguish direct/identity matches from readable same-name candidates and report each relevant frame once. Unrelated plates contribute only scan counts. Reports cover classification facts/winning rule, requested versus observed presentation, region visibility/alpha/geometry, cast effect state/source/hooks, restoration errors, and NPC tooltip parsing/source evidence (up to twelve lines). Existing effects are inspected without creating frames or hooks. Missing matches do not prove who owns an overhead label.
 

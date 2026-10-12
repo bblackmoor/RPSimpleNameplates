@@ -91,7 +91,7 @@ local function Start()
     if not started then Say("Profiling requires a readable precise timer."); return end
     active = {started = started, memoryStart = memory, stats = {}, counters = {}}
     last = active
-    Say("Profiling started. Use /snp perf stop, then /snp perf report.")
+    Say("Profiling started. Use /rpsn perf stop, then /rpsn perf report.")
 end
 local function Stop()
     if not active then Say("Profiling is not running."); return end
@@ -99,10 +99,10 @@ local function Stop()
     active = nil
     session.finished = Clock() or session.started
     session.memoryEnd = Memory()
-    Say("Profiling stopped. Use /snp perf report.")
+    Say("Profiling stopped. Use /rpsn perf report.")
 end
 local function Report()
-    if not last then Say("No profiling session. Use /snp perf start."); return end
+    if not last then Say("No profiling session. Use /rpsn perf start."); return end
     local finished = last.finished or Clock() or last.started
     Say(("Profiling %s; %.1f seconds elapsed."):format(active and "running" or "stopped",
         math.max(0, finished - last.started)))
@@ -147,7 +147,7 @@ local function Command(argument)
     if argument == "start" then Start()
     elseif argument == "stop" then Stop()
     elseif argument == "report" or argument == "" then Report()
-    else Say("/snp perf start | stop | report") end
+    else Say("/rpsn perf start | stop | report") end
 end
 -- The token is opaque to consumers and distinguishes restarted sessions.
 ns.Profiler = {Wrap = Wrap, Count = Count, SizeSample = SizeSample, ColorSample = ColorSample, Command = Command}

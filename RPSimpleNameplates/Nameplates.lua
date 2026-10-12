@@ -392,15 +392,15 @@ local function ReconcileNames(plate)
                 reconcilePlates[plate] = nil; return
             end
         end
-        if frame.SNPArtworkPending then
+        if frame.RPSNArtworkPending then
             ns.NameplateFrames.ApplyBarArtwork(frame, assessment, context)
             assessment = Cap.InspectFrame(frame, context)
         end
-        if frame.SNPTitleVisibilityPending then
+        if frame.RPSNTitleVisibilityPending then
             ns.NameplateText.SyncFullTitleVisibility(frame, context, assessment, true)
         end
         local drifted, reason, plan
-        if frame.SNPState then drifted, reason, plan = CachedNameHasDrifted(frame, context, assessment) end
+        if frame.RPSNState then drifted, reason, plan = CachedNameHasDrifted(frame, context, assessment) end
         if drifted then
             ns.Profiler.Count("Name drift", reason or "unknown")
             if RepairCachedName(frame, context, assessment, plan) then
@@ -410,7 +410,7 @@ local function ReconcileNames(plate)
                 ApplySimpleStyle(frame, context, "reconciliation fallback")
             end
         end
-        if frame.SNPArtworkPending then
+        if frame.RPSNArtworkPending then
             local current = Cap.InspectFrame(frame, context)
             if current.canAccess then ns.NameplateFrames.ApplyBarArtwork(frame, current, context) end
         end
