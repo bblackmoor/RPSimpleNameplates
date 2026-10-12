@@ -1,3 +1,9 @@
+## 1.0.248 — 2026-10-11
+
+- Connect release metadata to CurseForge project 1740403 and add tag-triggered uploads of the same verified ZIP published on GitHub.
+- Include the current release notes, exact supported Retail versions, and embedded-library relations in CurseForge uploads. Configure the CF_API_TOKEN repository secret to enable publishing.
+- Retain the author's latest README, screenshots and icon source assets; no addon runtime behavior changes.
+
 ## 1.0.247 — 2026-10-10
 
 - Add automated GitHub builds with pinned upstream libraries, source and packaged-addon checks, installable ZIP artifacts, and GitHub releases when matching version tags are pushed.

@@ -15,6 +15,8 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -36,6 +38,7 @@ jobs:
       - name: Run source checks
         run: |
           git show --format= --check HEAD
+          python3 -m unittest discover -s tests -p 'test_*.py'
           for test in tests/*-smoke.lua; do
             texlua "$test"
           done
@@ -49,6 +52,7 @@ jobs:
       - name: Verify and test packaged addon
         run: |
           python3 scripts/validate_release.py --archive .release/*.zip
+          python3 scripts/upload_curseforge.py --archive .release/*.zip --notes dist/release-notes.md --dry-run
           cp .release/*.zip dist/
           mkdir -p dist/smoke
           unzip -q .release/*.zip -d dist/smoke
@@ -79,6 +83,7 @@ jobs:
       - name: Download verified package
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
+          name: SimpleNameplates-${{ needs.build.outputs.version }}
           path: package
           merge-multiple: true
 
@@ -91,3 +96,41 @@ jobs:
           gh release create "$RELEASE_TAG" package/*.zip \
             --verify-tag --title "Simple Nameplates ${RELEASE_TAG#v}" \
             --notes-file package/release-notes.md
+
+  curseforge:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: [build, release]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check CurseForge token setup
+        id: setup
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          if [[ -n "$CF_API_TOKEN" ]]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo '::notice::CurseForge upload skipped: add the CF_API_TOKEN repository secret.'
+            echo 'CurseForge upload skipped: add the **CF_API_TOKEN** repository secret, then rerun this job.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Check out tagged upload code
+        if: steps.setup.outputs.ready == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download verified package
+        if: steps.setup.outputs.ready == 'true'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: SimpleNameplates-${{ needs.build.outputs.version }}
+          path: package
+
+      - name: Upload verified ZIP to CurseForge
+        if: steps.setup.outputs.ready == 'true'
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: python3 scripts/upload_curseforge.py --archive package/*.zip --notes package/release-notes.md

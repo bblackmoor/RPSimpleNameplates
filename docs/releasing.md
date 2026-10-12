@@ -18,7 +18,7 @@ installable addon ZIP and `release-notes.md` in another ZIP; install the inner
 The workflow:
 
 1. Requires a numeric three-part TOC version and a matching first changelog entry.
-2. Runs all existing Lua smoke suites on the source checkout.
+2. Runs the upload-helper unit tests and all existing Lua smoke suites on the source checkout.
 3. Fetches the four libraries at the exact commits in `.pkgmeta` and builds a
    ZIP with a single top-level `SimpleNameplates` folder.
 4. Checks the full TOC/XML load chain against the tested source, retaining
@@ -43,11 +43,11 @@ the documented whitespace normalization.
 Set `SimpleNameplates/SimpleNameplates.toc` to the intended version and add the
 matching entry at the top of `CHANGELOG.md`. Commit and push those changes. Tag
 that commit with `v` followed by the exact TOC version, then push the tag. For
-version 1.0.247, for example:
+version 1.0.248, for example:
 
 ```sh
-git tag -a v1.0.247 -m "Simple Nameplates 1.0.247"
-git push origin v1.0.247
+git tag -a v1.0.248 -m "Simple Nameplates 1.0.248"
+git push origin v1.0.248
 ```
 
 The tag push runs the same checks and publishes the verified ZIP to GitHub
@@ -60,23 +60,35 @@ Only the release job has `contents: write`; it uses GitHub's supplied
 If Actions are disabled or an account policy blocks the pinned actions, enable
 them in [repository Actions settings](https://github.com/bblackmoor/SimpleNameplates/settings/actions).
 
-## CurseForge setup still needed
+## Publish to CurseForge
 
-CurseForge upload is not configured in this workflow. GitHub packaging and
-releases work independently. The verified ZIP can be uploaded manually.
+The addon metadata identifies
+[CurseForge project 1740403](https://authors.curseforge.com/#/projects/1740403).
+Create an [author API token](https://authors.curseforge.com/#/settings/api-tokens)
+and save it as `CF_API_TOKEN` in
+[GitHub Actions secrets](https://github.com/bblackmoor/SimpleNameplates/settings/secrets/actions).
+Keep the token out of commits, chat and documentation.
 
-To add automatic CurseForge uploads:
+For future matching version-tag pushes, the `curseforge` job waits for the build
+and GitHub release to succeed, then uploads the same ZIP bytes to the
+[CurseForge author upload API](https://support.curseforge.com/support/solutions/articles/9000197321-curseforge-upload-api).
+It reads the project ID and supported Retail patch versions from the TOC,
+resolves those versions against CurseForge's Retail catalog, includes the
+current release notes and embedded-library relations from `.pkgmeta`, and
+reports the returned file ID. It does not rebuild the package or fall back to
+a different game version if a declared version is missing from the catalog.
 
-1. Create or identify the Simple Nameplates project in CurseForge and record its
-   project ID.
-2. Create an author API token and save it as `CF_API_TOKEN` in
-   [GitHub Actions secrets](https://github.com/bblackmoor/SimpleNameplates/settings/secrets/actions).
-   Keep the token out of commits, chat and documentation.
-3. Add the project ID to the addon metadata and add a tag-only upload step using
-   the verified package. Confirm supported Retail versions on the first upload.
+If the secret is absent, the job posts a clear skipped-upload notice and the
+GitHub release still succeeds. After setting the secret, rerun only that
+`curseforge` job to upload its retained artifact. If an upload failed or timed
+out, check the project's files before retrying so an accepted upload is not
+submitted again. Existing published tags are not moved or republished by this
+setup change; the next version tag must include this workflow.
 
-The `.pkgmeta` recipe already identifies the included libraries for CurseForge's
-embedded-library relations. TRP3 remains an optional integration.
+An accepted upload may still await CurseForge's normal review before becoming
+public. Confirm supported Retail versions and the included libraries on the
+first accepted file. TRP3 remains an optional integration; required libraries
+are embedded in the ZIP.
 
 ## Local packaging checks
 
@@ -85,9 +97,11 @@ With Git, Bash, ZIP and LuaTeX installed, clone the packager at its pinned
 
 ```sh
 python3 scripts/validate_release.py
+python3 -m unittest discover -s tests -p 'test_*.py'
 for test in tests/*-smoke.lua; do texlua "$test" || exit 1; done
-bash /path/to/packager/release.sh -d -l -u -n 'SimpleNameplates-1.0.247'
-python3 scripts/validate_release.py --archive .release/SimpleNameplates-1.0.247.zip
+bash /path/to/packager/release.sh -d -l -u -n 'SimpleNameplates-1.0.248'
+python3 scripts/validate_release.py --archive .release/SimpleNameplates-1.0.248.zip
+python3 scripts/upload_curseforge.py --archive .release/SimpleNameplates-1.0.248.zip --notes dist/release-notes.md --dry-run
 ```
 
 Use the current TOC version in the ZIP name. `.release/`, `dist/` and Python
