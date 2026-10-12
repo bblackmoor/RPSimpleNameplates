@@ -1,12 +1,14 @@
 """Check release consistency and real Git-index preparation in disposable repos."""
 
 from pathlib import Path
+import io
 import os
 import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 SOURCE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SOURCE / "scripts"))
@@ -37,7 +39,7 @@ class StagedBuildTests(unittest.TestCase):
         self.root = Path(temporary.name)
         for directory in ("RPSimpleNameplates", "scripts", ".githooks"):
             (self.root / directory).mkdir()
-        for name in ("scripts/validate_release.py", ".githooks/pre-commit"):
+        for name in ("scripts/validate_release.py", ".githooks/pre-commit", ".gitattributes"):
             shutil.copy2(SOURCE / name, self.root / name)
         (self.root / TOC).write_text(BASE_TOC, encoding="utf-8")
         (self.root / "CHANGELOG.md").write_text(BASE_NOTES, encoding="utf-8")
@@ -213,6 +215,41 @@ class StagedBuildTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Stage changes", result.stderr)
         self.assertEqual(self.git("write-tree"), before)
+
+    def test_windows_default_text_writes_do_not_change_metadata_line_endings(self):
+        original_open = io.open
+
+        def windows_open(file, mode="r", buffering=-1, encoding=None, errors=None,
+                         newline=None, closefd=True, opener=None):
+            # Simulate Windows translating unspecified output newlines to CRLF.
+            if "w" in mode and "b" not in mode and newline is None:
+                newline = "\r\n"
+            return original_open(file, mode, buffering, encoding, errors,
+                                 newline, closefd, opener)
+
+        with patch.object(release, "ROOT", self.root), patch("io.open", windows_open):
+            version = release.prepare_staged()
+        self.assertEqual(version, "1.0.2")
+        for path in (TOC, "CHANGELOG.md"):
+            self.assertNotIn(b"\r", (self.root / path).read_bytes(), path)
+        checked = subprocess.run(["git", "diff", "--cached", "--check"], cwd=self.root,
+                                 capture_output=True, text=True)
+        self.assertEqual(checked.returncode, 0, checked.stdout)
+
+    def test_git_windows_line_ending_settings_keep_metadata_lf(self):
+        self.git("config", "core.autocrlf", "true")
+        self.git("config", "core.eol", "crlf")
+        self.git("checkout-index", "--force", "--", TOC, "CHANGELOG.md")
+        for path in (TOC, "CHANGELOG.md"):
+            self.assertNotIn(b"\r", (self.root / path).read_bytes(), path)
+        self.git("config", "core.hooksPath", ".githooks")
+        self.git("config", "user.name", "Release tests")
+        self.git("config", "user.email", "tests@example.invalid")
+        self.git("commit", "--quiet", "-m", "Check Windows line endings")
+        checked = subprocess.run(["git", "show", "--format=", "--check", "HEAD"],
+                                 cwd=self.root, capture_output=True, text=True)
+        self.assertEqual(checked.returncode, 0, checked.stdout)
+        self.assertEqual(self.git("status", "--porcelain"), "")
 
     def test_existing_build_tag_prevents_reusing_a_version(self):
         self.git("tag", "v1.0.2")

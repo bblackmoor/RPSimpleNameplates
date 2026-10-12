@@ -74,6 +74,13 @@ def staged_text(path):
     return text
 
 
+def write_metadata(path, contents):
+    # Git's whitespace check treats CRLF as trailing whitespace unless the
+    # repository explicitly allows it. Keep generated metadata LF on Windows too.
+    with path.open("w", encoding="utf-8", newline="\n") as output:
+        output.write(contents)
+
+
 def numbered_notes(changelog):
     notes = {}
     for section in re.split(r"(?m)(?=^## )", changelog):
@@ -164,8 +171,8 @@ def prepare_staged():
         next_changelog = (f"## {next_version} — {date.today().isoformat()}\n\n"
                           + generated_notes + "\n\n" + changelog)
     release_metadata(next_toc, next_changelog)
-    (ROOT / TOC).write_text(next_toc, encoding="utf-8")
-    (ROOT / "CHANGELOG.md").write_text(next_changelog, encoding="utf-8")
+    write_metadata(ROOT / TOC, next_toc)
+    write_metadata(ROOT / "CHANGELOG.md", next_changelog)
     git_text("add", "--", str(TOC), "CHANGELOG.md")
     return next_version
 

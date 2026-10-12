@@ -1,1 +1,3 @@
 .githooks/* text eol=lf
+CHANGELOG.md text eol=lf
+RPSimpleNameplates/RPSimpleNameplates.toc text eol=lf

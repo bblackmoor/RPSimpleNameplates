@@ -56,8 +56,9 @@ Then edit, stage and commit normally. The pre-commit hook creates a new changelo
 entry summarizing the staged file changes and sets the matching TOC version.
 You do not need to edit the changelog or start an `Unreleased` section first.
 Python 3 is required; the hook supports Windows's `py -3` launcher as well as
-`python3` and `python`. Hook line endings remain LF on Windows. This setting is
-local to each clone.
+`python3` and `python`. Hooks and generated TOC/changelog files retain LF line
+endings on Windows, preventing carriage returns from failing Git's whitespace
+check. This setting is local to each clone.
 
 You can still write more descriptive notes: stage an `Unreleased` section or a
 new matching numeric version and heading, and preparation keeps your notes.

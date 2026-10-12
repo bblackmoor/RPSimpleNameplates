@@ -1,3 +1,10 @@
+## 1.0.295 — 2026-10-12
+
+- Update `.gitattributes`.
+- Update `docs/releasing.md`.
+- Update `scripts/validate_release.py`.
+- Update `tests/test_release_metadata.py`.
+
 ## 1.0.294 — 2026-10-12
 
 - Remove `Media/icon-64.tga`.
