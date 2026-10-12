@@ -1,3 +1,8 @@
+## 1.0.294 — 2026-10-12
+
+- Remove `Media/icon-64.tga`.
+- Update `README.md`.
+
 ## 1.0.293 — 2026-10-12
 
 - Add `.gitattributes`.

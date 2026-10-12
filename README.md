@@ -21,14 +21,14 @@ RP Simple Nameplates styles Blizzard's existing nameplates. Health and cast prog
 
 ## Screenshots
 
-<img width="1200" height="1200" alt="Alliance-in-Stormwind" src="https://github.com/user-attachments/assets/ed92f75e-070c-4278-a853-0b35447a866b" />&nbsp;&nbsp;&nbsp;&nbsp;
-<img width="1200" height="1200" alt="Alliance-in-Silvermoon" src="https://github.com/user-attachments/assets/07e627e9-8fef-4229-96cd-ce503b1c218c" />&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://github.com/user-attachments/assets/ed92f75e-070c-4278-a853-0b35447a866b"><img width="300" alt="Alliance-in-Stormwind" src="https://github.com/user-attachments/assets/ed92f75e-070c-4278-a853-0b35447a866b" /></a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://github.com/user-attachments/assets/07e627e9-8fef-4229-96cd-ce503b1c218c"><img width="300" alt="Alliance-in-Silvermoon" src="https://github.com/user-attachments/assets/07e627e9-8fef-4229-96cd-ce503b1c218c" /></a>
 
-<img width="1200" height="1200" alt="Alliance-in-Horde-Silvermoon" src="https://github.com/user-attachments/assets/f6467601-0a0e-404b-9671-0f9641da8c60" />&nbsp;&nbsp;&nbsp;&nbsp;
-<img width="1200" height="1200" alt="Alliance-in-Elwynn-Forest" src="https://github.com/user-attachments/assets/ca3171d3-9ac3-44bb-9874-fd410c59a211" />&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://github.com/user-attachments/assets/f6467601-0a0e-404b-9671-0f9641da8c60"><img width="300" alt="Alliance-in-Horde-Silvermoon" src="https://github.com/user-attachments/assets/f6467601-0a0e-404b-9671-0f9641da8c60" /></a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://github.com/user-attachments/assets/ca3171d3-9ac3-44bb-9874-fd410c59a211"><img width="300" alt="Alliance-in-Elwynn-Forest" src="https://github.com/user-attachments/assets/ca3171d3-9ac3-44bb-9874-fd410c59a211" /></a>
 
-<img width="1200" height="1200" alt="Alliance-in-Dalaran" src="https://github.com/user-attachments/assets/0059939c-75d1-4bac-acca-76190c5bb1ee" />&nbsp;&nbsp;&nbsp;&nbsp;
-<img width="1200" height="1200" alt="Alliance-in-Combat" src="https://github.com/user-attachments/assets/665e4bb8-d5c6-4d61-a43b-530af09270ed" />&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://github.com/user-attachments/assets/0059939c-75d1-4bac-acca-76190c5bb1ee"><img width="300" alt="Alliance-in-Dalaran" src="https://github.com/user-attachments/assets/0059939c-75d1-4bac-acca-76190c5bb1ee" /></a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://github.com/user-attachments/assets/665e4bb8-d5c6-4d61-a43b-530af09270ed"><img width="300" alt="Alliance-in-Combat" src="https://github.com/user-attachments/assets/665e4bb8-d5c6-4d61-a43b-530af09270ed" /></a>
 
 ## Installation
 
