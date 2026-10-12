@@ -81,7 +81,7 @@ After the timing rows, the same chat report prints one short row for each observ
 | Global refresh plates | Actual full/focused global plate visits |
 | Urgent batches | Broad full/focused requests and remaining explicit unit jobs; not individual durations |
 | Name color drift | At most eight distinct readable RGB transitions plus overflow; no unit identities |
-| Periodic jobs | Attempted jobs by group: global refresh, reconciliation, restoration frame/plate, cast retry and unit/plate retry; includes guarded/blocked/no-write jobs |
+| Periodic jobs | Cast retries retire when styling or cast highlighting is disabled. Attempted jobs by group: global refresh, reconciliation, restoration frame/plate, cast retry and unit/plate retry; includes guarded/blocked/no-write jobs |
 | Periodic limits | Slices stopped by job count or time target, plus discarded stale plate assignments; count/time reasons can overlap |
 
 Reason counters explain call volume, not elapsed time or unique plate counts. Queued requests can merge, hook requests can return under a guard, and checks can return unknown or early. A drift label identifies a readable mismatch or structural cache invalidation. Unknown property values do not count as drift and do not trigger repair writes; they retry with elapsed-time backoff from 0.25 seconds to four seconds. Independent readable properties continue to be checked. Native label-chain changes use selective layout repair, while replaced regions or invalid presentation require full styling. Unchanged reconciliation plates perform no repair writes; plates become eligible again after 0.25 seconds, with actual service subject to the shared budget.

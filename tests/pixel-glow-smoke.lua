@@ -57,7 +57,7 @@ function hooksecurefunc(object, method, callback)
     end
 end
 
-local blocked, enabled = false, true
+local blocked, enabled, highlightEnabled = false, true, true
 local color = {0, 1, 1}
 local ns = {
     PresentationCapabilities = {
@@ -72,7 +72,7 @@ local ns = {
     AccessibleValue = function(value) return value end,
     WorldContext = {Get = function() return {} end},
     GetStylingEnabled = function() return enabled end,
-    GetInterruptibleHighlightEnabled = function() return enabled end,
+    GetInterruptibleHighlightEnabled = function() return enabled and highlightEnabled end,
     EffectColor = function() return table.unpack(color) end,
     NameplateFrames = {
         GetCastBar = function(frame) return frame.castBar end,
@@ -168,7 +168,22 @@ ns.PeriodicWork.Advance(0.25)
 ns.PeriodicWork.Run()
 equal(highlight.frame.shown, false, "deferred refresh uses current native state")
 
-enabled = false
+-- Disabled features retire blocked retries and cannot queue new work from
+-- explicit refreshes or native visibility hooks.
+for _, setting in ipairs({"styling", "highlight"}) do
+    enabled, highlightEnabled, blocked = true, true, true
+    Update()
+    assert(ns.PeriodicWork.Has("cast retry", frame), "blocked active cast queues retry")
+    if setting == "styling" then enabled = false else highlightEnabled = false end
+    ns.PeriodicWork.Advance(0.25)
+    ns.PeriodicWork.Run()
+    assert(not ns.PeriodicWork.Has("cast retry", frame), setting .. " disable retires blocked retry")
+    Update()
+    assert(not ns.PeriodicWork.Has("cast retry", frame), setting .. " disabled refresh does not queue")
+    frame.castBar.Icon:SetShown(not frame.castBar.Icon.shown)
+    assert(not ns.PeriodicWork.Has("cast retry", frame), setting .. " disabled native hook does not queue")
+end
+enabled, highlightEnabled, blocked = false, true, false
 Update()
 equal(highlight.frame.shown, false, "disable hides pulse")
 assert(not highlight.pulse:IsPlaying(), "disable stops pulse")

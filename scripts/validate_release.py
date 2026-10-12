@@ -5,6 +5,7 @@ import argparse
 import os
 from pathlib import Path, PurePosixPath
 import re
+import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from zipfile import ZipFile
@@ -33,26 +34,85 @@ def load_entries(toc):
             if line.strip() and not line.lstrip().startswith("#")]
 
 
-def metadata():
-    toc = (ROOT / TOC).read_text(encoding="utf-8")
+def release_metadata(toc, changelog, ref=""):
     match = re.search(r"^## Version: (\d+\.\d+\.\d+)\s*$", toc, re.MULTILINE)
     require(match is not None, "TOC must contain a numeric three-part version")
     version = match.group(1)
-    ref = os.environ.get("GITHUB_REF", "")
     if ref.startswith("refs/tags/"):
         require(ref == f"refs/tags/v{version}",
                 f"Release tag must be v{version}, matching the TOC version")
 
-    changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
     sections = re.split(r"(?m)(?=^## )", changelog)
     notes = next((part for part in sections if part.startswith(f"## {version} — ")), None)
     require(notes is not None, f"Missing changelog entry for {version}")
     require(changelog.lstrip().startswith(f"## {version} — "),
             "The first changelog entry must match the TOC version")
+    return version, notes.strip() + "\n"
+
+
+def metadata():
+    toc = (ROOT / TOC).read_text(encoding="utf-8")
+    version, notes = release_metadata(toc, (ROOT / "CHANGELOG.md").read_text(encoding="utf-8"),
+                                      os.environ.get("GITHUB_REF", ""))
     output = ROOT / "dist/release-notes.md"
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(notes.strip() + "\n", encoding="utf-8")
+    output.write_text(notes, encoding="utf-8")
     return version, toc
+
+
+def git_text(*args, required=True):
+    result = subprocess.run(["git", *args], cwd=ROOT, capture_output=True,
+                            encoding="utf-8", check=False)
+    require(not required or result.returncode == 0, "Cannot read Git metadata for release preparation")
+    return result.stdout if result.returncode == 0 else None
+
+
+def staged_text(path):
+    text = git_text("show", f":{path}", required=False)
+    require(text is not None, f"Stage {path} before preparing or checking a build")
+    return text
+
+
+def prepare_staged():
+    toc, changelog = staged_text(TOC), staged_text("CHANGELOG.md")
+    version_match = re.search(r"^## Version: (\d+\.\d+\.\d+)\s*$", toc, re.MULTILINE)
+    require(version_match is not None, "TOC must contain a numeric three-part version")
+    version = version_match.group(1)
+    trimmed = changelog.lstrip()
+    heading = re.match(r"## (Unreleased|\d+\.\d+\.\d+) — [^\n]+", trimmed)
+    require(heading is not None, "Start the changelog with a numbered or Unreleased release entry")
+    if heading.group(1) != "Unreleased":
+        release_metadata(toc, changelog)
+        require(git_text("rev-parse", "--verify", "--quiet", f"refs/tags/v{version}",
+                         required=False) is None,
+                "The current release is tagged; start a new Unreleased changelog entry before preparing a build")
+        previous = git_text("show", f"HEAD:{TOC}", required=False) or ""
+        previous_version = re.search(r"^## Version: (\d+\.\d+\.\d+)\s*$", previous, re.MULTILINE)
+        # An explicitly staged matching version/entry is already prepared.
+        if previous_version and previous_version.group(1) != version:
+            return version
+
+    require(git_text("rev-parse", "--is-shallow-repository").strip() == "false",
+            "Fetch full Git history before deriving a commit-count build number")
+    head = git_text("rev-parse", "--verify", "--quiet", "HEAD", required=False)
+    count = int(git_text("rev-list", "--count", "HEAD")) if head else 0
+    next_version = version.rsplit(".", 1)[0] + f".{count + 1}"
+    require(git_text("rev-parse", "--verify", "--quiet", f"refs/tags/v{next_version}",
+                     required=False) is None,
+            f"Build {next_version} is already tagged; prepare a distinct version and changelog entry")
+    # Never fold unstaged edits into the commit as a side effect of preparation.
+    for path, staged in ((TOC, toc), ("CHANGELOG.md", changelog)):
+        require((ROOT / path).read_text(encoding="utf-8") == staged,
+                f"Stage or stash unstaged edits to {path} before preparing a build")
+    next_toc = toc[:version_match.start(1)] + next_version + toc[version_match.end(1):]
+    offset = len(changelog) - len(trimmed)
+    next_changelog = (changelog[:offset + heading.start(1)] + next_version
+                      + changelog[offset + heading.end(1):])
+    release_metadata(next_toc, next_changelog)
+    (ROOT / TOC).write_text(next_toc, encoding="utf-8")
+    (ROOT / "CHANGELOG.md").write_text(next_changelog, encoding="utf-8")
+    git_text("add", "--", str(TOC), "CHANGELOG.md")
+    return next_version
 
 
 def verify_archive(path, version, source_toc):
@@ -73,7 +133,7 @@ def verify_archive(path, version, source_toc):
                           packaged_toc, re.MULTILINE), "Packaged version does not match source")
         require(load_entries(packaged_toc) == load_entries(source_toc),
                 "Packaged TOC load order differs from source")
-        for field in ("Title", "Interface", "SavedVariables", "OptionalDeps", "X-Website", "X-Curse-Project-ID"):
+        for field in ("Title", "Interface", "SavedVariables", "OptionalDeps", "IconTexture", "X-Website", "X-Curse-Project-ID"):
             pattern = rf"^## {field}: (.+)$"
             expected = re.search(pattern, source_toc, re.MULTILINE)
             actual = re.search(pattern, packaged_toc, re.MULTILINE)
@@ -129,8 +189,19 @@ def verify_archive(path, version, source_toc):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--archive", type=Path)
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--archive", type=Path)
+    mode.add_argument("--staged", action="store_true", help="Check the release metadata in Git's index")
+    mode.add_argument("--prepare-staged", action="store_true",
+                      help="Prepare and stage matching commit-count metadata; retain explicitly prepared versions")
     args = parser.parse_args()
+    if args.prepare_staged:
+        print(prepare_staged())
+        return
+    if args.staged:
+        version, _ = release_metadata(staged_text(TOC), staged_text("CHANGELOG.md"))
+        print(version)
+        return
     version, toc = metadata()
     if args.archive:
         verify_archive(args.archive, version, toc)

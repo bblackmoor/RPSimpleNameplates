@@ -23,7 +23,7 @@ installable addon ZIP and `release-notes.md` in another ZIP; install the inner
 The workflow:
 
 1. Requires a numeric three-part TOC version and a matching first changelog entry.
-2. Runs the upload-helper unit tests and all existing Lua smoke suites on the source checkout.
+2. Runs the release-tool unit tests and all existing Lua smoke suites on the source checkout.
 3. Fetches the four libraries at the exact commits in `.pkgmeta` and builds a
    ZIP with a single top-level `RPSimpleNameplates` folder.
 4. Checks the full TOC/XML load chain against the tested source, retaining
@@ -43,16 +43,40 @@ pin, bundled source, license/provenance records and tests together. The package
 check rejects a fetched runtime file that differs from the bundled copy beyond
 the documented whitespace normalization.
 
+## Prepare matching build metadata
+
+Build numbers normally use the next commit count from a full-history checkout.
+Stage the intended changes, then run the same preparation used by the optional
+pre-commit hook:
+
+```sh
+python3 scripts/validate_release.py --prepare-staged
+python3 scripts/validate_release.py --staged
+```
+
+Preparation changes the TOC version and the first unpublished changelog heading
+together and stages those two files. A new matching numeric version and heading
+that you explicitly staged are retained. Unstaged metadata edits are never
+added implicitly. A tagged changelog entry cannot be rewritten: start a new
+`## Unreleased — YYYY-MM-DD` section for the next build. Shallow history and
+already-used build tags are rejected before any metadata rewrite.
+
+You can enable the local hook with `git config core.hooksPath .githooks`.
+GitHub web/API commits do not execute local hooks, so run the preparation before
+creating those commits too. Commit-count versions describe the prepared build;
+branches can share a count, and rewriting history can change it. An explicitly
+prepared version provides an override when needed.
+
 ## Publish a GitHub release
 
 Set `RPSimpleNameplates/RPSimpleNameplates.toc` to the intended version and add the
 matching entry at the top of `CHANGELOG.md`. Commit and push those changes. Tag
 that commit with `v` followed by the exact TOC version, then push the tag. For
-version 1.0.248, for example:
+version 1.0.289, for example:
 
 ```sh
-git tag -a v1.0.248 -m "RP Simple Nameplates 1.0.248"
-git push origin v1.0.248
+git tag -a v1.0.289 -m "RP Simple Nameplates 1.0.289"
+git push origin v1.0.289
 ```
 
 The tag push runs the same checks and publishes the verified ZIP to GitHub
@@ -104,9 +128,9 @@ With Git, Bash, ZIP and LuaTeX installed, clone the packager at its pinned
 python3 scripts/validate_release.py
 python3 -m unittest discover -s tests -p 'test_*.py'
 for test in tests/*-smoke.lua; do texlua "$test" || exit 1; done
-bash /path/to/packager/release.sh -d -l -u -n 'RPSimpleNameplates-1.0.248'
-python3 scripts/validate_release.py --archive .release/RPSimpleNameplates-1.0.248.zip
-python3 scripts/upload_curseforge.py --archive .release/RPSimpleNameplates-1.0.248.zip --notes dist/release-notes.md --dry-run
+bash /path/to/packager/release.sh -d -l -u -n 'RPSimpleNameplates-1.0.289'
+python3 scripts/validate_release.py --archive .release/RPSimpleNameplates-1.0.289.zip
+python3 scripts/upload_curseforge.py --archive .release/RPSimpleNameplates-1.0.289.zip --notes dist/release-notes.md --dry-run
 ```
 
 Use the current TOC version in the ZIP name. `.release/`, `dist/` and Python

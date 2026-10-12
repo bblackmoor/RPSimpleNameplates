@@ -3,24 +3,6 @@
 set -eu
 
 repo_root=$(git rev-parse --show-toplevel)
-toc="$repo_root/RPSimpleNameplates/RPSimpleNameplates.toc"
-
-if [ ! -f "$toc" ]; then
-    echo "Error: $toc not found."
-    exit 1
-fi
-
-if ! grep -q '^## Version:' "$toc"; then
-    echo "Error: No version entry found in $toc."
-    exit 1
-fi
-
-commit_count=$(git rev-list --count HEAD 2>/dev/null || printf '0')
-build=$((commit_count + 1))
-version="1.0.$build"
-
-sed -i "s/^## Version:.*/## Version: $version/" "$toc"
-
-git add "$toc"
-
-echo "Updated addon version to $version"
+cd "$repo_root"
+python3 scripts/validate_release.py --prepare-staged
+python3 scripts/validate_release.py --staged

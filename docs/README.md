@@ -14,13 +14,14 @@ Start with the current behavior guides. Release history belongs in the [changelo
 | [Cast-effect testing](design/cast-effect-testing.md) | Repeatable cast test and detection/rendering diagnosis |
 | [Nameplate settings source review](design/nameplate-settings-review.md) | Evidence for native frame and overhead-name restrictions |
 | [Library provenance](../RPSimpleNameplates/Libs/README.md) | Bundled dependencies and pinned upstream sources |
-| [Packaging and releases](releasing.md) | Automated builds, version tags, installable ZIP checks, and CurseForge project/token setup |
+| [Packaging and releases](releasing.md) | Build numbering, automated builds, version tags, ZIP checks, and CurseForge setup |
 
 ## Local checks
 
 Run from the repository root with LuaTeX:
 
 ```sh
+python3 -m unittest discover -s tests -p 'test_*.py'
 for test in tests/*-smoke.lua; do
     texlua "$test" || exit 1
 done

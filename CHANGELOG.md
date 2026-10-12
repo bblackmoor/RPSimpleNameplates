@@ -1,4 +1,8 @@
-## 1.0.248 — 2026-10-11
+## 1.0.289 — 2026-10-11
+
+- Retire blocked cast-highlight retries when styling or highlighting is disabled; avoid requeuing disabled work from native visibility hooks.
+- Prepare commit-count versions and changelog headings together from staged metadata. Preserve explicitly prepared versions and published release notes, and reject partial staging or incomplete Git history before metadata changes.
+- Use the author’s current 64-pixel icon in the addon list and check its packaged metadata.
 
 - Complete the rename to RP Simple Nameplates: use `RPSimpleNameplates` for the addon folder, TOC filename, build artifacts and installable ZIP; update source links, display names, packaging, release checks, tests and developer paths.
 - Retain `/snp` commands and current nameplate styling and settings behavior. Installation instructions describe a first release.

@@ -11,8 +11,16 @@ local GetHealthBar, GetCastBar = ns.NameplateFrames.GetHealthBar, ns.NameplateFr
 local pendingFrames = setmetatable({}, {__mode = "k"})
 local eventStateByUnit = {}
 local UpdateInterruptibleHighlight
+local function CancelRetry(frame)
+    pendingFrames[frame] = nil
+    ns.PeriodicWork.Cancel("cast retry", frame)
+end
 local function RetryFrame(frame)
     if not pendingFrames[frame] then return end
+    if not GetStylingEnabled() or not GetInterruptibleHighlightEnabled() then
+        CancelRetry(frame)
+        return
+    end
     local context = GetContext()
     if CanAccessFrame(frame, context) then
         UpdateInterruptibleHighlight(frame, context, frame.SNPPresentation)
@@ -21,6 +29,10 @@ local function RetryFrame(frame)
     return 0.25
 end
 local function DeferFrame(frame)
+    if not GetStylingEnabled() or not GetInterruptibleHighlightEnabled() then
+        CancelRetry(frame)
+        return
+    end
     pendingFrames[frame] = true
     ns.PeriodicWork.Schedule("cast retry", frame, RetryFrame, 0.25)
 end
@@ -398,18 +410,18 @@ end
 
 UpdateInterruptibleHighlight = function(frame, context, decision)
     context = context or GetContext()
-    if not CanAccessFrame(frame, context) then DeferFrame(frame); return end
-    pendingFrames[frame] = nil
-    ns.PeriodicWork.Cancel("cast retry", frame)
     if not GetStylingEnabled() or not decision or not decision.showCastBar
         or not GetInterruptibleHighlightEnabled() then
-        if frame.SNPInterruptibleHighlight then
+        CancelRetry(frame)
+        if CanAccessFrame(frame, context) and frame.SNPInterruptibleHighlight then
             frame.SNPInterruptibleHighlight.interruptibleState = false
             frame.SNPInterruptibleHighlight.interruptibleSource = "disabled"
             frame.SNPInterruptibleHighlight.frame:Hide()
         end
         return
     end
+    if not CanAccessFrame(frame, context) then DeferFrame(frame); return end
+    CancelRetry(frame)
     local highlight = EnsureInterruptibleHighlight(frame, context)
     if not highlight then return end
     RefreshHighlight(highlight, context, decision)
