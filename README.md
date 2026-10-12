@@ -1,6 +1,6 @@
 # Simple Nameplates
 
-Simple Nameplates makes it easier to see who is attacking you, who might, and who is worth talking to. It gives Blizzard’s nameplates clear, consistent colors and readable names, with optional roleplaying names and titles. It is for players who want a useful view of the people and creatures around them, especially during everyday play and roleplay. Choose it over Blizzard’s defaults for more control over colors and text, or over Plater when a few straightforward settings cover what you need.
+**Simple Nameplates** makes it easier to see who is attacking you, who might, and who is worth talking to. It gives Blizzard's nameplates clear, consistent colors and readable names, with optional roleplaying names and titles. It is for players who want a useful view of the people and creatures around them, especially during everyday play and roleplay. Choose it over Blizzard's defaults for more control over colors and text, or over **EllesmereUI** or **Plater** when a few straightforward settings cover what you need.
 
 ## Features
 
@@ -11,23 +11,23 @@ Simple Nameplates makes it easier to see who is attacking you, who might, and wh
 - Dim background NPC names to make other names stand out.
 - Display NPC service titles and optional threat percentages.
 - Highlight interruptible casts with a solid, pulsing, or animated alert border.
-- Use Total RP 3 names, titles, and out-of-character markers.
+- Use **Total RP** 3 names, titles, and out-of-character markers.
 - Save appearance profiles and let each character choose its own.
 - Start with editable Default and High Contrast profiles.
 
-Simple Nameplates styles Blizzard’s existing nameplates. Health and cast progress, spell icons, and target behavior remain controlled by the game. Plater’s scripting tools suit players who want to build more specialized combat displays; Simple Nameplates focuses on colors, names, and a small set of display choices.
+Simple Nameplates styles Blizzard's existing nameplates. Health and cast progress, spell icons, and target behavior remain controlled by the game.
 
 ## Installation
 
-Download the installable ZIP from [GitHub Releases](https://github.com/bblackmoor/SimpleNameplates/releases), extract it, and copy its `SimpleNameplates` folder to:
+Simple Nameplates is available on CurtseForge.
+
+Alternatively, download the installable ZIP from [GitHub Releases](https://github.com/bblackmoor/SimpleNameplates/releases), extract it, and copy its `SimpleNameplates` folder to:
 
 ```text
 World of Warcraft/_retail_/Interface/AddOns/SimpleNameplates/
 ```
 
-Start World of Warcraft and enable the addon at character selection. Simple Nameplates is for Retail WoW. No separate library installation is needed; Plater and Details are not required.
-
-Before the first tagged release, or to try a development build, download the installable ZIP from the **Build and release** workflow's [build artifacts](https://github.com/bblackmoor/SimpleNameplates/actions/workflows/release.yml). The artifact download contains the addon ZIP and release notes. **Code → Download ZIP** also works: copy the inner `SimpleNameplates` folder containing `SimpleNameplates.toc`.
+Start World of Warcraft and enable the addon at character selection. Simple Nameplates is for Retail WoW. No separate library installation is needed.
 
 On your first login, the addon may ask to enable the nameplate settings it needs. Choose **Apply and enable** to accept the listed changes, or **Disable styling** to leave it off. Disabling styling restores the settings changed by that setup.
 
@@ -44,7 +44,7 @@ Type `/snp` to open settings, or find **Simple Nameplates** under **Options → 
 | TRP3 | Roleplaying names, short and long titles, and OOC markers |
 | About | Installed version, source, commands, and known limitations |
 
-Changes apply immediately and are saved. Settings cannot be changed during combat; entering combat cancels unfinished edits. Completed changes are kept.
+Changes apply immediately and are saved. Settings cannot be changed during combat; entering combat cancels unfinished edits.
 
 ### Colors and health bars
 
@@ -59,11 +59,11 @@ The first matching category wins:
 | 5 | NPC – Interactive | Green |
 | 6 | NPC – Background | Grey |
 
-An enemy that is attacking you uses red even if it also offers an interaction. NPC – Interactive uses interaction information supplied by WoW; an NPC’s title alone does not put it in that category.
+An enemy that is attacking you uses red even if it also offers an interaction.
 
 Each category has a **Health Bar** switch. Turn it off to show a colored name and title without a bar. Background NPCs use names alone by default. Names inside bars use white outlined text, with optional dimming for background NPCs.
 
-Cast highlighting is off by default. Enable **Active** beside the cast-highlight color on **Colors**, then choose the effect on **Highlight**. Both pages show a preview; disabled previews are grey, dimmed, and still.
+Cast highlighting is off by default. Enable **Active** beside the cast-highlight color on **Colors**, then choose the effect on **Highlight**.
 
 ### Profiles
 
@@ -77,9 +77,11 @@ TRP3 integration is optional and off by default. Enable **Display TRP3 profile i
 
 ## Known limitations
 
-Simple Nameplates can style only nameplates WoW makes available to addons. Some separate overhead names remain controlled by Blizzard, including nonattackable opposite-faction players in sanctuaries. Enabling more nameplate settings does not guarantee access to those names.
+Simple Nameplates can style only nameplates WoW makes available to addons. Some separate overhead names remain controlled by Blizzard, including nonattackable opposite-faction players in sanctuaries.
 
-Threat percentages appear only when WoW supplies usable threat information. Detecting which player is attacking you in PvP is best effort.
+Detecting which player is attacking you in PvP is best effort.
+
+Threat percentages appear only when WoW supplies usable threat information.
 
 Use one nameplate addon at a time. If you see competing colors or duplicate displays, disable other nameplate addons and reload the UI.
 
