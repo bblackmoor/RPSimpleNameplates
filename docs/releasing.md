@@ -46,22 +46,40 @@ the documented whitespace normalization.
 ## Prepare matching build metadata
 
 Build numbers normally use the next commit count from a full-history checkout.
-Stage the intended changes, then run the same preparation used by the optional
-pre-commit hook:
+Enable the local hook once, from the repository folder:
+
+```sh
+git config --local core.hooksPath .githooks
+```
+
+Then edit, stage and commit normally. The pre-commit hook creates a new changelog
+entry summarizing the staged file changes and sets the matching TOC version.
+You do not need to edit the changelog or start an `Unreleased` section first.
+Python 3 is required; the hook supports Windows's `py -3` launcher as well as
+`python3` and `python`. Hook line endings remain LF on Windows. This setting is
+local to each clone.
+
+You can still write more descriptive notes: stage an `Unreleased` section or a
+new matching numeric version and heading, and preparation keeps your notes.
+Otherwise, automatic notes name added, removed and updated files. Git's commit
+message is not available during the pre-commit hook, so it is not used for
+automatic notes.
+
+To run the same preparation without the hook:
 
 ```sh
 python3 scripts/validate_release.py --prepare-staged
 python3 scripts/validate_release.py --staged
 ```
 
-Preparation changes the TOC version and the first unpublished changelog heading
-together and stages those two files. A new matching numeric version and heading
-that you explicitly staged are retained. Unstaged metadata edits are never
-added implicitly. A tagged changelog entry cannot be rewritten: start a new
-`## Unreleased — YYYY-MM-DD` section for the next build. Shallow history and
-already-used build tags are rejected before any metadata rewrite.
+Preparation stages the TOC and changelog together. Automatic entries retain
+previous notes, and tagged entries cannot be rewritten. A new matching numeric
+version and heading that you explicitly staged are retained. Unstaged metadata
+edits are never added implicitly. Shallow history, partially staged version
+overrides and already-used build tags are rejected before any metadata rewrite.
+An existing mismatch already committed to HEAD is repaired by adding a new
+entry, preserving the previous notes.
 
-You can enable the local hook with `git config core.hooksPath .githooks`.
 GitHub web/API commits do not execute local hooks, so run the preparation before
 creating those commits too. Commit-count versions describe the prepared build;
 branches can share a count, and rewriting history can change it. An explicitly
@@ -69,9 +87,10 @@ prepared version provides an override when needed.
 
 ## Publish a GitHub release
 
-Set `RPSimpleNameplates/RPSimpleNameplates.toc` to the intended version and add the
-matching entry at the top of `CHANGELOG.md`. Commit and push those changes. Tag
-that commit with `v` followed by the exact TOC version, then push the tag. For
+Commit with the local hook enabled (or run preparation before a web/API commit)
+and push. Read the resulting version in
+`RPSimpleNameplates/RPSimpleNameplates.toc`. Tag that commit with `v` followed by
+the exact TOC version, then push the tag. For
 version 1.0.289, for example:
 
 ```sh

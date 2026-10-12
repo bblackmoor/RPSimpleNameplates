@@ -4,5 +4,19 @@ set -eu
 
 repo_root=$(git rev-parse --show-toplevel)
 cd "$repo_root"
-python3 scripts/validate_release.py --prepare-staged
-python3 scripts/validate_release.py --staged
+
+run_python() {
+    if command -v py >/dev/null 2>&1 && py -3 -c 'import sys; sys.exit(sys.version_info.major != 3)' >/dev/null 2>&1; then
+        py -3 "$@"
+    elif command -v python3 >/dev/null 2>&1 && python3 -c 'import sys; sys.exit(sys.version_info.major != 3)' >/dev/null 2>&1; then
+        python3 "$@"
+    elif command -v python >/dev/null 2>&1 && python -c 'import sys; sys.exit(sys.version_info.major != 3)' >/dev/null 2>&1; then
+        python "$@"
+    else
+        echo 'Install Python 3 and make py, python3 or python available to Git.' >&2
+        return 1
+    fi
+}
+
+run_python scripts/validate_release.py --prepare-staged
+run_python scripts/validate_release.py --staged

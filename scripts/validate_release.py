@@ -2,6 +2,7 @@
 """Check release metadata and the installable ZIP using only Python's stdlib."""
 
 import argparse
+from datetime import date
 import os
 from pathlib import Path, PurePosixPath
 import re
@@ -73,6 +74,42 @@ def staged_text(path):
     return text
 
 
+def numbered_notes(changelog):
+    notes = {}
+    for section in re.split(r"(?m)(?=^## )", changelog):
+        heading = re.match(r"## (\d+\.\d+\.\d+) — ", section)
+        if heading:
+            notes[heading.group(1)] = section.strip()
+    return notes
+
+
+def check_published_notes(changelog, previous):
+    current = numbered_notes(changelog)
+    for version, notes in numbered_notes(previous).items():
+        if current.get(version) == notes:
+            continue
+        tag = f"refs/tags/v{version}"
+        if git_text("rev-parse", "--verify", "--quiet", tag, required=False) is not None:
+            require(current.get(version) == notes,
+                    f"Published changelog entry {version} cannot be changed; add new notes instead")
+
+
+def staged_change_notes():
+    changes = git_text("diff", "--cached", "--name-status", "--no-renames", "-z").split("\0")
+    require(len(changes) > 1, "Stage changes before preparing a build")
+    notes = []
+    for status, path in zip(changes[::2], changes[1::2]):
+        if path in (str(TOC), "CHANGELOG.md"):
+            continue
+        action = {"A": "Add", "D": "Remove"}.get(status, "Update")
+        # Git paths can contain Markdown delimiters and line breaks.
+        path = path.replace("\r", "\\r").replace("\n", "\\n")
+        delimiter = "`" * (1 + max((len(run) for run in re.findall(r"`+", path)), default=0))
+        rendered = f"{delimiter} {path} {delimiter}" if "`" in path else f"`{path}`"
+        notes.append(f"- {action} {rendered}.")
+    return "\n".join(notes) or "- Update release metadata."
+
+
 def prepare_staged():
     toc, changelog = staged_text(TOC), staged_text("CHANGELOG.md")
     version_match = re.search(r"^## Version: (\d+\.\d+\.\d+)\s*$", toc, re.MULTILINE)
@@ -81,16 +118,18 @@ def prepare_staged():
     trimmed = changelog.lstrip()
     heading = re.match(r"## (Unreleased|\d+\.\d+\.\d+) — [^\n]+", trimmed)
     require(heading is not None, "Start the changelog with a numbered or Unreleased release entry")
-    if heading.group(1) != "Unreleased":
+    previous_toc = git_text("show", f"HEAD:{TOC}", required=False) or ""
+    previous_notes = git_text("show", "HEAD:CHANGELOG.md", required=False) or ""
+    previous_version = re.search(r"^## Version: (\d+\.\d+\.\d+)\s*$", previous_toc, re.MULTILINE)
+    check_published_notes(changelog, previous_notes)
+    if (heading.group(1) != "Unreleased" and previous_version
+            and previous_version.group(1) != version):
+        # An explicitly staged matching version/entry is already prepared.
         release_metadata(toc, changelog)
         require(git_text("rev-parse", "--verify", "--quiet", f"refs/tags/v{version}",
                          required=False) is None,
-                "The current release is tagged; start a new Unreleased changelog entry before preparing a build")
-        previous = git_text("show", f"HEAD:{TOC}", required=False) or ""
-        previous_version = re.search(r"^## Version: (\d+\.\d+\.\d+)\s*$", previous, re.MULTILINE)
-        # An explicitly staged matching version/entry is already prepared.
-        if previous_version and previous_version.group(1) != version:
-            return version
+                f"Build {version} is already tagged; prepare a distinct version")
+        return version
 
     require(git_text("rev-parse", "--is-shallow-repository").strip() == "false",
             "Fetch full Git history before deriving a commit-count build number")
@@ -105,9 +144,25 @@ def prepare_staged():
         require((ROOT / path).read_text(encoding="utf-8") == staged,
                 f"Stage or stash unstaged edits to {path} before preparing a build")
     next_toc = toc[:version_match.start(1)] + next_version + toc[version_match.end(1):]
-    offset = len(changelog) - len(trimmed)
-    next_changelog = (changelog[:offset + heading.start(1)] + next_version
-                      + changelog[offset + heading.end(1):])
+    generated_notes = staged_change_notes()
+    # Keep the complete previous entry when no new notes were staged. This also
+    # repairs an already-committed TOC/changelog mismatch without editing history.
+    tagged_heading = git_text("rev-parse", "--verify", "--quiet",
+                              f"refs/tags/v{heading.group(1)}", required=False) is not None
+    handwritten = heading.group(1) == "Unreleased" or (
+        changelog != previous_notes and heading.group(1) == version and not tagged_heading)
+    if handwritten:
+        offset = len(changelog) - len(trimmed)
+        next_changelog = (changelog[:offset + heading.start(1)] + next_version
+                          + changelog[offset + heading.end(1):])
+        first = next(section for section in re.split(r"(?m)(?=^## )", next_changelog.lstrip())
+                     if section.startswith("## "))
+        if not first.partition("\n")[2].strip():
+            end = offset + heading.end() - len(heading.group(1)) + len(next_version)
+            next_changelog = next_changelog[:end] + "\n\n" + generated_notes + "\n\n" + next_changelog[end:].lstrip("\n")
+    else:
+        next_changelog = (f"## {next_version} — {date.today().isoformat()}\n\n"
+                          + generated_notes + "\n\n" + changelog)
     release_metadata(next_toc, next_changelog)
     (ROOT / TOC).write_text(next_toc, encoding="utf-8")
     (ROOT / "CHANGELOG.md").write_text(next_changelog, encoding="utf-8")
@@ -193,7 +248,7 @@ def main():
     mode.add_argument("--archive", type=Path)
     mode.add_argument("--staged", action="store_true", help="Check the release metadata in Git's index")
     mode.add_argument("--prepare-staged", action="store_true",
-                      help="Prepare and stage matching commit-count metadata; retain explicitly prepared versions")
+                      help="Prepare matching commit-count metadata and automatic notes from staged changes")
     args = parser.parse_args()
     if args.prepare_staged:
         print(prepare_staged())

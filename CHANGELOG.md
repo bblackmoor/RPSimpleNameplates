@@ -1,3 +1,11 @@
+## 1.0.293 — 2026-10-12
+
+- Add `.gitattributes`.
+- Update `.githooks/pre-commit`.
+- Update `docs/releasing.md`.
+- Update `scripts/validate_release.py`.
+- Update `tests/test_release_metadata.py`.
+
 ## 1.0.289 — 2026-10-11
 
 - Retire blocked cast-highlight retries when styling or highlighting is disabled; avoid requeuing disabled work from native visibility hooks.
