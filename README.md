@@ -19,13 +19,16 @@ Simple Nameplates styles Blizzard's existing nameplates. Health and cast progres
 
 ## Screenshots
 
-<img width="2560" height="1600" alt="Alliance-in-Stormwind" src="https://github.com/user-attachments/assets/81273266-ac83-4481-9451-a5551c2b32a1" />&nbsp;&nbsp;&nbsp;&nbsp;
-<img width="2560" height="1600" alt="Alliance-in-Elwynn-Forest" src="https://github.com/user-attachments/assets/f680789f-cb78-4afd-9a7f-593d0a2ee1cb" />    
+<img width="2560" height="1600" alt="Alliance-in-Stormwind" src="https://github.com/user-attachments/assets/81273266-ac83-4481-9451-a5551c2b32a1" />
 
-<img width="2560" height="1600" alt="Alliance-in-Combat" src="https://github.com/user-attachments/assets/56ce9b44-0c10-4a2a-a030-16999bbce8d1" />&nbsp;&nbsp;&nbsp;&nbsp;
-<img width="2560" height="1600" alt="Alliance-in-Dalaran" src="https://github.com/user-attachments/assets/cbd7afa8-e023-4c21-bf8a-ddc86931cb7a" />    
+<img width="2560" height="1600" alt="Alliance-in-Elwynn-Forest" src="https://github.com/user-attachments/assets/f680789f-cb78-4afd-9a7f-593d0a2ee1cb" />
 
-<img width="2560" height="1600" alt="Alliance-in-Silvermoon" src="https://github.com/user-attachments/assets/36b93a25-a2f9-48f8-a462-7898c3f01edf" />&nbsp;&nbsp;&nbsp;&nbsp;
+<img width="2560" height="1600" alt="Alliance-in-Combat" src="https://github.com/user-attachments/assets/56ce9b44-0c10-4a2a-a030-16999bbce8d1" />
+
+<img width="2560" height="1600" alt="Alliance-in-Dalaran" src="https://github.com/user-attachments/assets/cbd7afa8-e023-4c21-bf8a-ddc86931cb7a" />
+
+<img width="2560" height="1600" alt="Alliance-in-Silvermoon" src="https://github.com/user-attachments/assets/36b93a25-a2f9-48f8-a462-7898c3f01edf" />
+
 <img width="2560" height="1600" alt="Alliance-in-Horde-Silvermoon" src="https://github.com/user-attachments/assets/3b494dcf-712e-4eaf-9d5f-a14fd5b22eae" />
 
 ## Installation
