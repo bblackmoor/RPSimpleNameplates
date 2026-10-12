@@ -1,3 +1,8 @@
+## 1.0.296 — 2026-10-12
+
+- Update `docs/README.md`.
+- Update `docs/releasing.md`.
+
 ## 1.0.295 — 2026-10-12
 
 - Update `.gitattributes`.

@@ -14,7 +14,15 @@ Start with the current behavior guides. Release history belongs in the [changelo
 | [Cast-effect testing](design/cast-effect-testing.md) | Repeatable cast test and detection/rendering diagnosis |
 | [Nameplate settings source review](design/nameplate-settings-review.md) | Evidence for native frame and overhead-name restrictions |
 | [Library provenance](../RPSimpleNameplates/Libs/README.md) | Bundled dependencies and pinned upstream sources |
-| [Packaging and releases](releasing.md) | Build numbering, automated builds, version tags, ZIP checks, and CurseForge setup |
+| [Packaging and releases](releasing.md) | Local hook setup, release checklist, matching version tags, publication checks, and failure recovery |
+
+## Releases
+
+Use the [release checklist](releasing.md#release-checklist) to prepare a build,
+push its matching version tag, and confirm GitHub and CurseForge publication.
+The local commit hook creates the build number and changelog entry; publishing
+starts when the tag for that commit reaches GitHub. The guide includes Windows
+setup, authenticated pushes, and troubleshooting for metadata or upload failures.
 
 ## Local checks
 
