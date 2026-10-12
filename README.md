@@ -1,8 +1,8 @@
-# Simple Nameplates
+# RP Simple Nameplates
 
 <img width="400" height="400" alt="icon-400" src="https://github.com/user-attachments/assets/60460ced-103b-464b-a258-dcbd92c3f04b" />
 
-**Simple Nameplates** makes it easier to see who is attacking you, who might, and who is worth talking to. It gives Blizzard's nameplates clear, consistent colors and readable names, with optional roleplaying names and titles. It is for players who want a useful view of the people and creatures around them, especially during everyday play and roleplay. Choose it over Blizzard's defaults for more control over colors and text, or over **EllesmereUI** or **Plater** when a few straightforward settings cover what you need.
+**RP Simple Nameplates** makes it easier to see who is attacking you, who might, and who is worth talking to. It gives Blizzard's nameplates clear, consistent colors and readable names, with optional roleplaying names and titles. It is for players who want a useful view of the people and creatures around them, especially during everyday play and roleplay. Choose it over Blizzard's defaults for more control over colors and text, or over **EllesmereUI** or **Plater** when a few straightforward settings cover what you need.
 
 ## Features
 
@@ -17,7 +17,7 @@
 - Save appearance profiles and let each character choose its own.
 - Start with editable Default and High Contrast profiles.
 
-Simple Nameplates styles Blizzard's existing nameplates. Health and cast progress, spell icons, and target behavior remain controlled by the game.
+RP Simple Nameplates styles Blizzard's existing nameplates. Health and cast progress, spell icons, and target behavior remain controlled by the game.
 
 ## Screenshots
 
@@ -32,21 +32,21 @@ Simple Nameplates styles Blizzard's existing nameplates. Health and cast progres
 
 ## Installation
 
-Simple Nameplates is available on CurseForge.
+RP Simple Nameplates is available on CurseForge.
 
-Alternatively, download the installable ZIP from [GitHub Releases](https://github.com/bblackmoor/SimpleNameplates/releases), extract it, and copy its `SimpleNameplates` folder to:
+Alternatively, download the installable ZIP from [GitHub Releases](https://github.com/bblackmoor/RPSimpleNameplates/releases), extract it, and copy its `RPSimpleNameplates` folder to:
 
 ```text
-World of Warcraft/_retail_/Interface/AddOns/SimpleNameplates/
+World of Warcraft/_retail_/Interface/AddOns/RPSimpleNameplates/
 ```
 
-Start World of Warcraft and enable the addon at character selection. Simple Nameplates is for Retail WoW. No separate library installation is needed.
+Start World of Warcraft and enable the addon at character selection. RP Simple Nameplates is for Retail WoW. No separate library installation is needed.
 
 On your first login, the addon may ask to enable the nameplate settings it needs. Choose **Apply and enable** to accept the listed changes, or **Disable styling** to leave it off. Disabling styling restores the settings changed by that setup.
 
-## Using Simple Nameplates
+## Using RP Simple Nameplates
 
-Type `/snp` to open settings, or find **Simple Nameplates** under **Options → AddOns**.
+Type `/snp` to open settings, or find **RP Simple Nameplates** under **Options → AddOns**.
 
 | Page | What you can change |
 | --- | --- |
@@ -90,7 +90,7 @@ TRP3 integration is optional and off by default. Enable **Display TRP3 profile i
 
 ## Known limitations
 
-Simple Nameplates can style only nameplates WoW makes available to addons. Some separate overhead names remain controlled by Blizzard, including nonattackable opposite-faction players in sanctuaries.
+RP Simple Nameplates can style only nameplates WoW makes available to addons. Some separate overhead names remain controlled by Blizzard, including nonattackable opposite-faction players in sanctuaries.
 
 Detecting which player is attacking you in PvP is best effort.
 
@@ -121,4 +121,4 @@ Copyright © 2026 Brandon Blackmoor (<bblackmoor@blackgate.net>)
 
 Licensed under [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
-Source: [bblackmoor/SimpleNameplates](https://github.com/bblackmoor/SimpleNameplates)
+Source: [bblackmoor/RPSimpleNameplates](https://github.com/bblackmoor/RPSimpleNameplates)
