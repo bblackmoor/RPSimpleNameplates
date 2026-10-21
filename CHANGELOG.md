@@ -1,3 +1,7 @@
+## 1.1.303 — 2026-10-21
+
+- Update the addon icon and bundled artwork with the revised design.
+
 ## 1.1.302 — 2026-10-21
 
 - Update `Media/icon-1200.png`.
