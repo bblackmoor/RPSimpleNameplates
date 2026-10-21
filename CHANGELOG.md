@@ -1,4 +1,4 @@
-## 1.1.299 — 2026-10-21
+## 1.1.300 — 2026-10-21
 
 - Add full nameplate previews to Text, Colors, and Cast Highlight so appearance changes are easier to compare.
 - Gather all cast highlight controls on Cast Highlight and show the controls for the selected effect. Preserve settings for the other effects.
@@ -7,6 +7,11 @@
 - Import and export themes containing colors, text, and cast highlights through copy and paste. Character activation and global behavior settings stay separate.
 - Apply text, color, and cast highlight changes with focused refreshes while retaining existing frame budgets.
 - Repair release packaging after the upstream LibStub history was replaced; pin its available commit containing the same tested source.
+- Exclude LibStub's new upstream revision marker from the installable ZIP.
+
+## 1.1.299 — 2026-10-21
+
+- Repair the LibStub source pin; package verification identified its new upstream revision marker as an unexpected file.
 
 ## 1.1.298 — 2026-10-21
 

@@ -46,6 +46,7 @@ ignore:
   - RPSimpleNameplates/Libs/*/.checkout
   - RPSimpleNameplates/Libs/DetailsFramework/definitions.lua
   - RPSimpleNameplates/Libs/LibStub/CHANGELOG.txt
+  - RPSimpleNameplates/Libs/LibStub/UPSTREAM_REVISION
   - RPSimpleNameplates/Libs/CallbackHandler-1.0/CallbackHandler-1.0.xml
 
 plain-copy:
