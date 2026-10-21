@@ -9,7 +9,7 @@ move-folders:
 externals:
   RPSimpleNameplates/Libs/LibStub:
     url: https://github.com/lua-wow/LibStub
-    commit: cc0d836cd83a21268bd915953d1faca499166dff
+    commit: af45e4a862a4b0bd025dfac95f4697ecdbc5b015
     curse-slug: libstub
   RPSimpleNameplates/Libs/CallbackHandler-1.0:
     url: https://github.com/WoWUIDev/Ace3

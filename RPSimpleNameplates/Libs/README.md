@@ -8,7 +8,7 @@ Automated builds fetch upstream sources at these `.pkgmeta` commit pins. Each pi
 
 | Library | Repository | Pinned commit | Subdirectory |
 | --- | --- | --- | --- |
-| LibStub | lua-wow/LibStub | `cc0d836cd83a21268bd915953d1faca499166dff` | Root |
+| LibStub | lua-wow/LibStub | `af45e4a862a4b0bd025dfac95f4697ecdbc5b015` | Root |
 | CallbackHandler-1.0 | WoWUIDev/Ace3 | `40f4cc1356ae7fcc0cf71fc0a19dc7d50d6ae6c2` | `CallbackHandler-1.0` |
 | LibSharedMedia-3.0 | SquizzCheeze/Squizzumables | `e40d97410035e5b148c4cbec180af6f2b6317bad` | `Libs/LibSharedMedia-3.0` |
 | Details Framework | Tercioo/Details-Framework | `653af57120e1287be784d468324590a9c150ae98` | Root |
