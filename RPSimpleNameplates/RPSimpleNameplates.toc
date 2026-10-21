@@ -3,7 +3,7 @@
 ## Category: Unit Frames
 ## Notes: Colors accessible Blizzard plates. Known limit: opposite-faction PC world names in sanctuary; entity types and contexts are listed in About.
 ## Author: Brandon Blackmoor <bblackmoor@blackgate.net>
-## Version: 1.1.297
+## Version: 1.1.298
 ## OptionalDeps: LibSharedMedia-3.0, SharedMedia, totalRP3, Masque, LibDFramework-1.0
 ## SavedVariables: SimpleNameplatesDB
 ## IconTexture: Interface\AddOns\RPSimpleNameplates\Media\icon-64.tga
