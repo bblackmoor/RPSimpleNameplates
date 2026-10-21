@@ -3127,4 +3127,57 @@ do
     equal(bar.points, points, "zero-width initialization does not release native anchors")
 end
 
+-- Settings updates keep initialized identity/classification while refreshing only
+-- the affected visuals. Unexpected settings or frame replacement still fall back.
+do
+    local frame = Region()
+    frame.unit, frame.name, frame.healthBar, frame.HealthBarsContainer = "nameplate1", Region(), Region(), Region()
+    frame.name:SetFont("Native", 10, ""); frame.name:SetTextColor(1, 1, 1)
+    frame.name:SetVertexColor(1, 1, 1, 1)
+    stylingEnabled, categoryMode, showBar, dimBackground = true, "active", true, false
+    appearance.namePlacement, appearance.nameSize, appearance.healthBarWidth = "INSIDE", 18, 100
+    unit = {reaction = 3, names = {nameplate1 = "Settings sample"}}
+    UnitGUID = function() return "Creature-Settings" end
+    local context = ns.WorldContext.Get()
+    ns.NameplatePresentation.ApplySimpleStyle(frame, context)
+    local decision, facts = frame.RPSNPresentation, frame.RPSNEntityFacts
+    local count, full = ns.Profiler.Count, 0
+    ns.Profiler.Count = function(group, reason)
+        if group == "Styling requests" then full = full + 1 end
+        count(group, reason)
+    end
+    appearance.nameSize, appearance.healthBarWidth = 30, 125
+    ns.NameplatePresentation.UpdateData(frame, context, {text=true})
+    equal(full, 0, "text settings avoid full styling")
+    equal(frame.RPSNNameStyle.size, 30, "focused text settings update font geometry")
+    equal(frame.RPSNStyleSettings.nameSize, 30, "settings cache advances after focused update")
+    equal(frame.healthBar.width, 175, "focused width uses native baseline")
+    equal(frame.RPSNPresentation, decision, "text settings retain presentation identity")
+    equal(frame.RPSNEntityFacts, facts, "text settings reuse classification")
+    barColorOverride = {0.2, 0.3, 0.4}
+    dimBackground = true
+    ns.NameplatePresentation.UpdateData(frame, context, {color=true})
+    equal(full, 0, "colors avoid full styling")
+    equal(frame.healthBar.barR, 0.2, "focused colors recolor health fill")
+    equal(frame.RPSNEntityFacts, facts, "colors reuse classification")
+    appearance.namePlacement = "ABOVE"
+    ns.NameplatePresentation.UpdateData(frame, context, {text=true, color=true})
+    equal(full, 0, "coalesced text/color settings stay focused")
+    equal(frame.RPSNNameStyle.inside, false, "focused placement removes inside copy")
+    local updateCast = ns.CastHighlight.UpdateInterruptibleHighlight
+    local casts = 0
+    ns.CastHighlight.UpdateInterruptibleHighlight = function() casts = casts + 1 end
+    highlightEnabled = not highlightEnabled
+    ns.NameplatePresentation.UpdateData(frame, context, {castSettings=true})
+    equal(full, 0, "cast settings avoid full styling")
+    equal(casts, 1, "focused cast settings update highlight")
+    equal(frame.RPSNEntityFacts, facts, "cast settings do not classify")
+    ns.CastHighlight.UpdateInterruptibleHighlight = updateCast
+    -- An unrelated settings difference must not be accepted by a cast-only job.
+    appearance.nameSize = 20
+    ns.NameplatePresentation.UpdateData(frame, context, {castSettings=true})
+    equal(full, 1, "unexpected changes retain safe full-style fallback")
+    ns.Profiler.Count, barColorOverride = count, nil
+end
+
 print("Nameplates smoke: passed")

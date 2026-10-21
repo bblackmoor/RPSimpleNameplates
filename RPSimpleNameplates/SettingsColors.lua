@@ -4,7 +4,6 @@ local UI = addon.SettingsUI
 local AddSection, AddDescription, RunRefreshers, RefreshNameplates =
     UI.AddSection, UI.AddDescription, UI.RunRefreshers, UI.RefreshNameplates
 local PriorityColorForState, SetPriorityColor = addon.PriorityColorForState, addon.SetPriorityColor
-local EffectColor, SetEffectColor = addon.EffectColor, addon.SetEffectColor
 
 local Widgets = addon.SettingsWidgets
 
@@ -27,27 +26,12 @@ local function AddHealthBarSwitch(context, row, swatch, state)
     end
 end
 
-local function AddCastHighlightSwitch(context, row, swatch)
-    local label = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    label:SetText("Active")
-    label:SetPoint("LEFT", swatch:GetFrame(), "RIGHT", 12, 0)
-    local toggle = Widgets.CreateSwitch(row, function(checked)
-        addon.SetInterruptibleHighlightEnabled(checked)
-        RefreshContext(context)
-        RefreshNameplates()
-    end)
-    toggle:SetPoint("LEFT", label, "RIGHT", 8, 0)
-    context.refreshers[#context.refreshers + 1] = function()
-        toggle:SetChecked(addon.GetInterruptibleHighlightEnabled())
-    end
-end
-
 local function CreateColorRow(context, text, displayText, getColor, setColor, state)
     local row = UI.CreateSettingRow(context.content, context.layout, text)
     local swatch = Widgets.CreateColorPicker(row, function(r, g, b)
         setColor(r, g, b)
         RefreshContext(context)
-        RefreshNameplates()
+        RefreshNameplates("color")
     end, getColor)
     swatch:SetPoint("LEFT", row, "LEFT", UI.CONTROL_X, 0)
     context.refreshers[#context.refreshers + 1] = function() swatch:SetColor(getColor()) end
@@ -78,7 +62,7 @@ local function AddGradientControl(context)
     local slider = Widgets.CreateSlider(row, 0, 100, 1, function(value)
         if value == addon.GetGradientOpacity() then return end
         addon.SetGradientOpacity(value)
-        if not context.canceling then RefreshContext(context); RefreshNameplates() end
+        if not context.canceling then RefreshContext(context); RefreshNameplates("color") end
     end)
     slider:SetPoint("LEFT", row, "LEFT", UI.CONTROL_X - 190, 0)
     for _, endpoint in ipairs({{0, "LEFT"}, {100, "RIGHT"}}) do
@@ -92,38 +76,6 @@ local function AddGradientControl(context)
         local value = addon.GetGradientOpacity()
         slider:SetValue(value)
     end
-    local preview = CreateFrame("StatusBar", nil, row)
-    preview:SetPoint("LEFT", row, "LEFT", UI.CONTROL_X + 30, 0)
-    preview:SetWidth(190)
-    preview:SetMinMaxValues(0, 100)
-    preview:SetValue(100)
-    preview:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
-    local name = preview:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    local threat = preview:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    name:SetPoint("LEFT", preview, "LEFT", 3, -0.5)
-    name:SetPoint("RIGHT", threat, "LEFT", -3, 0)
-    name:SetJustifyH("LEFT")
-    name:SetText("Sample")
-    threat:SetPoint("RIGHT", preview, "RIGHT", -3, -0.5)
-    threat:SetJustifyH("RIGHT")
-    threat:SetText("255%")
-    for _, text in ipairs({name, threat}) do
-        text:SetDrawLayer("OVERLAY", 7)
-        text:SetTextColor(1, 1, 1, 1)
-        text:SetWordWrap(false)
-        text:SetMaxLines(1)
-    end
-    context.refreshers[#context.refreshers + 1] = function()
-        local size = addon.GetAppearanceSetting("nameSize")
-        local flags = addon.FontFlags and addon.FontFlags() or ""
-        preview:SetHeight(size + 7)
-        preview:SetStatusBarColor(PriorityColorForState("hostile"))
-        name:SetFont(addon.FontPath(addon.GetAppearanceSetting("nameFont")), size, flags)
-        threat:SetFont(addon.FontPath(addon.GetAppearanceSetting("threatFont")), size, flags)
-        if addon.HealthGradient then
-            addon.HealthGradient.Apply(preview, preview:GetStatusBarTexture(), addon.WorldContext.Get())
-        end
-    end
 end
 
 local function AddBackgroundNameControl(context)
@@ -131,7 +83,7 @@ local function AddBackgroundNameControl(context)
     local toggle = Widgets.CreateSwitch(row, function(checked)
         addon.SetDimBackgroundNames(checked)
         RefreshContext(context)
-        RefreshNameplates()
+        RefreshNameplates("color")
     end)
     toggle:SetPoint("LEFT", row, "LEFT", UI.CONTROL_X, 0)
     context.refreshers[#context.refreshers + 1] = function()
@@ -169,7 +121,7 @@ local function CreateColorsPanel()
             end
         end)
         context.canceling = false
-        if changed and not quiet then RefreshNameplates() end
+        if changed and not quiet then RefreshNameplates("color") end
     end
     addon.CancelColorsEdits = CancelColorsEdits
     local function Refresh()
@@ -184,22 +136,16 @@ local function CreateColorsPanel()
     end)
     AddDescription(content, layout,
         "Restores High Contrast defaults for that profile, Default for all others. " ..
-        "Restores health-bar preferences, background-name dimming and gradient opacity. Disables cast highlighting and restores its settings on Highlight.")
+        "Restores health-bar preferences, background-name dimming and gradient opacity. Cast highlight settings are unchanged.")
+    if addon.AddNameplatePreview then addon.AddNameplatePreview(context) end
     AddGradientControl(context)
     AddPriorityColorControls(context)
-    AddSection(content, layout, "Cast highlight color")
-    local row, swatch = CreateColorRow(context, "Interruptible cast highlight",
-        "Highlights interruptible casts and channels. Applies to the selected profile.",
-        function() return EffectColor("interruptible") end,
-        function(r, g, b) SetEffectColor("interruptible", r, g, b) end)
-    AddCastHighlightSwitch(context, row, swatch)
-    addon.AddCastEffectPreview(context)
     panel.Refresh = Refresh
     panel:SetScript("OnShow", panel.Refresh)
     panel:SetScript("OnHide", function()
         CancelColorsEdits()
         UI.CancelColorEdit()
-        if addon.CastHighlight then addon.CastHighlight.StopPreview(context.preview) end
+        if context.StopPreview then context.StopPreview() end
     end)
     Refresh()
     layout:Finish()

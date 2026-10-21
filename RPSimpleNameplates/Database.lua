@@ -12,7 +12,6 @@ local IsSavedFontSelection = ns.IsSavedFontSelection
 local IsAvailableFontSelection = ns.IsAvailableFontSelection
 local DEFAULT_APPEARANCE = defaults.appearance
 local DEFAULT_TRP3 = defaults.trp3
-local DEFAULT_STYLING_ENABLED = defaults.stylingEnabled
 local DEFAULT_SHOW_THREAT = defaults.showThreat
 local DEFAULT_HIDE_CRITTER_COMPANION_NAMES = defaults.hideCritterCompanionNames
 local MIN_NAME_SIZE, MAX_NAME_SIZE = ns.MIN_NAME_SIZE, ns.MAX_NAME_SIZE
@@ -205,6 +204,7 @@ local function CreateValidatedDB()
         },
         profiles = {},
         profileKeys = {},
+        characterEnabled = {},
     }
 end
 
@@ -254,7 +254,6 @@ local function ValidateCategoryModes(db, savedGlobal)
 end
 
 local function ValidateGlobalToggles(db, savedGlobal)
-    db.global.stylingEnabled = SavedBoolean(savedGlobal.stylingEnabled, DEFAULT_STYLING_ENABLED)
     db.global.hideCritterCompanionNames = SavedBoolean(savedGlobal.hideCritterCompanionNames,
         DEFAULT_HIDE_CRITTER_COMPANION_NAMES)
 end
@@ -279,6 +278,11 @@ local function ValidatedDB(saved)
     if savedGlobal.highContrastRemoved == true then db.global.highContrastRemoved = true end
     ValidateProfiles(db, savedProfiles)
     ValidateProfileKeys(db, saved.profileKeys)
+    for character, enabled in pairs(type(saved.characterEnabled) == "table" and saved.characterEnabled or {}) do
+        if type(character) == "string" and type(enabled) == "boolean" then
+            db.characterEnabled[character] = enabled
+        end
+    end
     ValidateCategoryModes(db, savedGlobal)
     ValidateGlobalToggles(db, savedGlobal)
     ValidateTRP3Settings(db, savedGlobal)
@@ -361,6 +365,7 @@ end
 -- Cancel while the original selection and object identity still exist.
 local function CancelProfileEdits()
     if ns.SettingsUI and ns.SettingsUI.CancelColorEdit then ns.SettingsUI.CancelColorEdit() end
+    if ns.SettingsUI and ns.SettingsUI.CancelThemeDialog then ns.SettingsUI.CancelThemeDialog() end
     if ns.CancelAppearanceEdits then ns.CancelAppearanceEdits(true) end
     if ns.CancelColorsEdits then ns.CancelColorsEdits(true) end
     if ns.CancelHighlightEdits then ns.CancelHighlightEdits(true) end
@@ -563,31 +568,24 @@ end
 local function ResetAllColors()
     CancelColorEdit()
     if ns.CancelColorsEdits then ns.CancelColorsEdits(true) end
-    if ns.CancelHighlightEdits then ns.CancelHighlightEdits(true) end
     local profile = ActiveProfile()
     local defaults = ActiveProfileDefaults()
     for key, default in pairs(defaults.priorityColors) do
         profile.priorityColors[key] = CopyColor(default)
         profile.healthBars[key] = DEFAULT_HEALTH_BARS[key]
     end
-    for key, default in pairs(defaults.effectColors) do
-        profile.effectColors[key] = CopyColor(default)
-    end
-    profile.interruptibleHighlight = defaults.interruptibleHighlight
-    profile.interruptibleEffect = defaults.interruptibleEffect
-    profile.castAdvanced = ValidatedCastBorders()
     profile.gradientOpacity = defaults.gradientOpacity
     profile.dimBackgroundNames = DEFAULT_DIM_BACKGROUND_NAMES
-    local modes = EnsureDB().global.categoryModes
-    for key, default in pairs(DEFAULT_CATEGORY_MODES) do modes[key] = default end
-    if ns.ApplyManagedNameSettings then ns.ApplyManagedNameSettings() end
 end
 
 
 local function ResetHighlightSettings()
+    CancelColorEdit()
     if ns.CancelHighlightEdits then ns.CancelHighlightEdits(true) end
     local profile = ActiveProfile()
     profile.interruptibleEffect = defaults.interruptibleEffect
+    profile.interruptibleHighlight = defaults.interruptibleHighlight
+    profile.effectColors = ActiveProfileDefaults().effectColors
     profile.castAdvanced = ValidatedCastBorders()
 end
 ns.ResetHighlightSettings = ResetHighlightSettings
@@ -625,12 +623,16 @@ local function SetInterruptibleHighlightEnabled(enabled)
     ActiveProfile().interruptibleHighlight = enabled == true
 end
 
+local function GetCharacterEnabled()
+    return EnsureDB().characterEnabled[CharacterKey()] ~= false
+end
+
 local function GetStylingEnabled()
-    return EnsureDB().global.stylingEnabled and not ns.nameplateSetupPending
+    return GetCharacterEnabled() and not ns.nameplateSetupPending
 end
 
 local function SetStylingEnabled(enabled)
-    EnsureDB().global.stylingEnabled = enabled == true
+    EnsureDB().characterEnabled[CharacterKey()] = enabled == true
     if not enabled and ns.RestoreNameplateSetup then ns.RestoreNameplateSetup() end
 end
 
@@ -643,6 +645,14 @@ local function SetThreatEnabled(enabled)
 end
 
 
+-- Themes contain exactly the profile's visual fields. Validation creates a fresh
+-- object, so imported tables cannot alias another profile or carry global data.
+ns.GetThemeData = function() return CopyProfile(ActiveProfile()) end
+ns.ValidateThemeData = function(data) return ValidatedProfile(data) end
+ns.ApplyThemeData = function(data)
+    CancelProfileEdits()
+    EnsureDB().profiles[GetActiveProfileName()] = ValidatedProfile(data)
+end
 ns.GetProfile = function(name) return EnsureDB().profiles[name] end
 ns.EnsureDB = EnsureDB
 ns.DEFAULT_PROFILE_NAME = DEFAULT_PROFILE_NAME
@@ -679,6 +689,7 @@ ns.GetInterruptibleEffect = function() return ActiveProfile().interruptibleEffec
 ns.SetInterruptibleEffect = function(value)
     if ns.CAST_EFFECT_BY_VALUE[value] then ActiveProfile().interruptibleEffect = value end
 end
+ns.GetCharacterEnabled = GetCharacterEnabled
 ns.GetStylingEnabled = GetStylingEnabled
 ns.SetStylingEnabled = SetStylingEnabled
 ns.GetThreatEnabled = GetThreatEnabled

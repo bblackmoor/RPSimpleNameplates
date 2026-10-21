@@ -47,7 +47,7 @@ local function CreateTRP3Panel()
     AddOption("Show short title before the name", "showShortTitle")
     AddOption("Show [OOC] instead of the short title", "showOOC")
     AddOption("Show TRP3 long title beneath the health bar", "showFullTitle",
-        "Uses 80% of the name size. An active cast or channel replaces the title; it returns when casting ends.")
+        "Uses the name size minus two. An active cast or channel replaces the title; it returns when casting ends.")
     UI.AddDescription(content, layout,
         "Missing profile information uses the WoW name. NPC service titles do not require TRP3.")
     panel.Refresh = Refresh

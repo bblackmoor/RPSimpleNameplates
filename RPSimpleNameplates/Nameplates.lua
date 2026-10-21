@@ -36,7 +36,7 @@ local CachedNameHasDrifted, RepairCachedName =
     ns.NameplateText.CachedNameHasDrifted, ns.NameplateText.RepairCachedName
 
 local fullWork = {full = true}
-local workKeys = {"full", "classify", "name", "threat", "cast", "layout"}
+local workKeys = {"full", "classify", "name", "threat", "cast", "layout", "color", "text", "castSettings"}
 local function MergeWork(destination, source)
     for _, key in ipairs(workKeys) do if source[key] then destination[key] = true end end
     return destination

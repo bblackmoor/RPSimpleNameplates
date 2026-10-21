@@ -8,7 +8,7 @@ function GameTooltip:SetOwner(frame) self.owner = frame end
 function GameTooltip:AddLine() end
 local ns, refreshes = {}, 0
 for _, file in ipairs({"Defaults", "FontMedia", "Core", "ManagedNames", "Database",
-    "HealthGradient", "FontRendering", "SettingsControls", "SettingsColorPicker", "SettingsWidgets", "SettingsProfileDialogs", "SettingsProfiles", "SettingsHighlight", "SettingsColors"}) do
+    "HealthGradient", "FontRendering", "SettingsControls", "SettingsColorPicker", "SettingsWidgets", "SettingsProfileDialogs", "SettingsProfiles", "SettingsPreview", "SettingsHighlight", "SettingsColors"}) do
     assert(loadfile("RPSimpleNameplates/" .. file .. ".lua"))("RPSimpleNameplates", ns)
 end
 ns.RefreshAll = function() refreshes = refreshes + 1 end
@@ -128,28 +128,24 @@ for _, label in ipairs({"Effect", "Border thickness", "Border offset", "Fade in"
     assert(BelongsTo(Row(label), highlightPanel), "interruptible settings moved to Highlight")
     assert(not BelongsTo(Row(label), panel), "interruptible settings removed from Colors")
 end
-local colorsPreview, highlightPreview = 0, 0
-for _, object in ipairs(ui.objects) do
-    if object.kind == "StatusBar" and object:GetWidth() == 190 and object:GetHeight() == 14 then
-        if BelongsTo(object, panel) then colorsPreview = colorsPreview + 1 end
-        if BelongsTo(object, highlightPanel) then highlightPreview = highlightPreview + 1 end
-    end
-end
-assert(colorsPreview == 1 and highlightPreview == 1, "each page has an effect preview")
-local function AssertPreviewAlpha(alpha)
-    panel.Refresh(); highlightPanel.Refresh()
+local function Samples(panel)
+    local sample = {}
     for _, object in ipairs(ui.objects) do
-        if object.kind == "StatusBar" and object:GetWidth() == 190 and object:GetHeight() == 14 then
-            assert(object.alpha == alpha, "both previews track Colors Active state")
-        end
-        if object.kind == "FontString" then
-            assert(object:GetText() ~= "Preview demonstrates the selected effect even while Inactive; it does not detect a real cast. Enable Active on Colors to highlight interruptible enemy casts.", "preview explanation removed")
+        if BelongsTo(object, panel) then
+            if object.kind == "StatusBar" and object:GetValue() == 65 then sample.health = object end
+            if object.kind == "StatusBar" and object:GetValue() == 55 then sample.cast = object end
+            if object.kind == "FontString" and object:GetText() == "Sample Name" then sample.name = object end
+            if object.kind == "FontString" and object:GetText() == "125%" then sample.threat = object end
         end
     end
+    assert(sample.health and sample.cast and sample.name and sample.threat, "complete sample on each page")
+    return sample
 end
-AssertPreviewAlpha(0.5)
-ns.SetInterruptibleHighlightEnabled(true); AssertPreviewAlpha(1)
-ns.SetInterruptibleHighlightEnabled(false); AssertPreviewAlpha(0.5)
+local colorSample, highlightSample = Samples(panel), Samples(highlightPanel)
+ns.SetInterruptibleHighlightEnabled(true); panel.Refresh(); highlightPanel.Refresh()
+assert(colorSample.cast.alpha == 1 and highlightSample.cast.alpha == 1)
+ns.SetInterruptibleHighlightEnabled(false); panel.Refresh(); highlightPanel.Refresh()
+assert(colorSample.cast.alpha == 0.5 and highlightSample.cast.alpha == 0.5)
 
 local dimToggle = Control(Row("Dim background NPC names"), "switch")
 assert(ns.GetDimBackgroundNames(), "background dimming defaults on")
@@ -170,34 +166,9 @@ assert(ns.GetDimBackgroundNames() and dimToggle.MyObject:GetValue(), "Colors res
 local methods = getmetatable(UIParent).__index
 function methods:SetAlpha(value) self.alpha = value end
 local gradientSlider = Control(Row("Gradient opacity"), "slider")
-local preview
-for _, object in ipairs(ui.objects) do
-    if object:GetParent() == Row("Gradient opacity") and object.kind == "StatusBar" then preview = object end
-end
-assert(preview and preview:GetValue() == 100 and preview:GetMinMaxValues() == 0)
-local sample, threat
-for _, object in ipairs(ui.objects) do
-    if object:GetParent() == preview and object.kind == "FontString" and object.textColor[1] == 1 then
-        if object:GetText() == "Sample" then sample = object end
-        if object:GetText() == "255%" then threat = object end
-    end
-end
-assert(sample and threat and sample.textColor[1] == 1 and threat.textColor[1] == 1)
-assert(sample.flags == "SLUG,OUTLINE" and threat.flags == "SLUG,OUTLINE", "preview text always outlined")
-assert(sample.RPSNUnderlayers == nil and threat.RPSNUnderlayers == nil, "preview has no glyph copies")
-assert(Row("Gradient opacity").point[5] > Row("1. Attacking me").point[5], "gradient row above colors")
-assert(preview.point[1] == "LEFT" and preview.point[2] == Row("Gradient opacity")
-    and preview.point[4] == ns.SettingsUI.CONTROL_X + 30, "preview has doubled 40-unit gap after slider")
-assert(gradientSlider.point[4] == ns.SettingsUI.CONTROL_X - 190, "slider sits between label and preview")
-local percentageCaptions = 0
-for _, object in ipairs(ui.objects) do
-    if object.kind == "FontString" and object:GetParent() == Row("Gradient opacity")
-        and object:GetText() == "100%" then percentageCaptions = percentageCaptions + 1 end
-end
-assert(percentageCaptions == 1, "only the endpoint caption remains; no current percentage readout")
-for _, object in ipairs(ui.objects) do
-    assert(not (object.kind == "FontString" and object:GetText() == "Gradient preview"), "no separate preview label")
-end
+local preview = colorSample.health
+local sample, threat = colorSample.name, colorSample.threat
+assert(sample.flags == "SLUG,OUTLINE" and threat.flags == "SLUG,OUTLINE", "sample text outlined")
 assert(ns.GetGradientOpacity() == 100 and gradientSlider.MyObject:GetValue() == 100, "Default starts at 100%")
 local beforeGradient = refreshes
 gradientSlider:SetValue(0)
@@ -208,7 +179,7 @@ gradientSlider:SetValue(50)
 assert(ns.GetGradientOpacity() == 50 and refreshes == beforeGradient + 2)
 assert(preview.RPSNHealthGradient:IsShown() and preview.RPSNHealthGradient.alpha == 1
     and preview.RPSNHealthGradient.gradient[2].a == 0.4, "50% slider produces 40% left darkness")
-assert(preview.RPSNHealthGradient.width == 190 * 0.95, "preview fade position preserved")
+assert(preview.RPSNHealthGradient.width == 228 * 0.95, "preview fade position preserved")
 assert(ns.CopyActiveProfile("Gradient copy"))
 assert(ns.GetGradientOpacity() == 50, "profile copy retains opacity")
 ns.SetGradientOpacity(0)
@@ -224,9 +195,9 @@ ns.SetGradientOpacity(50); ns.ResetAllColors(); panel.Refresh(); highlightPanel.
 assert(ns.GetGradientOpacity() == 0 and not preview.RPSNHealthGradient:IsShown())
 assert(ns.SetActiveProfileName("Default")); panel.Refresh()
 
-local castRow = Row("Interruptible cast highlight")
+local castRow = Row("Cast highlight color")
 local cast = Control(castRow, "color")
-local castToggle = Control(castRow, "switch")
+local castToggle = Control(Row("Highlight interruptible casts"), "switch")
 local effectDropdown = Control(Row("Effect"), "dropdown")
 assert(#effectDropdown.MyObject.func() == 3, "pulse, solid and alert exposed")
 local effectRefreshes = refreshes
@@ -236,7 +207,7 @@ for _, option in ipairs(effectDropdown.MyObject.func()) do
 end
 assert(refreshes == effectRefreshes + 3, "one plate refresh per effect change")
 assert(not ns.GetInterruptibleHighlightEnabled(), "effect choice does not enable Active")
-assert(castToggle.point[2]:GetText() == "Active" and castToggle.point[4] == 8)
+assert(BelongsTo(castToggle, highlightPanel), "cast activation belongs to Cast Highlight")
 for _, enabled in ipairs({true, false, true}) do
     local before = refreshes
     castToggle:GetScript("OnClick")(castToggle, "LeftButton")
@@ -273,11 +244,11 @@ for _, object in ipairs(ui.objects) do
     if object.MyObject and object.MyObject.type == "button" and object.text:GetText() == "Reset color settings" then resetAll = object end
 end
 assert(resetAll:GetWidth() == 190 and resetAll:GetHeight() == 24)
-assert(resetAll.point[5] > castRow.point[5], "whole-page reset remains above controls")
+assert(not BelongsTo(castRow, panel), "cast color is absent from Colors")
 local before = refreshes
 Click(resetAll)
-assert(refreshes == before + 1 and not ns.GetInterruptibleHighlightEnabled())
-assert(ns.GetInterruptibleEffect() == "PULSE", "Colors reset restores effect default")
+assert(refreshes == before + 1 and ns.GetInterruptibleHighlightEnabled())
+assert(ns.GetInterruptibleEffect() == "PULSE", "selected profile effect is preserved")
 assert(ns.GetTRP3Enabled() and Snapshot(ns.EnsureDB().profiles.Default) == preservedDefault)
 assert(ns.GetActiveProfileName() == "High Contrast")
 for _, case in ipairs(cases) do
@@ -285,7 +256,8 @@ for _, case in ipairs(cases) do
     RGBEqual(SwatchRGB(Control(Row(case[2]), "color")), default.r, default.g, default.b)
     assert(ns.GetHealthBarEnabled(case[1]) == (case[1] ~= "useless"))
 end
-RGBEqual(SwatchRGB(cast), 0.2, 0, 1)
+highlightPanel.Refresh()
+RGBEqual(SwatchRGB(cast), 0.4, 0.5, 0.6)
 initial, before = Snapshot(SimpleNameplatesDB), refreshes
 panel:GetScript("OnShow")(panel)
 panel:GetScript("OnShow")(panel)

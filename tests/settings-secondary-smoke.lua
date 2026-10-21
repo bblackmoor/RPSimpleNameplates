@@ -131,7 +131,7 @@ assert(Snapshot(ns.EnsureDB().global)==globals and Snapshot(ns.EnsureDB().profil
 -- Every selector rebuilds its menu after profile changes.
 Show(panels[1])
 for _, option in ipairs(selector.MyObject.func()) do assert(option.value~="Renamed") end
-local styling=Control("Selected profile", "switch")
+local styling=Control("Enabled", "switch")
 Click(styling); assert(not ns.GetStylingEnabled() and restored==2)
 Click(styling); assert(ns.GetStylingEnabled() and setup==1)
 Click(styling); allowSetup=false; Click(styling)
@@ -231,14 +231,9 @@ assert(ns.nameplateSetupPending and not styling.MyObject:GetValue())
 assert(popup.key == "RPSN_NAMEPLATE_SETUP")
 StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnAccept()
 assert(ns.GetStylingEnabled() and styling.MyObject:GetValue(), "visible styling control refreshes after setup approval")
-local activationStatus
-for _, object in ipairs(ui.objects) do
-    if object:GetParent() == Row("Selected profile") and object.kind == "FontString" and object:GetText() == "Active" then activationStatus = object end
-end
-assert(activationStatus)
 cvars.nameplateShowFriendlyNpcs = "0"
 ns.CheckNameplateSetup()
-assert(not styling.MyObject:GetValue() and activationStatus:GetText() == "Inactive", "external setup suspension refreshes the visible switch/status")
+assert(not styling.MyObject:GetValue(), "external setup suspension refreshes the visible switch/status")
 StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnCancel()
 assert(not ns.GetStylingEnabled() and not styling.MyObject:GetValue())
 local blocked, combat = true, false
@@ -250,7 +245,7 @@ blocked, combat = false, true
 StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnAccept()
 assert(ns.nameplateSetupPending and not styling.MyObject:GetValue(), "combat-deferred approval remains inactive")
 combat = false; ns.RetryNameplateSetup()
-assert(ns.GetStylingEnabled() and styling.MyObject:GetValue() and activationStatus:GetText() == "Active", "deferred completion refreshes switch/status")
+assert(ns.GetStylingEnabled() and styling.MyObject:GetValue(), "deferred completion refreshes switch/status")
 print("Profiles, TRP3 and About integration smoke: passed")
 
 

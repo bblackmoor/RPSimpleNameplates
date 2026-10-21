@@ -1,6 +1,6 @@
 # Saved data model
 
-Current for 1.0.246. Implemented version-2 schema. RP Simple Nameplates uses Global behavior and appearance Profiles, with no separate Theme layer.
+Current for 1.1.297. Implemented version-2 schema. RP Simple Nameplates uses global behavior, per-character activation, and appearance Profiles. Themes are exchange snapshots, with no separate saved Theme layer.
 
 ## Why two scopes are sufficient
 
@@ -18,7 +18,7 @@ Name placement defaults to Inside for Default and new custom profiles, and Above
 SimpleNameplatesDB = {
     schemaVersion = 2,
     global = { categoryModes = { ... }, trp3 = { ... },
-               stylingEnabled = true, hideCritterCompanionNames = false,
+               hideCritterCompanionNames = false,
                highContrastRemoved = true, -- Optional; only after removal of the bundle.
                managedNameCVarOriginals = { ... },
                nameplateSetupOriginals = { ["Player-GUID"] = { ... } } },
@@ -31,10 +31,11 @@ SimpleNameplatesDB = {
         ["High Contrast"] = { ... },
     },
     profileKeys = { ["Player-GUID"] = "Default" },
+    characterEnabled = { ["Player-GUID"] = true },
 }
 ```
 
-A valid version-2 saved database separates behavior from look and feel. The structural refactor kept this shape and version. Validation reconstructs settings from defaults, discards invalid and unknown fields, and retains recognized valid settings regardless of the saved schema marker. No one-off migration or import/export facility is needed.
+A valid version-2 saved database separates behavior from look and feel. The structural refactor kept this shape and version. Validation reconstructs settings from defaults, discards invalid and unknown fields, and retains recognized valid settings regardless of the saved schema marker. The retired global stylingEnabled field is discarded rather than copied to every character; missing/invalid character activation defaults on.
 
 Useful and Useless each have one `priorityColors` entry per profile, used in all world and combat contexts. Player - Friendly uses one `friendly` entry in all world and combat contexts, with blue (`#0000FF`) as the default. The former `sanctuaryFriendly`, `sanctuaryUseful`, and `sanctuaryUseless` fields are unknown settings and are discarded during validation; valid `useful` and `useless` values are retained without conversion.
 
@@ -48,7 +49,7 @@ Profiling introduced in 1.0.163 is session-only. It adds no fields to `SimpleNam
 
 | Setting | Owner | Reason |
 | --- | --- | --- |
-| `stylingEnabled` | Global | Master addon behavior |
+| `characterEnabled` | Character-keyed map | Enabled defaults on independently of profile selection; setup suspension temporarily pauses effective styling |
 | Six `healthBars` booleans | Profile | Per-category health-bar visibility; on for the first five categories, off for NPC - Background |
 | Legacy `categoryModes` | Global | Retained for compatibility; ignored by rendering |
 | `hideCritterCompanionNames` | Global | Blizzard name management |
@@ -89,8 +90,14 @@ Health bars default On for the first five categories and Off for NPC - Backgroun
 
 ## Cast settings validation and reset scope
 
-Validation imports only valid current values. `interruptibleCastStyle` is discarded without conversion. Current effects are PULSE, SOLID and ALERT; invalid selections default to PULSE, and activation defaults off. `castAdvanced.PULSE` stores shared thickness (4), offset (3), fadeIn (0.1s) and fadeOut (0.1s). `castAdvanced.ALERT` stores minLength (20%), maxLength (100%), shrinkTime/growTime (0.2s), endOpacity (0%) and centerOpacity (100%). Valid existing values remain authoritative; missing/invalid fields use defaults without migration. Alert minLength greater than maxLength resets both to 20/100. The default `effectColors.interruptible` is #3300FF for all factory profiles, while saved colors remain unchanged. ResetHighlightSettings restores only effect and castAdvanced; color and activation remain on Colors.
+Validation imports only valid current values. `interruptibleCastStyle` is discarded without conversion. Current effects are PULSE, SOLID and ALERT; invalid selections default to PULSE, and activation defaults off. `castAdvanced.PULSE` stores shared thickness (4), offset (3), fadeIn (0.1s) and fadeOut (0.1s). `castAdvanced.ALERT` stores minLength (20%), maxLength (100%), shrinkTime/growTime (0.2s), endOpacity (0%) and centerOpacity (100%). Valid existing values remain authoritative; missing/invalid fields use defaults without migration. Alert minLength greater than maxLength resets both to 20/100. The default `effectColors.interruptible` is #3300FF for all factory profiles, while saved colors remain unchanged. ResetHighlightSettings restores cast activation, color, effect and castAdvanced; all these controls live on Cast Highlight.
 
-Reset color settings restores the selected profile's six priority colors, cast color, cast activation (off), cast effect (Pulsing border), health-bar defaults, background dimming (on) and gradient default. High Contrast uses its factory palette and gradient opacity 0%; Default and custom profiles use factory Default values. It also resets retained global category modes to active internally; rendering ignores those modes. It preserves profile selection, appearance/threat settings, styling enablement, critter hiding and TRP3.
+Reset color settings restores only six priority colors, health-bar defaults, background dimming and gradient opacity. High Contrast uses its factory palette and gradient opacity 0%; Default and custom profiles use factory Default values. It preserves cast highlighting, text/threat settings, character activation, legacy category modes, global visibility, TRP3 and profile selection.
 
 Reset text settings on Text restores that profile's appearance defaults and threat on, plus global critter hiding off. It preserves all Colors preferences, styling enablement, TRP3 and selection. Restore bundled profiles replaces Default/High Contrast while preserving custom profiles and globals.
+
+## Theme exchange
+
+`Themes.lua` serializes a validated visual profile as `RPSN-THEME:1` followed by sorted `path=value` lines. Strings percent-escape delimiters; numbers retain round-trip precision. Parsing never evaluates Lua and is limited to 16,384 bytes. Unsupported versions, duplicate/malformed lines, invalid escapes, control characters in known text values, and payloads with no recognized settings are rejected. Unknown fields are ignored; missing/invalid recognized values use factory defaults through the same profile validator as saved data. Absent SharedMedia fonts retain their saved key and normal runtime fallback.
+
+Import replaces only the selected profile's visual object. Character activation, profile names/assignments, global visibility, TRP3, and restoration ledgers are not exported or imported. The dialog captures profile name/object identity, rejects stale targets, and cancels on profile changes or combat entry. Export is copyable text; there is no Theme collection or reference.

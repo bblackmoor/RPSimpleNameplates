@@ -17,7 +17,7 @@ local function AddFont(context, label, key)
     end, function(value)
         addon.SetAppearanceSetting(key, value)
         Refresh(context)
-        UI.RefreshNameplates()
+        UI.RefreshNameplates("text")
     end)
     local function RefreshFont()
         local value = addon.GetAppearanceSetting(key)
@@ -44,7 +44,7 @@ local function AddSize(context, key, label, minimum, maximum, step, suffix)
         amount:SetText(tostring(value) .. suffix)
         if value == addon.GetAppearanceSetting(key) then return end
         addon.SetAppearanceSetting(key, value)
-        if not context.canceling then UI.RefreshNameplates() end
+        if not context.canceling then UI.RefreshNameplates("text") end
     end)
     slider:SetPoint("TOPLEFT", block, "TOPLEFT", UI.CONTROL_X, -10)
     slider:GetFrame():SetHeight(18)
@@ -67,7 +67,7 @@ local function AddPlacement(context)
     local _, dropdown = UI.CreateDropdownRow(context.content, context.layout, "Health-bar name placement", function() return options end, function(value)
         addon.SetAppearanceSetting("namePlacement", value)
         Refresh(context)
-        UI.RefreshNameplates()
+        UI.RefreshNameplates("text")
     end)
     context.refreshers[#context.refreshers + 1] = function()
         dropdown:SetValue(addon.GetAppearanceSetting("namePlacement"))
@@ -81,23 +81,23 @@ local function AddControls(context)
     UI.AddDescription(content, layout, "Includes fonts registered by other addons and SharedMedia packs.")
     AddToggle(context, "Use smoother font rendering (Slug)",
         function() return addon.GetAppearanceSetting("useSlugRendering") end,
-        function(value) addon.SetAppearanceSetting("useSlugRendering", value) end, UI.RefreshNameplates)
+        function(value) addon.SetAppearanceSetting("useSlugRendering", value) end, function() UI.RefreshNameplates("text") end)
     UI.AddDescription(content, layout,
         "Applies to names, titles, health, threat and cast text. Uses thin solid outlines on all styled text.")
     AddToggle(context, "Match Blizzard font in sanctuaries",
         function() return addon.GetAppearanceSetting("matchSanctuaryFont") end,
-        function(value) addon.SetAppearanceSetting("matchSanctuaryFont", value) end, UI.RefreshNameplates)
+        function(value) addon.SetAppearanceSetting("matchSanctuaryFont", value) end, function() UI.RefreshNameplates("text") end)
     UI.AddDescription(content, layout, "When off, the selected Name font applies everywhere.")
     AddSize(context, "nameSize", "Name size", addon.MIN_NAME_SIZE, addon.MAX_NAME_SIZE, 1, " pt")
     UI.AddDescription(content, layout,
-        "Also sets threat-text size. Titles use 80%; inside-bar text has four units above and three below.")
+        "Also sets threat-text size. Titles use the name size minus two.")
     UI.AddSection(content, layout, "Health bars")
     UI.AddDescription(content, layout,
-        "All Active categories use available health bars. Priority controls color; combat does not change the layout.")
+        "Health Bar switches on Colors choose which categories display bars. Combat does not change the layout.")
     AddSize(context, "healthBarWidth", "Health bar width", addon.MIN_HEALTH_BAR_WIDTH, addon.MAX_HEALTH_BAR_WIDTH, 5, "%")
     AddPlacement(context)
     AddFont(context, "Threat-percentage font", "threatFont")
-    AddToggle(context, "Show threat percentage when available", addon.GetThreatEnabled, addon.SetThreatEnabled, UI.RefreshNameplates)
+    AddToggle(context, "Show threat percentage when available", addon.GetThreatEnabled, addon.SetThreatEnabled, function() UI.RefreshNameplates("text") end)
     UI.AddSection(content, layout, "Global visibility")
     -- This setter owns its CVar capture/restoration.
     AddToggle(context, "Hide critter and companion names", addon.GetHideCritterCompanionNames, addon.SetHideCritterCompanionNames)
@@ -117,7 +117,7 @@ local function CreateAppearancePanel()
             if previous ~= slider:GetValue() then changed = true end
         end
         context.canceling = false
-        if changed and not quiet then UI.RefreshNameplates() end
+        if changed and not quiet then UI.RefreshNameplates("text") end
     end
     addon.CancelAppearanceEdits = CancelEdits
     addon.RefreshFontControls = function() UI.RunRefreshers(context.fontRefreshers) end
@@ -129,13 +129,17 @@ local function CreateAppearancePanel()
         addon.SetThreatEnabled(addon.Defaults.showThreat)
         addon.SetHideCritterCompanionNames(addon.Defaults.hideCritterCompanionNames)
         RefreshPage()
-        UI.RefreshNameplates()
+        UI.RefreshNameplates("text")
     end)
     UI.AddDescription(content, layout, "Resets the settings below, including global critter/companion visibility.")
+    if addon.AddNameplatePreview then addon.AddNameplatePreview(context) end
     AddControls(context)
     panel.Refresh = RefreshPage
     panel:SetScript("OnShow", panel.Refresh)
-    panel:SetScript("OnHide", function() CancelEdits() end)
+    panel:SetScript("OnHide", function()
+        CancelEdits()
+        if context.StopPreview then context.StopPreview() end
+    end)
     RefreshPage()
     layout:Finish()
     return panel

@@ -164,10 +164,9 @@ local ns = {
     SetCastBorderSetting = function() end,
     GetInterruptibleEffect = function() return "PULSE" end,
     SetInterruptibleEffect = function() end,
-    ResetHighlightSettings = function() end,
+    ResetHighlightSettings = function() castEnabled = false end,
     ResetAllColors = function()
         allColorResets = allColorResets + 1
-        castEnabled = false
         for _, state in ipairs({"attacking", "hostile", "neutral", "friendly", "useful", "useless"}) do modes[state] = "active" end
     end,
     GetTRP3Enabled = function() return trp3Enabled end,
@@ -206,7 +205,7 @@ assert(ns.RegisterSettingsPanels, "settings registration API")
 ns.RegisterSettingsPanels()
 equal(#categories, 6, "About and four subcategories")
 equal(table.concat({categories[1].name,categories[2].name,categories[3].name,categories[4].name,categories[5].name,categories[6].name}, ","),
-    "RP Simple Nameplates,Profiles,Text,Colors,Highlight,TRP3", "tab order")
+    "RP Simple Nameplates,Profiles,Text,Colors,Cast Highlight,TRP3", "tab order")
 ns.RegisterSettingsPanels()
 equal(#categories, 6, "one-time registration")
 equal(SLASH_RPSN1, "/rpsn", "slash registration")
@@ -330,7 +329,7 @@ local stylingSwitch
 for _, item in ipairs(frames) do
     if item.kind == "Button" and item.width == 44 then
         for _, label in ipairs(frames) do
-            if label.parent == item.parent and label.text == "Selected profile" then
+            if label.parent == item.parent and label.text == "Enabled" then
                 stylingSwitch = item
             end
         end
@@ -427,13 +426,13 @@ equal(profilesSelector.MyObject.myvalue, "High Contrast", "Profiles selector ref
 equal(appearanceSelector.MyObject.myvalue, "High Contrast", "Appearance selector refreshes on show")
 assert(belongsTo(button("Create"), categories[2].panel), "management belongs to Profiles")
 assert(belongsTo(fullTitle, categories[6].panel), "long-title switch belongs to TRP3")
-local _, _, effectFill = colorRow("Interruptible cast highlight")
-assert(belongsTo(effectFill, categories[4].panel), "cast color belongs to Colors")
+local _, _, effectFill = colorRow("Cast highlight color")
+assert(belongsTo(effectFill, categories[5].panel), "cast color belongs to Colors")
 assert(not switchFor("Highlight interruptible casts and channels"), "redundant Appearance cast toggle removed")
 assert(not button("Reset priority colors"), "priority reset button removed")
 assert(not button("Reset all profile colors"), "old bottom reset removed")
-local castToggle = assert(switchFor("Interruptible cast highlight"))
-assert(belongsTo(castToggle, categories[4].panel), "cast Active switch on Colors")
+local castToggle = assert(switchFor("Highlight interruptible casts"))
+assert(belongsTo(castToggle, categories[5].panel), "cast Active switch on Colors")
 for _, enabled in ipairs({true, false, true}) do
     castToggle:GetScript("OnClick")(castToggle, "LeftButton")
     equal(castEnabled, enabled, "cast Active switch changes activation")
@@ -441,9 +440,9 @@ for _, enabled in ipairs({true, false, true}) do
 end
 button("Reset color settings"):Click()
 equal(allColorResets, 1, "complete page reset available")
-equal(castEnabled, false, "Colors reset disables highlight")
-equal(castToggle.MyObject:GetValue(), false, "cast Active switch refreshes after reset")
-assert(button("Reset color settings").points.TOPLEFT[4] > effectFill.parent.parent.points.TOPLEFT[4], "reset precedes cast controls")
+equal(castEnabled, true, "Colors reset preserves highlight")
+equal(castToggle.MyObject:GetValue(), true, "cast switch remains unchanged after Colors reset")
+assert(belongsTo(button("Reset cast highlight settings"), categories[5].panel))
 castEnabled, threatEnabled = true, false
 local widthSlider
 for _, item in ipairs(frames) do
@@ -508,19 +507,7 @@ button("Reset color settings"):Click()
 equal(styling, true, "reset retains global styling choice")
 equal(hideCritters, false, "page reset restores global critter default")
 equal(modes.useful, "active", "Colors reset restores global category mode")
-local profileDropdown
-for _, item in ipairs(frames) do
-    if item.parent == stylingSwitch.parent and item.MyObject and item.MyObject.type == "dropdown" then profileDropdown = item end
-end
-assert(profileDropdown, "activation shares selector row")
-equal(profileDropdown.points.LEFT[3], 184, "Profiles selector moved left")
-equal(stylingSwitch.points.LEFT[1], profileDropdown, "activation immediately follows selector")
-equal(stylingSwitch.points.LEFT[3], 8, "activation has consistent gap")
-local activationStatus
-for _, item in ipairs(frames) do
-    if item.parent == stylingSwitch.parent and item.text == "Active" then activationStatus = item end
-end
-assert(activationStatus, "active status shown")
+assert(stylingSwitch.points.LEFT[3] == ns.SettingsUI.CONTROL_X, "Enabled uses its own labeled row")
 assert(not button("Reset text and layout"), "old reset removed")
 assert(button("Reset text settings").points.TOPLEFT[4] > hideSwitch.parent.points.TOPLEFT[4], "reset precedes global visibility")
 
@@ -535,14 +522,15 @@ ns.CheckNameplateSetup = function()
 end
 stylingSwitch:Click()
 equal(stylingSwitch:GetChecked(), false, "setup rejection keeps switch off")
-equal(activationStatus.text, "Inactive", "setup rejection updates status")
+
 
 -- Cast activation and color share the same row.
-assert(switchFor("Interruptible cast highlight") == castToggle, "cast Active switch retained")
-assert(colorRow("Interruptible cast highlight"), "cast color remains available")
+assert(switchFor("Highlight interruptible casts") == castToggle, "cast Active switch retained")
+assert(colorRow("Cast highlight color"), "cast color remains available")
 button("Reset color settings"):Click()
-equal(castToggle.MyObject:GetValue(), false, "Colors reset clears Active")
-equal(castEnabled, false, "Colors reset disables highlighting")
+button("Reset cast highlight settings"):Click()
+equal(castToggle.MyObject:GetValue(), false, "Cast Highlight reset clears activation")
+equal(castEnabled, false, "Cast Highlight reset disables highlighting")
 for _, labelText in ipairs({"1. Attacking me", "6. NPC - Background"}) do
     local swatch = colorRow(labelText)
     assert(button("Reset color settings").points.TOPLEFT[4] > swatch.parent.points.TOPLEFT[4], "reset precedes priority settings")

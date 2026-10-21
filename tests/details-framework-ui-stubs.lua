@@ -153,6 +153,7 @@ function methods:SetTexture(value, wrapHorizontal, wrapVertical, filter)
 end
 function methods:SetColorTexture(...) self.color={...} end
 function methods:SetVertexColor(...) self.color={...} end
+function methods:SetShown(value) if value then self:Show() else self:Hide() end end
 function methods:SetAlpha(value) self.alpha=value end
 function methods:SetTextColor(...) self.textColor={...} end
 function methods:EnableMouse(enabled) self.mouseEnabled=enabled end

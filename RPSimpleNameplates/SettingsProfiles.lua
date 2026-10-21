@@ -68,9 +68,12 @@ local function CreateProfilesPanel()
         "Profiles are account-wide; each character remembers its selection.")
     local refreshers = {}
     local function Refresh() UI.RunRefreshers(refreshers) end
-    local row, dropdown = AddProfileSelector(content, layout, refreshers, Refresh, 184)
-    addon.AddStylingSwitch(row, dropdown, refreshers)
-    AddDescription(content, layout, "Enables addon styling for all characters and profiles.")
+    UI.AddSection(content, layout, "This character")
+    local enabledRow = UI.CreateSettingRow(content, layout, "Enabled")
+    addon.AddStylingSwitch(enabledRow, nil, refreshers)
+    AddDescription(content, layout, "Enables addon styling for this character, independently of the selected profile.")
+    AddProfileSelector(content, layout, refreshers, Refresh)
+    if addon.AddThemeActions then addon.AddThemeActions(content, layout, function() Refresh(); RefreshNameplates() end) end
     UI.AddSection(content, layout, "Manage profiles")
     AddDescription(content, layout,
         "Create uses factory defaults. Default cannot be renamed or deleted.")

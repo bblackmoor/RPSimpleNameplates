@@ -16,6 +16,7 @@
 - Use **Total RP** 3 names, titles, and out-of-character markers.
 - Save appearance profiles and let each character choose its own.
 - Start with editable Default and High Contrast profiles.
+- Preview your settings and import or export visual themes.
 
 RP Simple Nameplates styles Blizzard's existing nameplates. Health and cast progress, spell icons, and target behavior remain controlled by the game.
 
@@ -50,10 +51,10 @@ Type `/rpsn` to open settings, or find **RP Simple Nameplates** under **Options 
 
 | Page | What you can change |
 | --- | --- |
-| Profiles | Turn styling on or off; select, create, copy, rename, delete, or restore profiles |
+| Profiles | Enable styling for this character; manage profiles; import or export themes |
 | Text | Fonts, text size, bar width, names inside or above bars, threat display, and critter/companion name hiding |
-| Colors | Category colors and health bars, background-name dimming, gradient strength, and cast-highlight color and activation |
-| Highlight | Cast-highlight effect, border thickness and offset, animation timing, and previews |
+| Colors | Category colors and health bars, background-name dimming, gradient strength, and a complete preview |
+| Cast Highlight | Cast-highlight activation, color, effect, border geometry, timing, and a complete preview |
 | TRP3 | Roleplaying names, short and long titles, and OOC markers |
 | About | Installed version, source, commands, and known limitations |
 
@@ -76,11 +77,15 @@ An enemy that is attacking you uses red even if it also offers an interaction.
 
 Each category has a **Health Bar** switch. Turn it off to show a colored name and title without a bar. Background NPCs use names alone by default. Names inside bars use white outlined text, with optional dimming for background NPCs.
 
-Cast highlighting is off by default. Enable **Active** beside the cast-highlight color on **Colors**, then choose the effect on **Highlight**.
+Cast highlighting is off by default. Enable **Highlight interruptible casts** on **Cast Highlight**, then choose its color and effect. Pulse and Alert settings appear when their effect is selected.
+
+Text, Colors, and Cast Highlight each provide a complete nameplate preview. Choose a sample category and turn **Preview a cast** on or off to see how your settings work together. Each tab’s reset button resets only controls on that tab.
 
 ### Profiles
 
-Profiles are shared across your account, and each character remembers its selection. **Create** starts with default settings; **Copy** duplicates the selected profile. Default can be edited and restored, but cannot be renamed or deleted. High Contrast can also be edited. **Restore bundled profiles** restores both presets without changing custom profiles.
+Profiles are shared across your account, and each character remembers its selection. **Enabled** applies only to the current character, defaults on, and is independent of profile selection. Turning it off restores Blizzard’s presentation. **Create** starts with default settings; **Copy** duplicates the selected profile. Default can be edited and restored, but cannot be renamed or deleted. High Contrast can also be edited. **Restore bundled profiles** restores both presets without changing custom profiles.
+
+**Export theme** provides text you can copy and share. **Import theme** applies pasted theme text to the selected profile, replacing its colors, text, and cast highlights. Characters sharing that profile see the changes. Themes exclude character activation, global critter/companion visibility, and TRP3 settings. Copy the profile first if you want to keep its current appearance.
 
 Additional fonts are available through SharedMedia font packs or other font-providing addons.
 
@@ -105,7 +110,7 @@ Use one nameplate addon at a time. If you see competing colors or duplicate disp
 | `/rpsn`, `/rpsn text`, `/rpsn appearance` | Open Text settings |
 | `/rpsn profiles` | Open Profiles |
 | `/rpsn colors` | Open Colors |
-| `/rpsn highlight` | Open Highlight |
+| `/rpsn highlight` | Open Cast Highlight |
 | `/rpsn trp3` | Open TRP3 settings |
 | `/rpsn about` | Open About |
 

@@ -2,8 +2,11 @@
 local _, addon = ...
 local settingsPages = {}
 
-local function RefreshNameplates()
-    if addon.RefreshAll then addon.RefreshAll() end
+local function RefreshNameplates(scope)
+    if addon.RefreshSettingsPreviews then addon.RefreshSettingsPreviews() end
+    if scope and addon.QueueNameplateRefresh then
+        addon.QueueNameplateRefresh("settings " .. scope, {[scope] = true})
+    elseif addon.RefreshAll then addon.RefreshAll() end
 end
 
 -- Canvas settings pages are not scrollable on their own. Each page owns a
@@ -24,24 +27,30 @@ local function CreateScrollablePanel(name)
     local function Reflow()
         local offset = 18
         for _, item in ipairs(layout.items) do
-            local height = item.height
-            if item.region and item.region.LayoutFullWidth then
-                item.region:SetWidth(math.max(1, content:GetWidth() - item.x - 24))
-            end
-            if item.autoHeight then
-                local text = item.region.LayoutText or item.region
-                if item.region.LayoutText then
-                    text:SetWidth(item.region:GetWidth())
-                    text:SetJustifyH("LEFT")
-                end
-                text:SetHeight(0) -- Measure wrapped text without its previous height cap.
-                height = math.max(16, text:GetStringHeight() + 2)
-            end
+            local visible = not item.visibleWhen or item.visibleWhen()
             if item.region then
-                item.region:SetHeight(height)
-                item.region:SetPoint("TOPLEFT", content, "TOPLEFT", item.x, -offset)
+                if visible then item.region:Show() else item.region:Hide() end
             end
-            offset = offset + height + item.gap
+            if visible then
+                local height = item.height
+                if item.region and item.region.LayoutFullWidth then
+                    item.region:SetWidth(math.max(1, content:GetWidth() - item.x - 24))
+                end
+                if item.autoHeight then
+                    local text = item.region.LayoutText or item.region
+                    if item.region.LayoutText then
+                        text:SetWidth(item.region:GetWidth())
+                        text:SetJustifyH("LEFT")
+                    end
+                    text:SetHeight(0) -- Measure wrapped text without its previous height cap.
+                    height = math.max(16, text:GetStringHeight() + 2)
+                end
+                if item.region then
+                    item.region:SetHeight(height)
+                    item.region:SetPoint("TOPLEFT", content, "TOPLEFT", item.x, -offset)
+                end
+                offset = offset + height + item.gap
+            end
         end
         layout.offset = offset
         desiredHeight = offset + 20
@@ -66,6 +75,7 @@ local function CreateScrollablePanel(name)
         self.offset = self.offset + (height or 20) + (gap or 0)
         return region
     end
+    layout.Reflow = function() if finished then UpdateContentSize() end end
     function layout:Space(height)
         self.items[#self.items + 1] = {height = height, gap = 0}
         self.offset = self.offset + height
@@ -219,6 +229,7 @@ function UI.InstallCombatGuard()
     local function Update(locked)
         addon.SettingsWidgets.SetCombatLocked(locked)
         if locked and UI.CancelProfileDialogs then UI.CancelProfileDialogs() end
+        if locked and UI.CancelThemeDialog then UI.CancelThemeDialog() end
         for _, panel in ipairs(settingsPages) do
             if panel.Refresh then panel.Refresh() end
         end

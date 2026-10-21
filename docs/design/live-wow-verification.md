@@ -21,20 +21,20 @@ These runs are not matched benchmarks. Inclusive timing rows overlap and must no
 - [ ] Install the current inner `RPSimpleNameplates` folder using the README instructions and confirm the About version. Play normally with profiling off; observe grey background names and inside labels without duplicate native text or visible hitches.
 - [ ] Change target/mouseover, enter/leave combat, move out of range/back, recycle plates and change zones. Verify current names/colors remain stable and no stale labels reappear.
 - [ ] Gain/lose threat; start, interrupt and finish casts/channels. Check immediate affected-unit updates, name space, pulse and title substitution.
-- [ ] Change profiles/fonts/size/width/gradients and toggle global Active off/on. Verify priority plates update immediately, background plates settle promptly over subsequent frames, and native presentation restores when disabled.
+- [ ] Change profiles/fonts/size/width/gradients and toggle per-character Enabled off/on. Verify priority plates update immediately, background plates settle promptly over subsequent frames, and native presentation restores when disabled.
 - [ ] Check sanctuary, eligible PvP/duel and restricted combat contexts, including deferred restoration while styling stays disabled. Record Lua, taint or protected-action errors.
 
 Capture a complete current-build report if flicker or hitches return. Additional scheduler tuning or diagnostics requires a reproduced unresolved problem; another routine screenshot is not required just to continue normal play.
 
 ## Settings foundation and page layout
 
-- [ ] With Details/Plater and standalone Details Framework disabled, log in/reload and open About, Profiles, Text, Colors, Highlight and TRP3. Confirm one registration, correct page order and scrolling. Repeat with an external DF embedder and record the selected DF minor version.
+- [ ] With Details/Plater and standalone Details Framework disabled, log in/reload and open About, Profiles, Text, Colors, Cast Highlight and TRP3. Confirm one registration, correct page order and scrolling. Repeat with an external DF embedder and record the selected DF minor version.
 - [ ] Check headings, wrapping, switches, disabled labels, swatches, sliders, dropdowns and info-link spacing at narrow/normal widths and different UI scales. Test content growing/shrinking and wheel/scrollbar operation.
 - [ ] Verify `/rpsn` and `/rpsn text` open Text (`/rpsn appearance` remains an alias); profiles/colors/highlight/trp3/about routes open their pages. Settings commands refuse combat opening; debug/perf commands remain available during combat.
 - [ ] Enter combat with an open color picker, typed slider editor, held slider drag, dropdown menu or profile dialog. Verify unfinished previews roll back, menus/dialogs close, current selections are restored, and all settings mutations (including resets and profile actions) are disabled. Previously committed edits remain.
 - [ ] Leave combat: controls resume their normal availability without resuming cancelled sessions; Default rename/delete and disabled TRP3 dependents remain disabled. Open the settings through the native Settings UI during combat and confirm controls cannot mutate saved values. Debug/perf remain usable.
 - [ ] About reads the installed `.toc` version; the copy-source link and three read-only reference swatches work and never open editable pickers.
-- [ ] Profiles' global Active switch reflects setup suspension while consent is pending, successful Apply and enable, refusal and failed/deferred writes without requiring a page reopen.
+- [ ] Profiles' per-character Enabled switch reflects setup suspension while consent is pending, successful Apply and enable, refusal and failed/deferred writes without requiring a page reopen.
 
 ## Profiles, saved data and edit lifecycle
 
@@ -50,18 +50,18 @@ Capture a complete current-build report if flicker or hitches return. Additional
 
 - [ ] All six Health Bar switches follow the selected profile; On shows a supported bar in both combat states, Off shows its name/title without a bar. Verify first-match priority and no category Active/Inactive or Hide controls.
 - [ ] Factory bars are On for the first five categories and Off for NPC - Background. Background-name dimming defaults On; On is grey #999999 and Off white #FFFFFF, with matching subtitles, inside/above/no-bar. Bar colors and threat styling are independent.
-- [ ] Colors contains the interruptible color and Active switch, with default color #3300FF. Highlight (between Colors and TRP3) contains Effect (Pulsing border, Solid border, Alert border), shared Border thickness (4) and outward Border offset (3), Pulse Fade in/Fade out (0.1 seconds each), and Alert length (20–100%), shrink/grow times (0.2 seconds each), end opacity (0%) and center opacity (100%). Pulse fades all four edges between 35% and 100%; Solid is fully opaque; Alert animates centered top/bottom gradient segments with hidden sides. Both Colors and Highlight have labeled effect previews, greyed out and static while the interruptible Active switch is off. Reset highlight settings restores effect/geometry/timing/gradient without changing Colors color/Active; Reset color settings retains its broader reset scope. Native icon/shield hooks and spellcast events drive detection without reading secret interruptibility. Live visual acceptance remains open.
-- [ ] Reset color settings restores the selected profile's factory palette, bars On except Background, background dimming On, cast activation Off, effect Pulsing border, and gradients On for Default/custom or Off for High Contrast. It preserves appearance/threat settings, selection, global styling, critter hiding and TRP3. Internal legacy category modes reset to active without affecting rendering.
-- [ ] Text reset restores selected-profile fonts/rendering/size/placement/width and threat On, plus global critter hiding Off. It preserves Colors preferences, global Active, TRP3 and selection. Bundled restore has the separate scope described above.
+- [ ] All cast highlight controls are on Cast Highlight: activation, color (#3300FF by default), effect, shared thickness (4) and offset (3), Pulse fade times (0.1 seconds each), and Alert length (20–100%), shrink/grow times (0.2 seconds each), end opacity (0%) and center opacity (100%). Pulse and Alert sections appear only for their selected effect; Solid shows shared controls only. Hidden values are retained. Text, Colors and Cast Highlight share a complete sample preview with category selection, name/title, partial health fill, optional threat and a cast/title switch. Disabled cast highlighting dims the preview cast and stops its effect animations. Page hide stops preview animations. Reset cast highlight settings restores activation, color, effect and all border parameters; Text and Colors resets preserve them.
+- [ ] Colors reset restores category palette, bars On except Background, dimming On and gradient opacity 100% for Default/custom or 0% for High Contrast. It preserves cast settings, text/threat, Enabled, global visibility, TRP3 and legacy modes. Cast Highlight reset affects only cast activation/color/effect/border parameters.
+- [ ] Text reset restores selected-profile fonts/rendering/size/placement/width and threat On, plus global critter hiding Off. It preserves Colors preferences, per-character Enabled, TRP3 and selection. Bundled restore has the separate scope described above.
 
 ## Fonts, geometry, gradients and native labels
 
 - [ ] Compare Slug Off/On with built-in/SharedMedia fonts at several UI scales. All styled names, titles, native health/threat/cast labels keep thin solid outlines with no extra glyph copies or shadows.
-- [ ] Default/custom names use Friz Quadrata, size 18, Inside placement and width 120%; High Contrast uses Above placement. Verify saved choices remain authoritative and reset returns profile defaults. Threat defaults to Arial Narrow at name size; TRP3 titles use name size minus two and NPC subtitles 80%.
+- [ ] Default/custom names use Friz Quadrata, size 18, Inside placement and width 120%; High Contrast uses Above placement. Verify saved choices remain authoritative and reset returns profile defaults. Threat defaults to Arial Narrow at name size; Titles use name size minus two.
 - [ ] Open long font lists, select absent saved fonts and register providers late. Choices survive reload/copy; unavailable faces use Arial Narrow temporarily and resume when available. Sanctuary matching changes only the name/title face, using the localized world font.
 - [ ] Inside names keep full size; bars leave four units above/three below. Native health labels and threat form the documented right-hand chain with three-unit gaps. Appearance changes, native label show/hide and rounded geometry converge without endless repair; switching Above or disabling restores captured dimensions/anchors.
 - [ ] Known Retail restricted-anchor layouts size correctly without requiring readable GetPoint; unsupported layouts remain untouched. Test modern/classic layouts and different UI scales without Lua/secret-value errors.
-- [ ] Full-health preview shows Sample and illustrative 255% threat. Gradients fade from 80% black at the left to clear at 95% full width, with the last 5% clear. Damage/heal clips the fixed tint to native remaining fill without rescaling, depleted-area tint or bright edge. Threat outlines remain unchanged at every health level; cast bars remain flat.
+- [ ] Complete previews on Text, Colors and Cast Highlight show the selected category, profile fonts/size/placement/width, partial health, title, optional threat and a sample cast. Cast/title switching does not alter saved appearance. Gradients remain clipped to native health fill with no secret-health arithmetic.
 - [ ] Decorative bar edges/absorb overflow glow are suppressed; shield fill, heal prediction, icons, shields, target/mouseover treatment and classification visibility remain intact. Disable styling and verify native artwork/text baselines restore, including retired/replaced regions.
 
 ## Casts, threat, NPC subtitles and TRP3
@@ -92,13 +92,20 @@ Capture a complete current-build report if flicker or hitches return. Additional
 
 See [the repeatable cast test](cast-effect-testing.md) for enemy selection, preview versus detection checks and a targeted debug capture.
 
-- [ ] Advanced is absent. Verify outward offset 3 and constant thickness 4; Pulse fades at 0.1 seconds each way, Solid stays opaque, and Alert has only top/bottom segments with continuous centered growth/shrink. Check previews on both pages and their independent hide/show lifecycle. Valid saved values survive reload; defaults fill missing values without migration.
+- [ ] Advanced is absent. Verify outward offset 3 and constant thickness 4; Pulse fades at 0.1 seconds each way, Solid stays opaque, and Alert has only top/bottom segments with continuous centered growth/shrink. Check complete previews on all three pages and their independent hide/show lifecycle. Valid saved values survive reload; defaults fill missing values without migration.
 
 - [ ] Gradient opacity on Colors spans 0–100%. Test 0 (none), 50 (half-strength tint) and 100 (original gradient); fade position, native health clipping and outlines remain unchanged. Preview updates immediately. Typed/drag edits roll back on combat entry and profile changes. Colors reset uses 100 for Default/custom and 0 for High Contrast; retired toggles are discarded without conversion.
 
 ## Recent cast-fill and preview regression checks
 
 - [ ] On the current build, test a fresh live interruptible cast, then leave combat and change its highlight color/profile/effect. Subsequent casts keep a plain fill. Check actual tint, completion/interruption, native shields/icons, disable/re-enable, and restoration without secret-value or taint errors.
-- [ ] Turn highlight Active off on Colors. Both Colors and Highlight previews are grey, dimmed, and completely static for Pulse, Solid, and Alert. Re-enable and verify the selected effect resumes; hide/show each page and repeat.
+- [ ] Turn Highlight interruptible casts off on Cast Highlight. Preview casts dim and their effects become static. Re-enable and verify the selected effect resumes; hide/show each page and repeat.
 
 Acceptance remains partial until the applicable client checks are recorded. Passing local suites or one converged scene does not close unobserved native behavior.
+
+## Version 1.1 settings and theme acceptance
+
+- [ ] On two characters sharing one profile, change Enabled independently and reload each. New characters start enabled; profile switches do not change Enabled. Disabling restores only the current character's presentation and setup originals.
+- [ ] Export a customized theme and import it into a copied profile. Verify all colors, text/threat, bar preferences, gradient/dimming and cast highlight settings match. Character activation, global critter visibility and TRP3 remain unchanged.
+- [ ] Paste invalid/unsupported theme text and verify an error without partial changes. Verify scrolling, selecting/copying the entire export, Escape/Close, stale profile selection, and combat cancellation.
+- [ ] Change text/color/cast sliders in a crowd. Priority plates update promptly and background plates settle under the existing scheduler budget; no new full-crowd performance campaign is implied by these focused settings checks.

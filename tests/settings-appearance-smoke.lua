@@ -14,7 +14,9 @@ for _, file in ipairs({"Defaults", "FontMedia", "Core", "ManagedNames", "Databas
     assert(loadfile("RPSimpleNameplates/" .. file .. ".lua"))("RPSimpleNameplates", ns)
 end
 ns.RefreshAll = function() refreshes = refreshes + 1 end
-ns.QueueNameplateRefresh = function() queued = queued + 1 end
+ns.QueueNameplateRefresh = function(reason)
+    if reason then refreshes = refreshes + 1 else queued = queued + 1 end
+end
 ns.GetActiveProfileName()
 local function Snapshot(value)
     if type(value) ~= "table" then return tostring(value) end

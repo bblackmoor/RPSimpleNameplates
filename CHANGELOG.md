@@ -1,3 +1,12 @@
+## 1.1.297 — 2026-10-20
+
+- Add complete nameplate previews to Text, Colors, and Cast Highlight.
+- Put all cast highlight controls on Cast Highlight; show only the selected effect's controls while preserving other effect values.
+- Limit each tab reset to controls on that tab.
+- Make Enabled independent for each character, defaulting on, with a separate row on Profiles.
+- Add copy/paste theme import and export for colors, text and cast highlights, excluding character activation and global settings.
+- Use focused settings refreshes for text, colors and cast highlights while retaining structural fallbacks and existing frame budgets.
+
 ## 1.0.296 — 2026-10-12
 
 - Update `docs/README.md`.

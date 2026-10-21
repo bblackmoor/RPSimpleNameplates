@@ -75,11 +75,11 @@ effectNS.ResetAppearance()
 equal(effectNS.GetInterruptibleEffect(), "SOLID", "Appearance reset preserves effect")
 equal(effectNS.GetInterruptibleHighlightEnabled(), true, "Appearance reset preserves activation")
 effectNS.ResetAllColors()
-equal(effectNS.GetInterruptibleEffect(), "PULSE", "Colors reset restores pulse")
+equal(effectNS.GetInterruptibleEffect(), "SOLID", "Colors reset preserves cast effect")
 effectNS.EnsureDB().profiles[effectNS.GetActiveProfileName()].interruptibleEffect = "invalid"
 effectNS = loadCore()
 equal(effectNS.GetInterruptibleEffect(), "PULSE", "invalid saved effect defaults pulse")
-equal(effectNS.GetInterruptibleHighlightEnabled(), false, "Colors reset disables highlight")
+equal(effectNS.GetInterruptibleHighlightEnabled(), true, "Colors reset preserves cast activation")
 -- Retired style settings are discarded without supplying activation.
 for _, legacy in ipairs({{true, "PIXEL", true}, {false, "PROC", false},
     {nil, "NONE", false}, {nil, "PIXEL", false}, {nil, "AUTOCAST", false},
@@ -124,7 +124,7 @@ profile.castAdvanced.ALERT.minLength, profile.castAdvanced.ALERT.maxLength = 90,
 borders = loadCore()
 equal(borders.GetCastBorderSetting("ALERT", "minLength"), 20, "invalid saved length pair defaults")
 equal(borders.GetCastBorderSetting("ALERT", "maxLength"), 100, "invalid saved length pair defaults")
-borders.ResetAllColors()
+borders.ResetHighlightSettings()
 equal(borders.GetCastBorderSetting("PULSE", "thickness"), 4, "Colors reset thickness")
 equal(borders.GetCastBorderSetting("PULSE", "fadeIn"), 0.1, "Colors reset original pulse")
 equal(borders.GetCastBorderSetting("ALERT", "minLength"), 20, "Colors reset Alert")
@@ -136,9 +136,9 @@ borders.SetCastBorderSetting("PULSE", "fadeIn", 0.5)
 borders.ResetHighlightSettings()
 equal(borders.GetInterruptibleEffect(), "PULSE", "Highlight reset restores effect")
 equal(borders.GetCastBorderSetting("PULSE", "fadeIn"), 0.1, "Highlight reset restores timing")
-equal(borders.GetInterruptibleHighlightEnabled(), true, "Highlight reset preserves Colors activation")
+equal(borders.GetInterruptibleHighlightEnabled(), false, "Highlight reset disables highlight")
 local r, g, b = borders.EffectColor("interruptible")
-equal(r, 0.4, "Highlight reset preserves Colors color")
+equal(r, 0.2, "Highlight reset restores cast color")
 borders.ResetAllColors()
 r, g, b = borders.EffectColor("interruptible")
 equal(r, 0.2, "new factory red component")
@@ -238,14 +238,14 @@ for _, case in ipairs(expectedPalettes) do
         equal(r, expected.r, case[1] .. " reset " .. state .. " red")
         equal(g, expected.g, case[1] .. " reset " .. state .. " green")
         equal(b, expected.b, case[1] .. " reset " .. state .. " blue")
-        equal(ns.GetCategoryMode(state), "active", "reset global activation")
+        equal(ns.GetCategoryMode(state), "inactive", "Colors reset preserves legacy category modes")
     end
     local r, g, b = ns.EffectColor("interruptible")
-    local expected = case[3].interruptible
+    local expected = {r=0.2, g=0.3, b=0.4}
     equal(r, expected.r, case[1] .. " reset cast red")
     equal(g, expected.g, case[1] .. " reset cast green")
     equal(b, expected.b, case[1] .. " reset cast blue")
-    equal(ns.GetInterruptibleHighlightEnabled(), false, "reset profile cast activation")
+    equal(ns.GetInterruptibleHighlightEnabled(), true, "Colors reset preserves cast activation")
     equal(ns.GetAppearanceSetting("nameSize"), 30, "Colors reset preserves Appearance settings")
     equal(ns.GetThreatEnabled(), false, "Colors reset preserves threat display")
     equal(ns.GetStylingEnabled(), false, "Colors reset preserves addon activation")
@@ -318,7 +318,7 @@ SimpleNameplatesDB = {
 }
 ns = loadCore()
 db = ns.EnsureDB()
-equal(ns.GetStylingEnabled(), false, "valid global retained")
+equal(ns.GetStylingEnabled(), true, "retired global activation discarded; character defaults enabled")
 equal(ns.GetCategoryMode("friendly"), "active", "removed category mode discarded")
 equal(ns.GetCategoryMode("hostile"), "active", "invalid category reset")
 equal(ns.GetTRP3Enabled(), true, "valid TRP3 retained")
@@ -355,7 +355,7 @@ for _, marker in ipairs({ 999, false }) do
     ns = loadCore()
     db = ns.EnsureDB()
     equal(db.schemaVersion, 2, "current schema marker")
-    equal(ns.GetStylingEnabled(), false, "valid setting retained across schema markers")
+    equal(ns.GetStylingEnabled(), true, "retired global activation is not a character preference")
     equal(ns.GetCategoryMode("hostile"), "inactive", "valid mode retained")
     equal(ns.GetCategoryMode("useless"), "active", "invalid mode discarded")
     equal(db.profiles.Default.appearance.nameSize, 25, "valid appearance retained")
@@ -431,7 +431,7 @@ equal(db.global.managedNameCVarOriginals.UnitNameFriendlyPlayerName, nil, "succe
 -- Removed-feature restoration works with styling disabled and defers in combat.
 ns = fresh()
 db = ns.EnsureDB()
-db.global.stylingEnabled = false
+ns.SetStylingEnabled(false)
 db.global.managedNameCVarOriginals.nameplateShowOnlyNameForFriendlyPlayerUnits = "bar-original"
 cvars.nameplateShowOnlyNameForFriendlyPlayerUnits = "1"
 inCombat = true
@@ -564,7 +564,7 @@ for line in toc:lines() do
 end
 toc:close()
 equal(table.concat(modules, ","),
-    "Libs/LibStub/LibStub.lua,Libs/CallbackHandler-1.0/CallbackHandler-1.0.lua,Libs/LibSharedMedia-3.0/LibSharedMedia-3.0.lua,Libs/DetailsFramework/load.xml,Defaults.lua,FontMedia.lua,Core.lua,Profiler.lua,PeriodicWork.lua,WorldContext.lua,ManagedNames.lua,NameplateSetup.lua,Database.lua,TRP3.lua,EntityFacts.lua,NameplateClassification.lua,PresentationCapabilities.lua,PresentationRules.lua,FontRendering.lua,HealthGradient.lua,NameplateFrames.lua,NPCTitles.lua,NameplateText.lua,NameplateThreat.lua,CastHighlight.lua,NameplateRestoration.lua,NameplatePresentation.lua,Nameplates.lua,Diagnostics.lua,SettingsControls.lua,SettingsColorPicker.lua,SettingsWidgets.lua,SettingsAbout.lua,SettingsBehavior.lua,SettingsProfileDialogs.lua,SettingsProfiles.lua,SettingsAppearance.lua,SettingsHighlight.lua,SettingsColors.lua,SettingsTRP3.lua,Settings.lua",
+    "Libs/LibStub/LibStub.lua,Libs/CallbackHandler-1.0/CallbackHandler-1.0.lua,Libs/LibSharedMedia-3.0/LibSharedMedia-3.0.lua,Libs/DetailsFramework/load.xml,Defaults.lua,FontMedia.lua,Core.lua,Profiler.lua,PeriodicWork.lua,WorldContext.lua,ManagedNames.lua,NameplateSetup.lua,Database.lua,Themes.lua,TRP3.lua,EntityFacts.lua,NameplateClassification.lua,PresentationCapabilities.lua,PresentationRules.lua,FontRendering.lua,HealthGradient.lua,NameplateFrames.lua,NPCTitles.lua,NameplateText.lua,NameplateThreat.lua,CastHighlight.lua,NameplateRestoration.lua,NameplatePresentation.lua,Nameplates.lua,Diagnostics.lua,SettingsControls.lua,SettingsColorPicker.lua,SettingsWidgets.lua,SettingsAbout.lua,SettingsBehavior.lua,SettingsProfileDialogs.lua,SettingsThemes.lua,SettingsProfiles.lua,SettingsPreview.lua,SettingsAppearance.lua,SettingsHighlight.lua,SettingsColors.lua,SettingsTRP3.lua,Settings.lua",
     "TOC module order")
 
 -- Removing the optional bundle persists until an explicit bundled restore.

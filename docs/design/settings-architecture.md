@@ -1,23 +1,23 @@
 # Settings and runtime architecture
 
-Current architecture for 1.0.246. Saved data remains schema 2, with global behavior and account-wide appearance profiles selected per character. Completed records are indexed in [developer documentation](../README.md); live-client checks are tracked separately.
+Current architecture for 1.1.297. Saved data remains schema 2, with global behavior, character activation, and account-wide appearance profiles selected per character. Completed records are indexed in [developer documentation](../README.md); live-client checks are tracked separately.
 
 ## Settings ownership and pages
 
-The pages are About, Profiles, Text, Colors, Highlight and TRP3, in that order. All use the Details Framework widget adapter with shared layout helpers, native dialogs and yellow circled-i links. There is no Behavior page or slash route.
+The pages are About, Profiles, Text, Colors, Cast Highlight and TRP3, in that order. All use the Details Framework widget adapter with shared layout helpers, native dialogs and yellow circled-i links. There is no Behavior page or slash route.
 
 | Page | Current responsibility |
 | --- | --- |
 | About | Metadata, source link, commands, known presentation limits and read-only native-label swatches |
-| Profiles | Account-wide profile management and the global styling Active switch |
+| Profiles | Account-wide profile management and per-character Enabled and theme import/export |
 | Text | Profile fonts, Slug rendering, name size/placement, health-bar width and threat display; global critter/companion hiding |
-| Colors | Six profile priority colors, profile cast color/Active switch/preview and six profile Health Bar switches, background-name dimming, a profile gradient opacity slider (0–100%) and full-health preview |
-| Highlight | Profile effect, shared thickness/offset, Pulse and Alert parameters, effect preview and reset |
+| Colors | Six profile priority colors and Health Bar switches, background-name dimming, gradient opacity (0–100%) and complete preview |
+| Cast Highlight | Activation, color, effect, shared geometry, conditional Pulse/Alert parameters, complete preview and reset |
 | TRP3 | Global integration and RP-name/title/OOC preferences |
 
 Visible pages refresh their selected-profile controls immediately; hidden pages reread on show. Profile switching cancels active previews before changing selection and refreshes plates. Native profile dialogs capture name and object identity at opening and reject acceptance after selection changes or same-name replacement. Database mutations cancel affected drafts before switching or replacing their targets.
 
-Reset text settings on Text restores profile appearance and threat display plus global critter hiding. Reset color settings restores the selected profile's factory colors, cast highlighting off and effect Pulsing border, background dimming on, gradient opacity 100% for Default/custom profiles or 0% for High Contrast, and Health Bar preferences On except NPC - Background. There are no individual color reset buttons. Neither page reset changes the global styling switch or TRP3 preferences. See the [saved-data model](saved-data-model.md) for exact field ownership.
+Reset text settings on Text restores profile appearance and threat display plus global critter hiding. Reset color settings restores the selected profile's factory category colors, background dimming on, gradient opacity 100% for Default/custom profiles or 0% for High Contrast, and Health Bar preferences On except NPC - Background. There are no individual color reset buttons. Reset cast highlight settings restores only cast highlighting, including activation and color. No tab reset changes per-character Enabled or TRP3 preferences. See the [saved-data model](saved-data-model.md) for exact field ownership.
 
 ## Current source ownership
 
@@ -50,8 +50,11 @@ Reset text settings on Text restores profile appearance and threat display plus 
 | `SettingsColorPicker.lua` | Native RGB session ownership, captured target, preview/commit/cancel and stale callbacks |
 | `SettingsProfileDialogs.lua` | Captured profile identity and native lifecycle/restore confirmations |
 | `SettingsAbout.lua` / `SettingsProfiles.lua` | About page, profile management and shared selectors |
-| `SettingsBehavior.lua` | Global styling/critter controls and their setup/restoration callbacks |
+| `SettingsBehavior.lua` | Character Enabled control and setup/restoration callbacks |
 | `SettingsAppearance.lua` (Text) / `SettingsColors.lua` / `SettingsHighlight.lua` / `SettingsTRP3.lua` | Page construction, refresh and scoped user actions |
+| `Themes.lua` | Versioned, allowlisted, non-executable visual theme exchange |
+| `SettingsThemes.lua` | Copy/paste theme dialog with captured profile identity and combat cancellation |
+| `SettingsPreview.lua` | Shared complete sample renderer and preview lifecycle |
 | `Settings.lua` | Settings registration and slash routing |
 
 ## Shared settings contracts
@@ -88,4 +91,10 @@ The 1.0.218 crowded-scene report confirms appearance convergence in that scene. 
 
 ## Interruptible effects
 
-Colors contains the interruptible color and Active switch, with default color #3300FF. Highlight (between Colors and TRP3) contains Effect (Pulsing border, Solid border, Alert border), shared Border thickness (4) and outward Border offset (3), Pulse Fade in/Fade out (0.1 seconds each), and Alert length (20–100%), shrink/grow times (0.2 seconds each), end opacity (0%) and center opacity (100%). Pulse fades all four edges between 35% and 100%; Solid is fully opaque; Alert animates centered top/bottom gradient segments with hidden sides. Both Colors and Highlight have labeled effect previews, greyed out and static, with both animation groups stopped, while the interruptible Active switch is off. Reset highlight settings restores effect/geometry/timing/gradient without changing Colors color/Active; Reset color settings retains its broader reset scope. Native icon/shield hooks and spellcast events drive detection without reading secret interruptibility. Live visual acceptance remains open.
+All cast highlight controls are on Cast Highlight: activation, color (#3300FF by default), effect, shared thickness (4) and offset (3), Pulse fade times (0.1 seconds each), and Alert length (20–100%), shrink/grow times (0.2 seconds each), end opacity (0%) and center opacity (100%). Pulse and Alert sections appear only for their selected effect; Solid shows shared controls only. Hidden values are retained. Text, Colors and Cast Highlight share a complete sample preview with category selection, name/title, partial health fill, optional threat and a cast/title switch. Disabled cast highlighting dims the preview cast and stops its effect animations. Page hide stops preview animations. Reset cast highlight settings restores activation, color, effect and all border parameters; Text and Colors resets preserve them.
+
+## Settings refresh scopes and themes
+
+Settings request `text`, `color`, or `castSettings` work through the existing coalescing queue. Each scope permits only its owned cache differences. Text updates fonts, geometry, artwork and threat configuration; Colors updates fill/gradient/name appearance; Cast Highlight updates cast effects. Initialized frames reuse their presentation and classification. Profile changes, Health Bar switches, Colors reset and invalid/replaced cache state use full styling. These jobs retain the existing per-frame scheduler budget and priority plates.
+
+A theme is a portable visual snapshot applied to the selected profile, not a separate selected collection. Theme fields are profile colors, health-bar preferences, gradient/dimming, appearance/threat and cast highlights. It excludes character Enabled, profile assignments/names, global visibility, TRP3 and restoration ledgers. Import/export dialogs name their captured profile. Import rejects stale selection/identity and closes on profile changes or combat. Imports refresh all plate presentation because they can change structure.

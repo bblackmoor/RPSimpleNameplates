@@ -59,7 +59,7 @@ cvars.nameplateShowFriendlyNpcs = "0"
 cvars.nameplateShowOnlyNameForFriendlyPlayerUnits = "1"
 equal(ns.CheckNameplateSetup(), false, "incompatible startup")
 equal(ns.GetStylingEnabled(), false, "styling suspended awaiting choice")
-equal(ns.EnsureDB().global.stylingEnabled, true, "saved intent survives pending popup")
+equal(ns.GetCharacterEnabled(), true, "saved intent survives pending popup")
 equal(#writes, 0, "no changes before consent")
 equal(shown.key, "RPSN_NAMEPLATE_SETUP", "setup popup")
 equal(shown.text:find("Friendly NPC Nameplates: Off -> On", 1, true) ~= nil, true, "current and required NPC setting")
@@ -90,7 +90,7 @@ cvars.nameplateShowFriendlyPlayers = "0"
 ns.CheckNameplateSetup()
 StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnCancel()
 equal(ns.GetStylingEnabled(), false, "disable choice")
-equal(ns.EnsureDB().global.stylingEnabled, false, "disable persisted")
+equal(ns.GetCharacterEnabled(), false, "disable persisted")
 equal(#writes, 0, "declining never changes WoW settings")
 equal(ns.CheckNameplateSetup(), false, "disabled startup")
 equal(shown, nil, "disabled startup has no popup")

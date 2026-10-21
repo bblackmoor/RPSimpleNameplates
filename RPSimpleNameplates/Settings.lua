@@ -7,7 +7,7 @@ local pageOrder = {
     {key = "Profiles", label = "Profiles"},
     {key = "Appearance", label = "Text"},
     {key = "Colors", label = "Colors"},
-    {key = "Highlight", label = "Highlight"},
+    {key = "Highlight", label = "Cast Highlight"},
     {key = "TRP3", label = "TRP3"},
 }
 local aliases = {
@@ -16,7 +16,7 @@ local aliases = {
     profiles = "Profiles", profile = "Profiles",
     appearance = "Appearance", text = "Appearance", font = "Appearance", fonts = "Appearance",
     colors = "Colors", color = "Colors",
-    highlight = "Highlight", highlights = "Highlight",
+    highlight = "Highlight", highlights = "Highlight", ["cast highlight"] = "Highlight",
     trp3 = "TRP3", rp = "TRP3",
 }
 local function RegisterSettingsPanels()

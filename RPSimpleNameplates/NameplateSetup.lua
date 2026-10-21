@@ -87,7 +87,7 @@ local function Disable()
     ns.SetStylingEnabled(false)
     ns.RestoreManagedNameSettings()
     if ns.RestoreAll then ns.RestoreAll() end
-    print("RP Simple Nameplates styling is disabled. Enable it again using Active in /rpsn profiles.")
+    print("RP Simple Nameplates styling is disabled. Enable it again using Enabled in /rpsn profiles.")
 end
 
 local function ShowReview(issues, failure)
@@ -125,7 +125,7 @@ Restore = function()
 end
 
 Apply = function()
-    if not ns.EnsureDB().global.stylingEnabled then return end
+    if not ns.GetCharacterEnabled() then return end
     Suspend()
     if InCombat() then deferredAction = "apply"; return end
     local originals, issues = Originals(), Issues()
@@ -144,7 +144,7 @@ Apply = function()
         -- success when WoW rejects a write or a CVar changes during setup.
         deferredAction = nil
         C_Timer.After(0, function()
-            if ns.EnsureDB().global.stylingEnabled and ns.nameplateSetupPending then
+            if ns.GetCharacterEnabled() and ns.nameplateSetupPending then
                 ShowReview(Issues(), "Some changes could not be applied. Styling remains paused; retry or disable it to restore changed settings.")
             end
         end)
@@ -156,7 +156,7 @@ end
 
 Check = function()
     if applying then return not ns.nameplateSetupPending end
-    if not ns.EnsureDB().global.stylingEnabled then Restore(); return false end
+    if not ns.GetCharacterEnabled() then Restore(); return false end
     deferredAction = nil -- Enabling cancels a deferred disable/restoration.
     -- Release older managed settings before reading compatibility. Otherwise
     -- legacy CVar restoration later at login can invalidate this review.

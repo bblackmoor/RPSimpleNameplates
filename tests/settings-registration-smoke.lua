@@ -44,7 +44,7 @@ function strtrim(text) return text:match("^%s*(.-)%s*$") end
 register()
 assert(created == #keys and #registered == #keys)
 for index, key in ipairs(keys) do assert(registered[index].panel.key == key, "page order") end
-assert(registered[3].label == "Text" and registered[5].label == "Highlight", "renamed Text and inserted Highlight tabs")
+assert(registered[3].label == "Text" and registered[5].label == "Cast Highlight", "renamed Text and inserted Highlight tabs")
 local firstRoot = registered[1]
 register()
 assert(created == #keys and #registered == #keys and registered[1] == firstRoot, "registration is idempotent")

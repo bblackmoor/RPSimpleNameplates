@@ -46,11 +46,11 @@ local function CaptureSettings(frame)
     frame.RPSNStyleSettings = settings
 end
 
-local function SettingsAreCurrent(frame)
+local function SettingsAreCurrent(frame, work)
     local settings = frame.RPSNStyleSettings
     if not settings then return false end
     for _, key in ipairs(appearanceKeys) do
-        if settings[key] ~= ns.GetAppearanceSetting(key) then return false end
+        if settings[key] ~= ns.GetAppearanceSetting(key) and not (work and work.text) then return false end
     end
     for _, key in ipairs(trpKeys) do
         if settings[key] ~= ns.GetTRP3Setting(key) then return false end
@@ -58,7 +58,10 @@ local function SettingsAreCurrent(frame)
     for _, key in ipairs(optionalSettings) do
         local value
         if ns[key] then value = ns[key]() end
-        if settings[key] ~= value then return false end
+        local owned = work and ((work.text and key == "GetThreatEnabled")
+            or (work.color and (key == "GetGradientOpacity" or key == "GetDimBackgroundNames"))
+            or (work.castSettings and key == "GetInterruptibleHighlightEnabled"))
+        if settings[key] ~= value and not owned then return false end
     end
     return true
 end
@@ -147,7 +150,7 @@ ApplySimpleStyle = ns.Profiler.Wrap("Full styling", ApplySimpleStyle)
 -- Validate identity and configuration without collecting entity facts or titles.
 -- Assessments stay operation-local; inaccessible frames retain their pending
 -- work/restoration instead of borrowing a prior access decision.
-local function PresentationIsCurrent(frame, assessment, context)
+local function PresentationIsCurrent(frame, assessment, context, work)
     local decision, expected = frame.RPSNPresentation, frame.RPSNNameStyle
     if not decision or not expected or not frame.RPSNState then return false, "not initialized" end
     if Restore.IsPending(frame) then return false, "restoration pending" end
@@ -159,10 +162,10 @@ local function PresentationIsCurrent(frame, assessment, context)
     if frame.RPSNOriginalHealthBarsContainer ~= frame.HealthBarsContainer then return false, "container replaced" end
     if frame.RPSNStyledCastBar ~= assessment.castBar then return false, "cast bar replaced" end
     if expected.presentation ~= decision then return false, "presentation cache" end
-    if not SettingsAreCurrent(frame) then return false, "settings changed" end
+    if not SettingsAreCurrent(frame, work) then return false, "settings changed" end
     if not decision.suppressText then
         if expected.name ~= assessment.name or expected.bar ~= assessment.healthBar
-            or not ns.FontPathMatches(expected.font, Text.NameFontPath(context))
+            or (not (work and work.text) and not ns.FontPathMatches(expected.font, Text.NameFontPath(context)))
             or (expected.inside and (not frame.RPSNInsideName
                 or frame.RPSNInsideNameBar ~= assessment.healthBar)) then return false, "name cache" end
         local showBar = assessment.hasHealthBar == true and ns.GetHealthBarEnabled(frame.RPSNState) ~= false
@@ -213,7 +216,17 @@ end
 
 local function PerformDataUpdate(frame, assessment, context, work)
     local state, decision = frame.RPSNState, frame.RPSNPresentation
-    local nameChanged, colorChanged = work.name, false
+    local nameChanged, colorChanged = work.name or work.text or work.color, work.color
+    if work.text and not decision.suppressText then
+        ns.NameplateFrames.ApplyBarWidth(frame, assessment, context)
+        ns.NameplateFrames.ApplyBarArtwork(frame, assessment, context)
+        ns.NameplateThreat.UpdateThreatText(frame, state, context, decision)
+        ns.NameplateFrames.LayoutHealthText(frame, assessment.healthBar, context)
+    elseif work.color and not decision.suppressText and ns.HealthGradient then
+        local fill = Cap.SafeField(assessment.healthBar, "barTexture", context)
+            or Cap.ReadRegion(assessment.healthBar, "GetStatusBarTexture", context)
+        ns.HealthGradient.Apply(assessment.healthBar, fill, context)
+    end
     if work.classify then
         local unit = ns.AccessibleValue(frame.unit)
         if type(unit) ~= "string" then return "full" end
@@ -224,7 +237,7 @@ local function PerformDataUpdate(frame, assessment, context, work)
             or nextDecision.showHealthBar ~= decision.showHealthBar
             or nextDecision.nameOnly ~= decision.nameOnly then return "full" end
         local oldFacts = frame.RPSNEntityFacts
-        colorChanged = nextState ~= state
+        colorChanged = colorChanged or nextState ~= state
         nameChanged = nameChanged or colorChanged or facts.npcTitle ~= (oldFacts and oldFacts.npcTitle)
         -- Keep the cached presentation identity when its structure is unchanged.
         decision.state, decision.colorState = nextState, nextState
@@ -240,10 +253,11 @@ local function PerformDataUpdate(frame, assessment, context, work)
     elseif work.layout or (work.threat and LayoutHasChanged(frame, context)) then
         Text.UpdateNameLayout(frame, context, decision, assessment)
     end
-    if work.cast then
+    if work.cast or work.castSettings then
         ns.CastHighlight.UpdateInterruptibleHighlight(frame, context, decision)
         Text.SyncFullTitleVisibility(frame, context, assessment)
     end
+    if work.text or work.color or work.castSettings then CaptureSettings(frame) end
 end
 
 local function PerformNameRepair(frame, assessment, context)
@@ -279,7 +293,7 @@ local function FocusedUpdate(frame, context, work, kind)
         ns.Profiler.Count("Focused outcomes", restored and "native/restored" or "restoration pending")
         return
     end
-    local current, reason = PresentationIsCurrent(frame, assessment, context)
+    local current, reason = PresentationIsCurrent(frame, assessment, context, work)
     if not current then
         ns.Profiler.Count("Focused outcomes", "invalid-cache fallback")
         ns.Profiler.Count("Focused cache invalidation", reason)
