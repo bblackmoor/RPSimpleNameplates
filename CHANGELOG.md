@@ -1,3 +1,17 @@
+## 1.1.302 — 2026-10-21
+
+- Update `Media/icon-1200.png`.
+- Update `Media/icon-1200.psd`.
+- Update `Media/icon-256.png`.
+- Update `Media/icon-256.psd`.
+- Update `Media/icon-400.png`.
+- Update `Media/icon-400.psd`.
+- Update `Media/icon-64.png`.
+- Update `Media/icon-64.psd`.
+- Update `RPSimpleNameplates/Media/icon-64.tga`.
+- Update `RPSimpleNameplates/Media/icon.blp`.
+- Add `RPSimpleNameplates/Media/icon.png`.
+
 ## 1.1.301 — 2026-10-21
 
 - Add full nameplate previews to Text, Colors, and Cast Highlight so appearance changes are easier to compare.
