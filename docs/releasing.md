@@ -168,7 +168,11 @@ A manual workflow run creates an artifact even if a tag is selected; publication
 requires the tag-push event. A failed build prevents publication.
 
 Only the release job has `contents: write`; it uses GitHub's supplied
-`GITHUB_TOKEN`. It creates a new release and does not overwrite an existing one.
+`GITHUB_TOKEN`. It creates a new release for a pushed Git tag. When the tag was created by
+publishing a release in GitHub's browser, it attaches the verified ZIP to that
+existing release instead. Existing assets are never overwritten. This permits
+the browser fallback when the GitHub connector has no tag-creation action;
+use the committed version, exact tested commit, and matching changelog notes.
 If Actions are disabled or an account policy blocks the pinned actions, enable
 them in [repository Actions settings](https://github.com/bblackmoor/RPSimpleNameplates/settings/actions).
 

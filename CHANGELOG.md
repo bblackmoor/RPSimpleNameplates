@@ -1,3 +1,16 @@
+## 1.1.301 — 2026-10-21
+
+- Add full nameplate previews to Text, Colors, and Cast Highlight so appearance changes are easier to compare.
+- Gather all cast highlight controls on Cast Highlight and show the controls for the selected effect. Preserve settings for the other effects.
+- Reset only the settings controlled by the current Text, Colors, or Cast Highlight tab.
+- Remember Enabled separately for each character, defaulting on, with its own row on Profiles.
+- Import and export themes containing colors, text, and cast highlights through copy and paste. Character activation and global behavior settings stay separate.
+- Apply text, color, and cast highlight changes with focused refreshes while retaining existing frame budgets.
+- Repair release packaging after the upstream LibStub history was replaced; pin its available commit containing the same tested source.
+- Exclude LibStub's new upstream revision marker from the installable ZIP.
+
+- Support browser-created release tags by attaching the verified ZIP to the existing release before the CurseForge upload.
+
 ## 1.1.300 — 2026-10-21
 
 - Add full nameplate previews to Text, Colors, and Cast Highlight so appearance changes are easier to compare.
