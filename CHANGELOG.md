@@ -1,3 +1,8 @@
+## 1.1.304 — 2026-11-17
+
+- Consolidate numeric settings validation and rounding while preserving saved-value defaults and interactive clamping.
+- Reject non-finite name-size edits and add regression coverage for numeric settings.
+
 ## 1.1.303 — 2026-10-21
 
 - Update the addon icon and bundled artwork with the revised design.

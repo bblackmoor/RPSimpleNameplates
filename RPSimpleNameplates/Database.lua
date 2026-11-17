@@ -29,6 +29,21 @@ local function IsFiniteNumber(value)
         and value ~= math.huge and value ~= -math.huge
 end
 
+-- Saved values outside their range fall back to defaults. Interactive edits
+-- clamp to the range instead; both paths reject non-finite numbers.
+local function BoundedNumber(value, minimum, maximum, clamp)
+    if not IsFiniteNumber(value) then return nil end
+    if clamp then return math.max(minimum, math.min(maximum, value)) end
+    if value >= minimum and value <= maximum then return value end
+end
+
+local function RoundedNumber(value, minimum, maximum, step, clamp)
+    value = BoundedNumber(value, minimum, maximum, clamp)
+    if value == nil then return nil end
+    local steps = math.floor((value - minimum) / step + 0.5)
+    return math.min(maximum, minimum + steps * step)
+end
+
 local function IsValidColor(color)
     return type(color) == "table"
         and IsFiniteNumber(color.r) and color.r >= 0 and color.r <= 1
@@ -70,11 +85,9 @@ local function ValidatedCastBorders(saved)
         result[effect] = {}
         for _, control in ipairs(controls) do
             local value = source[control.key]
-            if IsFiniteNumber(value) and value >= control.min and value <= control.max then
-                result[effect][control.key] = value
-            else
-                result[effect][control.key] = control.default
-            end
+            -- Preserve valid saved values, including values between slider steps.
+            result[effect][control.key] = BoundedNumber(value, control.min, control.max)
+                or control.default
         end
     end
     if result.ALERT.minLength > result.ALERT.maxLength then
@@ -136,15 +149,10 @@ local function ValidateProfileAppearance(profile, saved)
         profile.appearance.useSlugRendering)
     profile.appearance.nameFont = IsSavedFontSelection(savedAppearance.nameFont)
         and savedAppearance.nameFont or profile.appearance.nameFont
-    if IsFiniteNumber(savedAppearance.nameSize)
-        and savedAppearance.nameSize >= MIN_NAME_SIZE
-        and savedAppearance.nameSize <= MAX_NAME_SIZE then
-        profile.appearance.nameSize = math.floor(savedAppearance.nameSize + 0.5)
-    end
-    if IsFiniteNumber(savedAppearance.healthBarWidth)
-        and savedAppearance.healthBarWidth >= MIN_BAR_WIDTH and savedAppearance.healthBarWidth <= MAX_BAR_WIDTH then
-        profile.appearance.healthBarWidth = math.floor(savedAppearance.healthBarWidth / 5 + 0.5) * 5
-    end
+    profile.appearance.nameSize = RoundedNumber(savedAppearance.nameSize,
+        MIN_NAME_SIZE, MAX_NAME_SIZE, 1) or profile.appearance.nameSize
+    profile.appearance.healthBarWidth = RoundedNumber(savedAppearance.healthBarWidth,
+        MIN_BAR_WIDTH, MAX_BAR_WIDTH, 5) or profile.appearance.healthBarWidth
     profile.appearance.threatFont = IsSavedFontSelection(savedAppearance.threatFont)
         and savedAppearance.threatFont or profile.appearance.threatFont
     if savedAppearance.namePlacement == "ABOVE" or savedAppearance.namePlacement == "INSIDE" then
@@ -160,9 +168,8 @@ local function ValidateProfileToggles(profile, saved)
     for key in pairs(DEFAULT_PRIORITY_COLORS) do
         profile.healthBars[key] = SavedBoolean(savedBars[key], DEFAULT_HEALTH_BARS[key])
     end
-    if IsFiniteNumber(saved.gradientOpacity) and saved.gradientOpacity >= 0 and saved.gradientOpacity <= 100 then
-        profile.gradientOpacity = math.floor(saved.gradientOpacity + 0.5)
-    end
+    profile.gradientOpacity = RoundedNumber(saved.gradientOpacity, 0, 100, 1)
+        or profile.gradientOpacity
     profile.dimBackgroundNames = SavedBoolean(saved.dimBackgroundNames, DEFAULT_DIM_BACKGROUND_NAMES)
     profile.showThreat = SavedBoolean(saved.showThreat, profile.showThreat)
     if type(saved.interruptibleHighlight) == "boolean" then
@@ -470,11 +477,12 @@ local function SetAppearanceSetting(key, value)
         appearance[key] = value
     elseif (key == "nameFont" or key == "threatFont") and IsAvailableFontSelection(value) then
         appearance[key] = value
-    elseif key == "nameSize" and type(value) == "number" then
-        appearance[key] = math.max(MIN_NAME_SIZE,
-            math.min(MAX_NAME_SIZE, math.floor(value + 0.5)))
-    elseif key == "healthBarWidth" and IsFiniteNumber(value) then
-        appearance[key] = math.max(MIN_BAR_WIDTH, math.min(MAX_BAR_WIDTH, math.floor(value / 5 + 0.5) * 5))
+    elseif key == "nameSize" then
+        appearance[key] = RoundedNumber(value, MIN_NAME_SIZE, MAX_NAME_SIZE, 1, true)
+            or appearance[key]
+    elseif key == "healthBarWidth" then
+        appearance[key] = RoundedNumber(value, MIN_BAR_WIDTH, MAX_BAR_WIDTH, 5, true)
+            or appearance[key]
     elseif key == "namePlacement" and (value == "ABOVE" or value == "INSIDE") then
         appearance[key] = value
     end
@@ -506,9 +514,8 @@ local function GetGradientOpacity()
 end
 
 local function SetGradientOpacity(value)
-    if IsFiniteNumber(value) then
-        ActiveProfile().gradientOpacity = math.floor(math.max(0, math.min(100, value)) + 0.5)
-    end
+    value = RoundedNumber(value, 0, 100, 1, true)
+    if value ~= nil then ActiveProfile().gradientOpacity = value end
 end
 
 local function GetHealthBarEnabled(state)
@@ -600,10 +607,10 @@ local function SetCastBorderSetting(effect, key, value)
     if not controls then return end
     for _, control in ipairs(controls) do
         if control.key == key then
-            if IsFiniteNumber(value) then
-                local steps = math.floor((math.max(control.min, math.min(control.max, value)) - control.min) / control.step + 0.5)
+            value = RoundedNumber(value, control.min, control.max, control.step, true)
+            if value ~= nil then
                 local settings = ActiveProfile().castAdvanced[effect]
-                settings[key] = math.min(control.max, control.min + steps * control.step)
+                settings[key] = value
                 if key == "minLength" and settings.minLength > settings.maxLength then
                     settings.minLength = settings.maxLength
                 elseif key == "maxLength" and settings.maxLength < settings.minLength then

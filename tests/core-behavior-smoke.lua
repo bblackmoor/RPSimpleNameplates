@@ -757,6 +757,51 @@ do
     equal(placement.GetAppearanceSetting("namePlacement"), "ABOVE", "saved Default above preserved")
 end
 
+-- Shared numeric validation preserves loading policy and clamps UI edits.
+do
+    SimpleNameplatesDB = nil
+    local settings = loadCore()
+    local invalid = {0 / 0, math.huge, -math.huge, "18", false}
+    for _, value in ipairs(invalid) do
+        settings.SetAppearanceSetting("nameSize", 18)
+        settings.SetAppearanceSetting("healthBarWidth", 120)
+        settings.SetGradientOpacity(50)
+        settings.SetAppearanceSetting("nameSize", value)
+        settings.SetAppearanceSetting("healthBarWidth", value)
+        settings.SetGradientOpacity(value)
+        equal(settings.GetAppearanceSetting("nameSize"), 18, "invalid name size ignored")
+        equal(settings.GetAppearanceSetting("healthBarWidth"), 120, "invalid width ignored")
+        equal(settings.GetGradientOpacity(), 50, "invalid opacity ignored")
+    end
+    settings.SetAppearanceSetting("nameSize", -100)
+    equal(settings.GetAppearanceSetting("nameSize"), settings.MIN_NAME_SIZE, "UI size clamps")
+    settings.SetAppearanceSetting("healthBarWidth", 122.5)
+    equal(settings.GetAppearanceSetting("healthBarWidth"), 125, "UI width rounds at half step")
+    settings.SetGradientOpacity(1000)
+    equal(settings.GetGradientOpacity(), 100, "UI opacity clamps")
+    local baseline = settings.ValidateThemeData({})
+    local saved = settings.ValidateThemeData({
+        appearance = {nameSize = -100, healthBarWidth = 122.5},
+        gradientOpacity = 1000,
+    })
+    equal(saved.appearance.nameSize, baseline.appearance.nameSize, "invalid saved size defaults")
+    equal(saved.appearance.healthBarWidth, 125, "saved width uses shared rounding")
+    equal(saved.gradientOpacity, baseline.gradientOpacity, "invalid saved opacity defaults")
+    for effect, controls in pairs(settings.CAST_BORDER_CONTROLS) do
+        for _, control in ipairs(controls) do
+            local value = control.min + (control.max - control.min) * 0.37
+            local theme = settings.ValidateThemeData({castAdvanced = {[effect] = {[control.key] = value}}})
+            if control.key ~= "minLength" and control.key ~= "maxLength" then
+                equal(theme.castAdvanced[effect][control.key], value, "valid saved cast precision preserved")
+            end
+            settings.SetCastBorderSetting(effect, control.key, control.max)
+            settings.SetCastBorderSetting(effect, control.key, math.huge)
+            local actual = settings.GetCastBorderSetting(effect, control.key)
+            assert(actual >= control.min and actual <= control.max, "cast edit remains bounded")
+        end
+    end
+end
+
 print("Core behavior smoke: passed")
 
 
