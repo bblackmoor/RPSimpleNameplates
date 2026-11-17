@@ -82,3 +82,15 @@ Text styling and presentation settings checks borrow the current profile through
 are local to the operation, never stored on frames or in the world context.
 Theme imports can replace profile tables; subsequent operations resolve the new
 object. Standalone getter calls continue to resolve the current profile.
+
+### Text module responsibilities
+
+- `NameplateTitles.lua`: font selection, full-title styling, width limits, and cast visibility.
+- `NameplateLayout.lua`: bar height, name anchors, inside labels, cached layout, and layout-only updates.
+- `NameplateTextRepair.lua`: drift observations, selective repair plans, appearance hooks, and deferred repair.
+- `NameplateText.lua`: unit/TRP3 text selection and styling orchestration; preserves the existing public interface.
+
+The TOC loads these in that order. Dependencies flow from orchestration and repair
+to layout and titles. Repair hooks retain their reentry guards and frame-identity
+checks. Profile references remain operation-local. Existing positional styling
+arguments are retained where replacing them would allocate an extra record.

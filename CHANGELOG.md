@@ -1,3 +1,8 @@
+## 1.1.306 — 2026-11-17
+
+- Separate title handling, name layout, and appearance reconciliation into focused modules while preserving the text-styling interface and behavior.
+- Update addon load order and regression fixtures for the new modules.
+
 ## 1.1.305 — 2026-11-17
 
 - Reuse the active profile within text styling and settings checks to reduce repeated player-identity and profile lookups.

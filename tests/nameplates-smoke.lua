@@ -98,7 +98,7 @@ local ns = {
     BLIZZARD_CRITTER_COMPANION_NAME_CVARS = {},
     FRIENDLY_COLOR_CVARS = {},
 }
-for _, file in ipairs({ "Profiler.lua", "PeriodicWork.lua", "WorldContext.lua", "EntityFacts.lua", "NameplateClassification.lua", "PresentationCapabilities.lua", "PresentationRules.lua", "FontRendering.lua", "NameplateFrames.lua", "NPCTitles.lua", "NameplateText.lua", "NameplateThreat.lua", "CastHighlight.lua", "NameplateRestoration.lua", "NameplatePresentation.lua", "Nameplates.lua", "Diagnostics.lua" }) do
+for _, file in ipairs({ "Profiler.lua", "PeriodicWork.lua", "WorldContext.lua", "EntityFacts.lua", "NameplateClassification.lua", "PresentationCapabilities.lua", "PresentationRules.lua", "FontRendering.lua", "NameplateFrames.lua", "NPCTitles.lua", "NameplateTitles.lua", "NameplateLayout.lua", "NameplateTextRepair.lua", "NameplateText.lua", "NameplateThreat.lua", "CastHighlight.lua", "NameplateRestoration.lua", "NameplatePresentation.lua", "Nameplates.lua", "Diagnostics.lua" }) do
     assert(loadfile("RPSimpleNameplates/" .. file))("RPSimpleNameplates", ns)
 end
 -- Retired category-disable fixtures exercise the global restoration path.
