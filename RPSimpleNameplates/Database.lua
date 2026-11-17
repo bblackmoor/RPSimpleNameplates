@@ -467,8 +467,8 @@ local function SetTRP3Setting(key, enabled)
     end
 end
 
-local function GetAppearanceSetting(key)
-    return ActiveProfile().appearance[key]
+local function GetAppearanceSetting(key, profile)
+    return (profile or ActiveProfile()).appearance[key]
 end
 
 local function SetAppearanceSetting(key, value)
@@ -494,23 +494,23 @@ local function ResetAppearance()
     for key, value in pairs(ActiveProfileDefaults().appearance) do appearance[key] = value end
 end
 
-local function PriorityColorForState(state)
-    local color = ActiveProfile().priorityColors[state]
+local function PriorityColorForState(state, profile)
+    local color = (profile or ActiveProfile()).priorityColors[state]
         or DEFAULT_PRIORITY_COLORS[state]
         or DEFAULT_PRIORITY_COLORS.useless
     return color.r, color.g, color.b
 end
 
-local function GetDimBackgroundNames()
-    return ActiveProfile().dimBackgroundNames
+local function GetDimBackgroundNames(profile)
+    return (profile or ActiveProfile()).dimBackgroundNames
 end
 
 local function SetDimBackgroundNames(enabled)
     if type(enabled) == "boolean" then ActiveProfile().dimBackgroundNames = enabled end
 end
 
-local function GetGradientOpacity()
-    return ActiveProfile().gradientOpacity
+local function GetGradientOpacity(profile)
+    return (profile or ActiveProfile()).gradientOpacity
 end
 
 local function SetGradientOpacity(value)
@@ -518,8 +518,8 @@ local function SetGradientOpacity(value)
     if value ~= nil then ActiveProfile().gradientOpacity = value end
 end
 
-local function GetHealthBarEnabled(state)
-    return ActiveProfile().healthBars[state] ~= false
+local function GetHealthBarEnabled(state, profile)
+    return (profile or ActiveProfile()).healthBars[state] ~= false
 end
 
 local function SetHealthBarEnabled(state, enabled)
@@ -622,8 +622,8 @@ local function SetCastBorderSetting(effect, key, value)
     end
 end
 
-local function GetInterruptibleHighlightEnabled()
-    return ActiveProfile().interruptibleHighlight == true
+local function GetInterruptibleHighlightEnabled(profile)
+    return (profile or ActiveProfile()).interruptibleHighlight == true
 end
 
 local function SetInterruptibleHighlightEnabled(enabled)
@@ -643,8 +643,8 @@ local function SetStylingEnabled(enabled)
     if not enabled and ns.RestoreNameplateSetup then ns.RestoreNameplateSetup() end
 end
 
-local function GetThreatEnabled()
-    return ActiveProfile().showThreat
+local function GetThreatEnabled(profile)
+    return (profile or ActiveProfile()).showThreat
 end
 
 local function SetThreatEnabled(enabled)
@@ -660,6 +660,9 @@ ns.ApplyThemeData = function(data)
     CancelProfileEdits()
     EnsureDB().profiles[GetActiveProfileName()] = ValidatedProfile(data)
 end
+-- Borrow only for the current operation: theme imports can replace this table.
+-- Optional profile arguments let rendering reuse it without a persistent cache.
+ns.GetActiveProfile = ActiveProfile
 ns.GetProfile = function(name) return EnsureDB().profiles[name] end
 ns.EnsureDB = EnsureDB
 ns.DEFAULT_PROFILE_NAME = DEFAULT_PROFILE_NAME

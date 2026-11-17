@@ -38,10 +38,10 @@ local function RenderPercent(text, value)
     return pcall(text.SetFormattedText, text, "%.0f%%", value)
 end
 
-local function UpdateThreatText(frame, state, context, decision, configure)
+local function UpdateThreatText(frame, state, context, decision, configure, profile)
     context = context or GetContext()
     if not CanAccessFrame(frame, context) then return end
-    if not GetThreatEnabled() then ClearThreatText(frame, "disabled"); return end
+    if not GetThreatEnabled(profile) then ClearThreatText(frame, "disabled"); return end
     local bar = GetHealthBar(frame, context)
     if not decision or not decision.showHealthBar or not bar then
         ClearThreatText(frame, "no displayed health bar"); return
@@ -49,7 +49,7 @@ local function UpdateThreatText(frame, state, context, decision, configure)
     local text, created = EnsureThreatText(frame, bar)
     if configure ~= false or created then
         text:SetTextColor(1, 1, 1, 1)
-        text:SetFont(FontPath(GetAppearanceSetting("threatFont")), GetAppearanceSetting("nameSize") or 12, ns.FontFlags())
+        text:SetFont(FontPath(GetAppearanceSetting("threatFont", profile)), GetAppearanceSetting("nameSize", profile) or 12, ns.FontFlags(profile))
         text:SetShadowColor(0, 0, 0, 0)
         text:SetShadowOffset(0, 0)
     end

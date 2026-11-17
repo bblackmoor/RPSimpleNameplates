@@ -1,8 +1,8 @@
 -- Simple Nameplates: thin outlines on all styled plate text.
 local _, ns = ...
 
-function ns.FontFlags()
-    return ns.GetAppearanceSetting("useSlugRendering") == true and "SLUG,OUTLINE" or "OUTLINE"
+function ns.FontFlags(profile)
+    return ns.GetAppearanceSetting("useSlugRendering", profile) == true and "SLUG,OUTLINE" or "OUTLINE"
 end
 
 -- Native font getters may normalize filename spelling and flag order. Compare

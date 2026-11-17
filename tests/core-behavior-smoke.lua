@@ -802,6 +802,37 @@ do
     end
 end
 
+-- Operation-local profile reads avoid identity queries and refresh after replacement.
+do
+    SimpleNameplatesDB = nil
+    local settings = loadCore()
+    local profile = settings.GetActiveProfile()
+    local originalGUID, calls = UnitGUID, 0
+    UnitGUID = function(...) calls = calls + 1; return originalGUID(...) end
+    settings.GetAppearanceSetting("nameSize", profile)
+    settings.GetGradientOpacity(profile)
+    settings.GetDimBackgroundNames(profile)
+    settings.GetHealthBarEnabled("hostile", profile)
+    settings.GetThreatEnabled(profile)
+    settings.GetInterruptibleHighlightEnabled(profile)
+    settings.PriorityColorForState("hostile", profile)
+    equal(calls, 0, "borrowed profile getters do not query player identity")
+    UnitGUID = originalGUID
+    assert(settings.CreateProfile("Operation profile"))
+    assert(settings.GetActiveProfile() ~= profile, "profile switch resolves new object")
+    settings.SetAppearanceSetting("nameSize", 22)
+    equal(settings.GetActiveProfile().appearance.nameSize, 22, "edits visible immediately")
+    local previous = settings.GetActiveProfile()
+    settings.ApplyThemeData({appearance = {nameSize = 24}})
+    assert(settings.GetActiveProfile() ~= previous, "theme replacement resolves new object")
+    equal(settings.GetActiveProfile().appearance.nameSize, 24, "import visible immediately")
+    settings.ResetAppearance()
+    equal(settings.GetActiveProfile().appearance.nameSize,
+        settings.ValidateThemeData({}).appearance.nameSize, "reset visible immediately")
+    assert(settings.SetActiveProfileName("Default"))
+    equal(settings.GetActiveProfile(), profile, "switch back resolves original profile")
+end
+
 print("Core behavior smoke: passed")
 
 

@@ -1,3 +1,8 @@
+## 1.1.305 — 2026-11-17
+
+- Reuse the active profile within text styling and settings checks to reduce repeated player-identity and profile lookups.
+- Keep profile references local to each operation so profile switches, theme imports, and resets remain immediate.
+
 ## 1.1.304 — 2026-11-17
 
 - Consolidate numeric settings validation and rounding while preserving saved-value defaults and interactive clamping.

@@ -74,3 +74,11 @@ Resolved: duplicate widget-only and ordinary friendly service-NPC labels in Silv
 ## Dependency boundary
 
 LibSharedMedia/CallbackHandler provide fonts and provider notifications. Details Framework minor 762 is bundled for settings widgets; neither its replacement unit/cast bars nor its border/glow constructors drive runtime plates. No texture selector or external font files are bundled. Source/license details are in [library provenance](../../RPSimpleNameplates/Libs/README.md).
+
+### Operation-local profile access
+
+Text styling and presentation settings checks borrow the current profile through
+`ns.GetActiveProfile()` and pass it to profile-aware getters. These references
+are local to the operation, never stored on frames or in the world context.
+Theme imports can replace profile tables; subsequent operations resolve the new
+object. Standalone getter calls continue to resolve the current profile.

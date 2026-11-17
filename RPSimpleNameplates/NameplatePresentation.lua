@@ -36,28 +36,29 @@ local trpKeys = {"useRoleplayingName", "showShortTitle", "showFullTitle", "showO
 local optionalSettings = {"GetGradientOpacity", "GetDimBackgroundNames",
     "GetThreatEnabled", "GetInterruptibleHighlightEnabled", "GetTRP3Enabled", "GetActiveProfileName"}
 
-local function CaptureSettings(frame)
+local function CaptureSettings(frame, profile)
     local settings = {}
-    for _, key in ipairs(appearanceKeys) do settings[key] = ns.GetAppearanceSetting(key) end
+    for _, key in ipairs(appearanceKeys) do settings[key] = ns.GetAppearanceSetting(key, profile) end
     for _, key in ipairs(trpKeys) do settings[key] = ns.GetTRP3Setting(key) end
     for _, key in ipairs(optionalSettings) do
-        if ns[key] then settings[key] = ns[key]() end
+        if ns[key] then settings[key] = ns[key](profile) end
     end
     frame.RPSNStyleSettings = settings
 end
 
-local function SettingsAreCurrent(frame, work)
+local function SettingsAreCurrent(frame, work, profile)
+    profile = profile or (ns.GetActiveProfile and ns.GetActiveProfile())
     local settings = frame.RPSNStyleSettings
     if not settings then return false end
     for _, key in ipairs(appearanceKeys) do
-        if settings[key] ~= ns.GetAppearanceSetting(key) and not (work and work.text) then return false end
+        if settings[key] ~= ns.GetAppearanceSetting(key, profile) and not (work and work.text) then return false end
     end
     for _, key in ipairs(trpKeys) do
         if settings[key] ~= ns.GetTRP3Setting(key) then return false end
     end
     for _, key in ipairs(optionalSettings) do
         local value
-        if ns[key] then value = ns[key]() end
+        if ns[key] then value = ns[key](profile) end
         local owned = work and ((work.text and key == "GetThreatEnabled")
             or (work.color and (key == "GetGradientOpacity" or key == "GetDimBackgroundNames"))
             or (work.castSettings and key == "GetInterruptibleHighlightEnabled"))
@@ -67,6 +68,7 @@ local function SettingsAreCurrent(frame, work)
 end
 
 local function ApplyStyle(frame, context)
+    local profile = ns.GetActiveProfile and ns.GetActiveProfile()
     context = context or GetContext()
     local assessment = Cap.InspectFrame(frame, context)
     if not assessment.canAccess then return end
@@ -92,33 +94,33 @@ local function ApplyStyle(frame, context)
         if not assessment.canAccess then return end
     end
     local state, _, facts = Classify(unit, context)
-    local decision = Resolve(context, facts, state, assessment, ns.GetStylingEnabled(), ns.GetHealthBarEnabled(state))
+    local decision = Resolve(context, facts, state, assessment, ns.GetStylingEnabled(), ns.GetHealthBarEnabled(state, profile))
     if decision.action ~= "style" then Restore.Request(frame, context); return end
     local previous = frame.RPSNPresentation
     if previous and (previous.suppressText == true) ~= (decision.suppressText == true) then
         if not Restore.Request(frame, context) then return end
         assessment = Cap.InspectFrame(frame, context)
         if not assessment.canAccess then return end
-        decision = Resolve(context, facts, state, assessment, ns.GetStylingEnabled(), ns.GetHealthBarEnabled(state))
+        decision = Resolve(context, facts, state, assessment, ns.GetStylingEnabled(), ns.GetHealthBarEnabled(state, profile))
         if decision.action ~= "style" then return end
     end
     Restore.Cancel(frame)
     Restore.Capture(frame, assessment, context)
-    CaptureSettings(frame)
+    CaptureSettings(frame, profile)
     frame.RPSNStyledCastBar = assessment.castBar
     frame.RPSNState, frame.RPSNPresentation, frame.RPSNEntityFacts = state, decision, facts
     InstallGeometryHook(frame, context)
     if decision.suppressText then
-        Text.StyleName(frame, state, context, decision, assessment)
+        Text.StyleName(frame, state, context, decision, assessment, profile)
         return "text suppressed"
     end
     ns.NameplateFrames.ApplyBarWidth(frame, assessment, context)
     ApplyVisibility(frame, decision, assessment, context)
     ns.NameplateFrames.ApplyBarArtwork(frame, assessment, context)
-    ns.NameplateThreat.UpdateThreatText(frame, state, context, decision)
+    ns.NameplateThreat.UpdateThreatText(frame, state, context, decision, nil, profile)
     ns.NameplateFrames.LayoutHealthText(frame, assessment.healthBar, context)
-    Text.StyleName(frame, state, context, decision, assessment)
-    if decision.showHealthBar then assessment.healthBar:SetStatusBarColor(ns.PriorityColorForState(decision.colorState)) end
+    Text.StyleName(frame, state, context, decision, assessment, profile)
+    if decision.showHealthBar then assessment.healthBar:SetStatusBarColor(ns.PriorityColorForState(decision.colorState, profile)) end
     ns.CastHighlight.UpdateInterruptibleHighlight(frame, context, decision)
     return "styled"
 end
@@ -198,12 +200,12 @@ local function RepairBarVisibility(frame, assessment, context)
     end
 end
 
-local function RepairBarColor(frame, assessment, context)
+local function RepairBarColor(frame, assessment, context, profile)
     local decision = frame.RPSNPresentation
     if decision.suppressText then return end
     RepairBarVisibility(frame, assessment, context)
     if decision.showHealthBar then
-        assessment.healthBar:SetStatusBarColor(ns.PriorityColorForState(decision.colorState))
+        assessment.healthBar:SetStatusBarColor(ns.PriorityColorForState(decision.colorState, profile))
     end
 end
 
@@ -215,12 +217,13 @@ local function LayoutHasChanged(frame, context)
 end
 
 local function PerformDataUpdate(frame, assessment, context, work)
+    local profile = ns.GetActiveProfile and ns.GetActiveProfile()
     local state, decision = frame.RPSNState, frame.RPSNPresentation
     local nameChanged, colorChanged = work.name or work.text or work.color, work.color
     if work.text and not decision.suppressText then
         ns.NameplateFrames.ApplyBarWidth(frame, assessment, context)
         ns.NameplateFrames.ApplyBarArtwork(frame, assessment, context)
-        ns.NameplateThreat.UpdateThreatText(frame, state, context, decision)
+        ns.NameplateThreat.UpdateThreatText(frame, state, context, decision, nil, profile)
         ns.NameplateFrames.LayoutHealthText(frame, assessment.healthBar, context)
     elseif work.color and not decision.suppressText and ns.HealthGradient then
         local fill = Cap.SafeField(assessment.healthBar, "barTexture", context)
@@ -232,7 +235,7 @@ local function PerformDataUpdate(frame, assessment, context, work)
         if type(unit) ~= "string" then return "full" end
         local nextState, _, facts = Classify(unit, context)
         local nextDecision = Resolve(context, facts, nextState, assessment,
-            ns.GetStylingEnabled(), ns.GetHealthBarEnabled(nextState))
+            ns.GetStylingEnabled(), ns.GetHealthBarEnabled(nextState, profile))
         if nextDecision.action ~= "style" or nextDecision.suppressText ~= decision.suppressText
             or nextDecision.showHealthBar ~= decision.showHealthBar
             or nextDecision.nameOnly ~= decision.nameOnly then return "full" end
@@ -247,9 +250,9 @@ local function PerformDataUpdate(frame, assessment, context, work)
     if work.threat and not decision.suppressText then
         ns.NameplateThreat.UpdateThreatValue(frame, state, context, decision)
     end
-    if colorChanged then RepairBarColor(frame, assessment, context) end
+    if colorChanged then RepairBarColor(frame, assessment, context, profile) end
     if nameChanged then
-        Text.StyleName(frame, state, context, decision, assessment)
+        Text.StyleName(frame, state, context, decision, assessment, profile)
     elseif work.layout or (work.threat and LayoutHasChanged(frame, context)) then
         Text.UpdateNameLayout(frame, context, decision, assessment)
     end
@@ -257,7 +260,7 @@ local function PerformDataUpdate(frame, assessment, context, work)
         ns.CastHighlight.UpdateInterruptibleHighlight(frame, context, decision)
         Text.SyncFullTitleVisibility(frame, context, assessment)
     end
-    if work.text or work.color or work.castSettings then CaptureSettings(frame) end
+    if work.text or work.color or work.castSettings then CaptureSettings(frame, profile) end
 end
 
 local function PerformNameRepair(frame, assessment, context)

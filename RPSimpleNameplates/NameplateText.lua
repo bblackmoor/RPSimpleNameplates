@@ -14,8 +14,8 @@ local GetHealthBar = ns.NameplateFrames.GetHealthBar
 local GetCastBar = ns.NameplateFrames.GetCastBar
 local InstallNameAppearanceHooks, FinishCachedAppearance
 
-local function NameFontPath(context)
-    if context.sanctuary == true and GetAppearanceSetting("matchSanctuaryFont") == true then
+local function NameFontPath(context, profile)
+    if context.sanctuary == true and GetAppearanceSetting("matchSanctuaryFont", profile) == true then
         -- The engine's world-label font family is localized by Blizzard.
         -- Read only its face: preserve the profile's size and our text layout.
         if SystemFont_World and type(SystemFont_World.GetFont) == "function" then
@@ -27,7 +27,7 @@ local function NameFontPath(context)
         end
         return FontPath("FRIZQT")
     end
-    return FontPath(GetAppearanceSetting("nameFont"))
+    return FontPath(GetAppearanceSetting("nameFont", profile))
 end
 
 local function UpdateNameText(frame)
@@ -143,7 +143,7 @@ local function ConstrainFullTitle(frame, context, assessment)
     end
 end
 
-local function StyleFullTitle(frame, state, text, baseNameSize, decision, context, nameShade, assessment)
+local function StyleFullTitle(frame, state, text, baseNameSize, decision, context, nameShade, assessment, profile)
     frame.RPSNTitleDesiredRegion, frame.RPSNTitleDesired = nil, nil
     local fullTitle = frame.RPSNFullTitleText
     local bar = GetHealthBar(frame, context, assessment)
@@ -155,7 +155,7 @@ local function StyleFullTitle(frame, state, text, baseNameSize, decision, contex
 
     fullTitle = EnsureFullTitleText(frame)
     local titleSize = math.max(6, baseNameSize - 2)
-    fullTitle:SetFont(NameFontPath(context), titleSize, ns.FontFlags())
+    fullTitle:SetFont(NameFontPath(context, profile), titleSize, ns.FontFlags(profile))
     -- Native single-line layout truncates overflow using the actual font.
     -- Keep the source string intact so widening the bar restores more text.
     ConstrainFullTitle(frame, context, assessment)
@@ -194,11 +194,11 @@ local function InsideBarHeight(frame, nameSize)
         frame.RPSNOriginalHealthBarsContainerHeight or 0)
 end
 
-local function ApplyConfiguredBarHeight(frame, state, bar, baseNameSize, context, decision, assessment)
+local function ApplyConfiguredBarHeight(frame, state, bar, baseNameSize, context, decision, assessment, profile)
     context = context or GetContext()
     assessment = assessment or ns.PresentationCapabilities.InspectFrame(frame, context)
     if not assessment.canAccess then return false, baseNameSize end
-    local inside = GetAppearanceSetting("namePlacement") == "INSIDE"
+    local inside = GetAppearanceSetting("namePlacement", profile) == "INSIDE"
         and decision and decision.showHealthBar and bar ~= nil
     local hasThreat = frame.RPSNThreatStatus == "displayed raw percentage"
         or frame.RPSNThreatStatus == "displayed scaled percentage"
@@ -274,10 +274,10 @@ local function GetInsideName(frame, bar)
     return insideName
 end
 
-local function ShowInsideName(frame, bar, text, fontPath, size, rightInset, rightRegion, textColor)
+local function ShowInsideName(frame, bar, text, fontPath, size, rightInset, rightRegion, textColor, profile)
     local insideName = GetInsideName(frame, bar)
     insideName:SetText(text)
-    insideName:SetFont(fontPath, size, ns.FontFlags())
+    insideName:SetFont(fontPath, size, ns.FontFlags(profile))
     insideName:SetShadowColor(0, 0, 0, 0)
     insideName:SetShadowOffset(0, 0)
     insideName:SetTextColor(textColor, textColor, textColor, 1)
@@ -302,7 +302,7 @@ local function RestoreNameDisplay(frame, context, assessment)
 end
 
 local function CacheNameStyle(frame, displayName, fontPath, size, nameR, nameG, nameB,
-        nameOnly, inside, rightInset, bar, rightRegion)
+        nameOnly, inside, rightInset, bar, rightRegion, profile)
     local expected = frame.RPSNNameStyle or {}
     frame.RPSNNameStyle = expected
     expected.text = displayName
@@ -311,7 +311,7 @@ local function CacheNameStyle(frame, displayName, fontPath, size, nameR, nameG, 
     expected.unknownReads = nil
     expected.font = fontPath
     expected.size = size
-    expected.flags = ns.FontFlags()
+    expected.flags = ns.FontFlags(profile)
     expected.r, expected.g, expected.b = nameR, nameG, nameB
     expected.nameOnly = nameOnly
     expected.inside = inside == true
@@ -335,7 +335,8 @@ local function SuppressText(frame, context)
     end
 end
 
-local function StyleName(frame, state, context, decision, assessment)
+local function StyleName(frame, state, context, decision, assessment, profile)
+    profile = profile or (ns.GetActiveProfile and ns.GetActiveProfile())
     context = context or GetContext()
     assessment = assessment or ns.PresentationCapabilities.InspectFrame(frame, context)
     if not assessment.canAccess then return end
@@ -350,21 +351,21 @@ local function StyleName(frame, state, context, decision, assessment)
     local name = frame and frame.name
     if not name then return end
     local fullTitle, displayName, unitName = UpdateNameText(frame)
-    local baseSize = GetAppearanceSetting("nameSize") or 12
+    local baseSize = GetAppearanceSetting("nameSize", profile) or 12
     local bar = GetHealthBar(frame, context, assessment)
     local nameOnly = decision.nameOnly
-    local inside, size = ApplyConfiguredBarHeight(frame, state, bar, baseSize, context, decision, assessment)
+    local inside, size = ApplyConfiguredBarHeight(frame, state, bar, baseSize, context, decision, assessment, profile)
     local rightInset = -3
 
-    local fontPath = NameFontPath(context)
-    name:SetFont(fontPath, size, ns.FontFlags())
+    local fontPath = NameFontPath(context, profile)
+    name:SetFont(fontPath, size, ns.FontFlags(profile))
     name:SetShadowColor(0, 0, 0, 0)
     name:SetShadowOffset(0, 0)
     local nameR, nameG, nameB = 1, 1, 1
-    if nameOnly then nameR, nameG, nameB = PriorityColorForState(decision.colorState or state)
+    if nameOnly then nameR, nameG, nameB = PriorityColorForState(decision.colorState or state, profile)
     end
     if state == "useless" then
-        local shade = ns.GetDimBackgroundNames and ns.GetDimBackgroundNames() and 153 / 255 or 1
+        local shade = ns.GetDimBackgroundNames and ns.GetDimBackgroundNames(profile) and 153 / 255 or 1
         nameR, nameG, nameB = shade, shade, shade
     end
     -- Blizzard also tints nameplate text with UnitSelectionColor through the
@@ -377,13 +378,13 @@ local function StyleName(frame, state, context, decision, assessment)
     local rightRegion, healthTextSignature = ns.NameplateFrames.LayoutHealthText(frame, bar, context)
     PositionName(frame, name, bar, nameOnly, inside, rightInset, rightRegion)
     if inside then
-        ShowInsideName(frame, bar, displayName, fontPath, size, rightInset, rightRegion, nameR)
+        ShowInsideName(frame, bar, displayName, fontPath, size, rightInset, rightRegion, nameR, profile)
     else
         RestoreNameDisplay(frame, context, assessment)
     end
-    StyleFullTitle(frame, state, fullTitle, baseSize, decision, context, nameR, assessment)
+    StyleFullTitle(frame, state, fullTitle, baseSize, decision, context, nameR, assessment, profile)
     CacheNameStyle(frame, displayName, fontPath, size, nameR, nameG, nameB,
-        nameOnly, inside, rightInset, bar, rightRegion)
+        nameOnly, inside, rightInset, bar, rightRegion, profile)
     frame.RPSNNameStyle.unitName = unitName
     frame.RPSNNameStyle.presentation = decision
     frame.RPSNNameStyle.healthTextSignature = healthTextSignature
@@ -420,13 +421,14 @@ end
 -- Threat/native-label presence changes the name's right edge. Reposition the
 -- existing labels without rereading names/TRP3 or reapplying their fonts.
 local function UpdateNameLayout(frame, context, decision, assessment)
+    local profile = ns.GetActiveProfile and ns.GetActiveProfile()
     assessment = assessment or ns.PresentationCapabilities.InspectFrame(frame, context)
     if not assessment.canAccess or frame.RPSNRestoring then return end
     local expected = frame.RPSNNameStyle
     if not expected or expected.suppressed then return end
     local bar = GetHealthBar(frame, context, assessment)
     local inside, size = ApplyConfiguredBarHeight(frame, frame.RPSNState, bar,
-        expected.size, context, decision, assessment)
+        expected.size, context, decision, assessment, profile)
     local rightRegion, signature = ns.NameplateFrames.LayoutHealthText(frame, bar, context)
     PositionName(frame, frame.name, bar, decision.nameOnly, inside, -3, rightRegion)
     if inside and frame.RPSNInsideName then
@@ -438,7 +440,7 @@ local function UpdateNameLayout(frame, context, decision, assessment)
     end
     ConstrainFullTitle(frame, context, assessment)
     CacheNameStyle(frame, expected.text, expected.font, size, expected.r, expected.g,
-        expected.b, decision.nameOnly, inside, -3, bar, rightRegion)
+        expected.b, decision.nameOnly, inside, -3, bar, rightRegion, profile)
     expected.healthTextSignature = signature
 end
 
@@ -449,6 +451,7 @@ end
 
 -- Assessments and observations belong to one synchronous operation only.
 local function CacheIsCurrent(frame, expected, context, assessment)
+    local profile = ns.GetActiveProfile and ns.GetActiveProfile()
     if ns.NameplateRestoration.IsPending(frame) then return false, "restoration pending" end
     local decision = frame.RPSNPresentation
     if not decision or expected.presentation ~= decision or decision.contextRevision ~= context.revision then return false, "presentation revision" end
@@ -462,7 +465,7 @@ local function CacheIsCurrent(frame, expected, context, assessment)
     end
     if expected.suppressed then return true end
     if expected.flags ~= ns.FontFlags() then return false, "font flags setting" end
-    if not ns.FontPathMatches(expected.font, NameFontPath(context)) then return false, "font setting" end
+    if not ns.FontPathMatches(expected.font, NameFontPath(context, profile)) then return false, "font setting" end
     if expected.bar ~= assessment.healthBar then return false, "health bar replaced" end
     if frame.RPSNOriginalVisibility
         and frame.RPSNOriginalHealthBarsContainer ~= frame.HealthBarsContainer then return false, "container replaced" end
