@@ -55,7 +55,6 @@ local function CopyColor(color)
     return { r = color.r, g = color.g, b = color.b }
 end
 
-
 local function SavedBoolean(value, default)
     if type(value) == "boolean" then return value end
     return default
@@ -75,7 +74,6 @@ local function CopySavedCVarOriginals(source, allowedCVars)
     end
     return copy
 end
-
 
 local function ValidatedCastBorders(saved)
     saved = type(saved) == "table" and saved or {}
@@ -108,7 +106,6 @@ local function NewProfile(presetName)
         dimBackgroundNames = DEFAULT_DIM_BACKGROUND_NAMES,
         interruptibleHighlight = defaults.interruptibleHighlight,
         interruptibleEffect = defaults.interruptibleEffect,
-        -- Retain the existing location for valid border values; no migration.
         castAdvanced = ValidatedCastBorders(),
     }
     for key, default in pairs(DEFAULT_PRIORITY_COLORS) do
@@ -585,7 +582,6 @@ local function ResetAllColors()
     profile.dimBackgroundNames = DEFAULT_DIM_BACKGROUND_NAMES
 end
 
-
 local function ResetHighlightSettings()
     CancelColorEdit()
     if ns.CancelHighlightEdits then ns.CancelHighlightEdits(true) end
@@ -651,7 +647,6 @@ local function SetThreatEnabled(enabled)
     ActiveProfile().showThreat = enabled == true
 end
 
-
 -- Themes contain exactly the profile's visual fields. Validation creates a fresh
 -- object, so imported tables cannot alias another profile or carry global data.
 ns.GetThemeData = function() return CopyProfile(ActiveProfile()) end
@@ -711,5 +706,4 @@ ns.GetTRP3Enabled = GetTRP3Enabled
 ns.SetTRP3Enabled = SetTRP3Enabled
 ns.GetTRP3Setting = GetTRP3Setting
 ns.SetTRP3Setting = SetTRP3Setting
-
 

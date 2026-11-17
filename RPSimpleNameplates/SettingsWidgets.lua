@@ -1,4 +1,4 @@
--- Details Framework boundary for converted settings pages.
+-- Details Framework boundary for settings pages.
 -- No saved settings, page registration, or plate work here.
 local _, addon = ...
 local Widgets = {}
@@ -55,7 +55,7 @@ local requiredMethods = {"CreateSwitch", "CreateSlider", "CreateDropDown",
     "CreateButton", "CreateColorPickButton"}
 
 -- Resolve at construction time: another embedder can upgrade the same LibStub
--- table after this file loads. Converted pages require a compatible library.
+-- table after this file loads. Settings pages require a compatible library.
 function Widgets.GetFramework()
     local framework = LibStub and LibStub:GetLibrary("DetailsFramework-1.0", true)
     if not framework then return nil, "Details Framework is unavailable" end

@@ -3,13 +3,10 @@ local _, ns = ...
 local GetContext = ns.WorldContext.Get
 local AccessibleBoolean = ns.AccessibleBoolean
 local AccessibleNumber, AccessibleValue = ns.AccessibleNumber, ns.AccessibleValue
-local PriorityColorForState, FontPath = ns.PriorityColorForState, ns.FontPath
-local GetAppearanceSetting, GetTRP3Setting = ns.GetAppearanceSetting, ns.GetTRP3Setting
+local FontPath = ns.FontPath
+local GetAppearanceSetting = ns.GetAppearanceSetting
 local GetHealthBar = ns.NameplateFrames.GetHealthBar
 local GetCastBar = ns.NameplateFrames.GetCastBar
-
-
-
 
 local function NameFontPath(context, profile)
     if context.sanctuary == true and GetAppearanceSetting("matchSanctuaryFont", profile) == true then
@@ -134,7 +131,6 @@ local function StyleFullTitle(frame, state, text, baseNameSize, decision, contex
     InstallTitleCastHooks(frame, GetCastBar(frame, context, assessment))
     SyncFullTitleVisibility(frame, context, assessment)
 end
-
 
 ns.NameplateTitles = {
     NameFontPath = NameFontPath,

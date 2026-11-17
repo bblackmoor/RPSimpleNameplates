@@ -6,7 +6,7 @@ local WorldContext = ns.WorldContext
 local GetFrameFromPlate = ns.NameplateFrames.GetFrameFromPlate
 local GetStylingEnabled = ns.GetStylingEnabled
 local StateForUnit = ns.NameplateClassification.StateForUnit
-local GetUnitFrame, GetHealthBar = ns.NameplateFrames.GetUnitFrame, ns.NameplateFrames.GetHealthBar
+local GetUnitFrame = ns.NameplateFrames.GetUnitFrame
 local ApplySimpleStyle = ns.NameplatePresentation.ApplySimpleStyle
 local UpdateData = ns.NameplatePresentation.UpdateData
 local RepairHealthColor, RepairName =
@@ -371,7 +371,6 @@ end
 
 events:SetScript("OnEvent", HandleEvent)
 
-
 -- Reconcile one current plate per job; no assessment or property observation
 -- survives between jobs. Urgent events are flushed before this shared budget.
 local function ReconcileNames(plate)
@@ -474,7 +473,6 @@ local function RuntimeUpdate(_, elapsed)
     Periodic.Run()
 end
 events:SetScript("OnUpdate", ns.Profiler.Wrap("Runtime update", RuntimeUpdate))
-
 
 ns.RefreshRestoredNameplate = function(frame)
     local unit = ns.AccessibleValue(frame.unit)

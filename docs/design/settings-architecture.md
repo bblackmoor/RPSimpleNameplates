@@ -39,7 +39,10 @@ Reset text settings on Text restores profile appearance and threat display plus 
 | `NameplateFrames.lua` | Region access, native geometry/restoration baselines, restricted-anchor fallback and flat-fill artwork |
 | `HealthGradient.lua` | Opacity-scaled fixed 80%-black to clear-at-95% tint clipped by the native fill |
 | `NPCTitles.lua` | Safe structured-tooltip subtitle resolution and bounded session caches |
-| `NameplateText.lua` | Names/titles, placement, bar-height padding, cast/title visibility and cached repair |
+| `NameplateTitles.lua` | Effective font selection, full-title styling, width limits and cast/title visibility |
+| `NameplateLayout.lua` | Bar-height padding, name anchors, inside labels, layout cache and layout-only updates |
+| `NameplateTextRepair.lua` | Drift detection, selective repairs, appearance hooks and deferred repair |
+| `NameplateText.lua` | Unit/TRP3 text selection, styling orchestration and shared text interface |
 | `NameplateThreat.lua` | Secret-safe formatted threat percentage; blank when unavailable |
 | `CastHighlight.lua` | Addon-owned Pulse/Solid/Alert border lifecycle, static disabled previews, and native bar/icon/shield hooks |
 | `NameplateRestoration.lua` | Original presentation restoration and deferred cleanup/retries |

@@ -1,3 +1,9 @@
+## 1.1.308 — 2026-11-17
+
+- Remove unused runtime aliases, stale refactor comments, and leftover extraction whitespace.
+- Correct cast-highlight setup, defaults, reset scopes, and runtime ordering in the developer guides.
+- Document the extracted title, layout, and text-repair module responsibilities.
+
 ## 1.1.307 — 2026-11-17
 
 - Reuse plate-discovery membership storage and fixed text-field lists to reduce temporary allocations without changing update timing.

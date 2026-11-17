@@ -5,9 +5,8 @@ local auxiliaryTextKeys = {"RPSNInsideName", "RPSNFullTitleText", "RPSNThreatTex
 local GetContext = ns.WorldContext.Get
 local AccessibleBoolean = ns.AccessibleBoolean
 local AccessibleNumber, AccessibleValue = ns.AccessibleNumber, ns.AccessibleValue
-local GetAppearanceSetting, GetTRP3Setting = ns.GetAppearanceSetting, ns.GetTRP3Setting
+local GetAppearanceSetting = ns.GetAppearanceSetting
 local GetHealthBar = ns.NameplateFrames.GetHealthBar
-
 
 local ConstrainFullTitle = ns.NameplateTitles.ConstrainFullTitle
 
@@ -174,6 +173,7 @@ local function SuppressText(frame, context)
     end
 end
 
+-- Repair cached native text without classification, profile lookup, or geometry writes.
 local function RepairNameOnly(frame, context, assessment)
     assessment = assessment or ns.PresentationCapabilities.InspectFrame(frame, context)
     if not assessment.canAccess or frame.RPSNRestoring then return end

@@ -5,7 +5,6 @@ local GetContext = ns.WorldContext.Get
 local AccessibleBoolean = ns.AccessibleBoolean
 local AccessibleNumber, AccessibleValue = ns.AccessibleNumber, ns.AccessibleValue
 
-
 local NameFontPath = ns.NameplateTitles.NameFontPath
 local PositionName = ns.NameplateLayout.PositionName
 local function AppearanceNumber(value)
@@ -450,7 +449,6 @@ local function RepairPendingNameAppearance(frame)
     end
 end
 
-
 -- One bounded appearance recovery after standalone structural/artwork work.
 -- No fonts, classification, layout, timers or full styling. Unknown values
 -- remain for reconciliation; readable resets must not survive completion.
@@ -502,7 +500,6 @@ FinishCachedAppearance = function(frame, context)
     frame.RPSNFinishingNameAppearance = nil
     if not ok then error(err, 0) end
 end
-
 
 CachedNameHasDrifted = ns.Profiler.Wrap("Name drift check", CachedNameHasDrifted)
 RepairCachedName = ns.Profiler.Wrap("Text repair", RepairCachedName)

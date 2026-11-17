@@ -3,10 +3,9 @@ local _, ns = ...
 local GetContext = ns.WorldContext.Get
 local UnitName = UnitName
 local AccessibleNumber, AccessibleValue = ns.AccessibleNumber, ns.AccessibleValue
-local PriorityColorForState, FontPath = ns.PriorityColorForState, ns.FontPath
+local PriorityColorForState = ns.PriorityColorForState
 local GetAppearanceSetting, GetTRP3Setting = ns.GetAppearanceSetting, ns.GetTRP3Setting
 local GetHealthBar = ns.NameplateFrames.GetHealthBar
-
 
 local NameFontPath = ns.NameplateTitles.NameFontPath
 local SyncFullTitleVisibility = ns.NameplateTitles.SyncFullTitleVisibility
@@ -125,8 +124,6 @@ local function StyleName(frame, state, context, decision, assessment, profile)
     InstallNameAppearanceHooks(frame, name, context)
 end
 
--- Focused native-name repair. No classification, profile lookup, bar artwork
--- or geometry writes; the runtime refresh handles actual content changes.
 StyleName = ns.Profiler.Wrap("Name/title styling", StyleName)
 
 ns.NameplateText = {

@@ -1,6 +1,6 @@
 # Onscreen entity evaluation
 
-Reviewed 2026-10-08 for 1.0.221. This document describes the actual runtime order. It does not propose a different tree or change classification behavior.
+This document describes the runtime order and the responsibilities of the current modules.
 
 ## Runtime entry and frame checks
 
@@ -13,7 +13,7 @@ Startup checks setting compatibility before normal styling. Events, queued refre
 5. Resolve context, color, profile Health Bar preference, and presentation policy using the presentation tree below.
 6. For a non-style decision, request restoration and return. For a change into or out of text suppression, restore the prior presentation first.
 7. Capture original values and save the selected state/decision. A widget-only decision suppresses actor text and returns.
-8. Apply ordinary bar/indicator visibility, name/title styling, supported health-bar color, threat text, and cast highlighting, in that order.
+8. Apply bar width, visibility and artwork, then threat text and health-label layout. Style names/titles, set the health-bar color, and update cast highlighting.
 
 `RefreshUnit` looks up a supplied plate before this pass; missing frames are queued for later retry. Each periodic plate reconciliation can repair current cached name styling without recollecting/classifying every entity. If cache repair cannot handle drift, it invokes a full styling pass. `/rpsn debug` separately collects target facts even when no plate exists, explaining why it can report Friendly for an entity that cannot be styled.
 
@@ -78,7 +78,7 @@ flowchart TD
 | Sanctuary, opposite-faction PC | Existing category color if an accessible plate exists; native overhead label otherwise |
 | Other or unknown context/identity | Existing category color; no inferred sanctuary override |
 
-After the presentation decision, `NameplateText` chooses the effective name/title font. In sanctuary with the profile's `matchSanctuaryFont` enabled, it reads the localized `SystemFont_World` face (Friz Quadrata fallback); otherwise it uses the selected profile Name font. The same face reaches floating names, inside-bar names, and NPC/TRP3 titles. Only the face changes. Cached style repair checks that the effective face still matches before reusing a cached decision.
+After the presentation decision, `NameplateTitles` chooses the effective name/title font. In sanctuary with the profile's `matchSanctuaryFont` enabled, it reads the localized `SystemFont_World` face (Friz Quadrata fallback); otherwise it uses the selected profile Name font. The same face reaches floating names, inside-bar names, and NPC/TRP3 titles. Only the face changes. Cached style repair checks that the effective face still matches before reusing a cached decision.
 
 For ordinary plates, show available health bars only when the category's profile Health Bar preference is on, in every combat state. Color the bar by priority and keep ordinary names white; a disabled or missing health bar uses the priority color for a floating name. Background names are the exception: their profile dimming setting selects grey (#999999) or white, including inside bars; their subtitles share that shade. The first five Health Bar preferences default on and Background defaults off. Retained global category modes do not gate styling. NPC service subtitles and optional TRP3 long titles sit below the health bar, or directly below the name with a one-unit gap when the bar is off or unavailable. An active native cast/channel hides that title; native cast OnShow/OnHide hooks update visibility immediately, and unreadable transitions retry during reconciliation. Disabled styling restores native presentation. No health values are fabricated.
 
@@ -137,6 +137,15 @@ Native geometry/show-hide callbacks can reset appearance during a repair. Cached
 
 Direct font/color/alpha setters also use guarded cached repair. Dimension recovery uses the known Retail hierarchy for restricted anchors and readable pixel-scale tolerance. Equivalent font filename spelling or flag order does not establish drift. Version 1.0.218 confirmed convergence in the recorded crowded scene; 1.0.219 removed temporary appearance audit instrumentation. Broader native acceptance remains on the live checklist.
 
-## Interruptible effects (1.0.221)
+## Interruptible effects
 
-Colors has a profile Effect dropdown with Pulsing border and Solid border, one shared Border thickness slider (default 4), pulse Fade in and Fade out (0.2 seconds each), and a labeled preview. Both use addon-owned four-edge borders anchored directly to the cast bar at zero inset. Pulse opacity is fixed at 35–100%; solid opacity is 100%. Advanced and all other effects/controls are removed. Direct icon/shield Show/Hide and cast-bar visibility changes refresh detection, hidden casts gate explicit events, and unknown active state retries conservatively. Actual cast and visual acceptance remains open. See [cast-effect testing](cast-effect-testing.md).
+Cast Highlight owns activation, color, effect and border settings. Pulsing border,
+Solid border and Alert border share thickness (default 4) and outward offset
+(default 3). Pulse fades between 35% and 100% opacity with 0.1-second fade-in and
+fade-out defaults. Solid stays fully opaque; Alert animates centered top/bottom
+gradient segments with hidden sides. Colors and Cast Highlight show full nameplate
+previews, greyed out and static when highlighting is off. Reset cast highlight
+settings restores all highlight settings; Reset color settings affects the Colors
+page only. Native icon/shield and cast-bar visibility hooks refresh detection;
+hidden casts gate explicit events, and unknown active state retries conservatively.
+See [cast-effect testing](cast-effect-testing.md) for the controls and live checks.
