@@ -1,3 +1,8 @@
+## 1.1.307 — 2026-11-17
+
+- Reuse plate-discovery membership storage and fixed text-field lists to reduce temporary allocations without changing update timing.
+- Add a reproducible runtime allocation benchmark with plate removal/reappearance checks.
+
 ## 1.1.306 — 2026-11-17
 
 - Separate title handling, name layout, and appearance reconciliation into focused modules while preserving the text-styling interface and behavior.

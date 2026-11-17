@@ -1,5 +1,7 @@
 -- Simple Nameplates: name geometry, inside labels, and layout cache.
 local _, ns = ...
+local healthTextKeys = {"Text", "RightText", "LeftText"}
+local auxiliaryTextKeys = {"RPSNInsideName", "RPSNFullTitleText", "RPSNThreatText"}
 local GetContext = ns.WorldContext.Get
 local AccessibleBoolean = ns.AccessibleBoolean
 local AccessibleNumber, AccessibleValue = ns.AccessibleNumber, ns.AccessibleValue
@@ -41,7 +43,7 @@ local function ApplyConfiguredBarHeight(frame, state, bar, baseNameSize, context
         or frame.RPSNThreatStatus == "displayed scaled percentage"
     local hasNativeText = false
     if bar and decision and decision.showHealthBar then
-        for _, key in ipairs({"Text", "RightText", "LeftText"}) do
+        for _, key in ipairs(healthTextKeys) do
             if AccessibleBoolean(ns.PresentationCapabilities.ReadRegion(bar[key], "IsShown", context)) == true then
                 hasNativeText = true
             end
@@ -167,7 +169,7 @@ end
 local function SuppressText(frame, context)
     -- Do not hide/reparent the unit frame or touch widget containers.
     if frame.name then frame.name:SetAlpha(0) end
-    for _, key in ipairs({"RPSNInsideName", "RPSNFullTitleText", "RPSNThreatText"}) do
+    for _, key in ipairs(auxiliaryTextKeys) do
         ns.NameplateFrames.SetShownSafe(frame[key], false, context)
     end
 end

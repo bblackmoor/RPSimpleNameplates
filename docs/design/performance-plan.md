@@ -16,3 +16,26 @@ The 2026-10-06 report covered 119.6 seconds: 8,454 full styles (20,134.112 ms in
 Explicit unit work and current/previous target, mouseover, and interaction plates remain immediate. Broad settings/context updates settle over successive frames. A time target cannot interrupt an atomic operation, and a backlog can delay service beyond eligibility. Restoration remains eligible while styling is disabled.
 
 The follow-up [appearance convergence record](reconciliation-stall-plan.md) captures the measured boundary fixes. Use [profiling](profiling.md) for equivalent timing definitions and [live verification](live-wow-verification.md) for unconfirmed client behavior. Exact FPS impact remains unestablished; another diagnostic phase is warranted only by a reproduced problem.
+
+## Phase 4 allocation measurements (2026-11-17)
+
+Run `luatex --luaonly tests/runtime-allocation-benchmark.lua` from the repository root.
+An optional source-directory argument selects another revision. The harness loads
+the production layout module and extracts the production discovery function.
+Native APIs and scheduler calls are stubbed; the native plate snapshot is reused
+to isolate addon-owned bookkeeping. GC is paused during 10,000 calls after warmup.
+
+| Isolated operation | Before | After |
+| --- | ---: | ---: |
+| Suppress auxiliary text | 1015.7 KiB | 0.1 KiB |
+| Discover 40 plates | 20546.9 KiB | 0.0 KiB |
+
+Discovery reuses a membership table and clears its references after each scan
+(and before reuse, to recover from an interrupted prior scan). Removal and
+reappearance assertions verify that membership does not leak between scans.
+Text layout and reconciliation share module-local constant field lists.
+
+Discovery remains at 0.25 seconds. Scheduler budgets, retry backoff, and repair
+ordering are unchanged. Reconciliation closures remain local: this benchmark
+does not establish a benefit for replacing them with additional shared state.
+These measurements isolate allocation savings, not live WoW CPU time or FPS.

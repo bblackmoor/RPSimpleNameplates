@@ -1,5 +1,6 @@
 -- Simple Nameplates: appearance drift detection, hooks, and selective repairs.
 local _, ns = ...
+local auxiliaryTextKeys = {"RPSNInsideName", "RPSNFullTitleText", "RPSNThreatText"}
 local GetContext = ns.WorldContext.Get
 local AccessibleBoolean = ns.AccessibleBoolean
 local AccessibleNumber, AccessibleValue = ns.AccessibleNumber, ns.AccessibleValue
@@ -127,7 +128,7 @@ local function CachedNameHasDrifted(frame, context, assessment)
     end
     if expected.suppressed then
         Check("alpha", name, "GetAlpha", 0, "suppressed alpha")
-        for _, key in ipairs({"RPSNInsideName", "RPSNFullTitleText", "RPSNThreatText"}) do
+        for _, key in ipairs(auxiliaryTextKeys) do
             if frame[key] then Check(key, frame[key], "IsShown", false, "suppressed text visible") end
         end
         return plan ~= nil, reason, plan
@@ -248,7 +249,7 @@ local function RepairCachedName(frame, context, assessment, plan)
         if plan.insideShown ~= nil then frame.RPSNInsideName:SetShown(plan.insideShown) end
         if plan.insideText ~= nil then frame.RPSNInsideName:SetText(plan.insideText) end
         if expected.suppressed then
-            for _, key in ipairs({"RPSNInsideName", "RPSNFullTitleText", "RPSNThreatText"}) do
+            for _, key in ipairs(auxiliaryTextKeys) do
                 if plan[key] ~= nil then frame[key]:SetShown(plan[key]) end
             end
         end

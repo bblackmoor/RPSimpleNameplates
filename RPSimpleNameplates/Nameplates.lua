@@ -419,10 +419,13 @@ local function ReconcileNames(plate)
 end
 ReconcileNames = ns.Profiler.Wrap("Reconciliation", ReconcileNames)
 
+-- Reuse membership storage; clear references after every completed scan.
+local discoveryPresence = {}
 local function DiscoverPlates()
     if not C_NamePlate or not C_NamePlate.GetNamePlates then return end
     -- The native list snapshot and Lua queue bookkeeping do no plate styling.
-    local present = {}
+    local present = discoveryPresence
+    for plate in pairs(present) do present[plate] = nil end
     for _, plate in ipairs(C_NamePlate.GetNamePlates()) do
         present[plate], reconcilePlates[plate] = true, true
         Periodic.Schedule("reconciliation", plate, ReconcileNames)
@@ -444,6 +447,7 @@ local function DiscoverPlates()
         if present[plate] then DeferPlate(plate)
         else pendingPlates[plate] = nil; Periodic.Cancel("plate retry", plate) end
     end
+    for plate in pairs(present) do present[plate] = nil end
 end
 DiscoverPlates = ns.Profiler.Wrap("Plate discovery", DiscoverPlates)
 local wasEnabled
