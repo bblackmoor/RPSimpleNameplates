@@ -44,11 +44,14 @@ local function RoundedNumber(value, minimum, maximum, step, clamp)
     return math.min(maximum, minimum + steps * step)
 end
 
+local function IsValidRGB(r, g, b)
+    return BoundedNumber(r, 0, 1) ~= nil
+        and BoundedNumber(g, 0, 1) ~= nil
+        and BoundedNumber(b, 0, 1) ~= nil
+end
+
 local function IsValidColor(color)
-    return type(color) == "table"
-        and IsFiniteNumber(color.r) and color.r >= 0 and color.r <= 1
-        and IsFiniteNumber(color.g) and color.g >= 0 and color.g <= 1
-        and IsFiniteNumber(color.b) and color.b >= 0 and color.b <= 1
+    return type(color) == "table" and IsValidRGB(color.r, color.g, color.b)
 end
 
 local function CopyColor(color)
@@ -537,7 +540,7 @@ local function SetCategoryMode(state, mode)
 end
 
 local function SetPriorityColor(state, r, g, b)
-    if DEFAULT_PRIORITY_COLORS[state] then
+    if DEFAULT_PRIORITY_COLORS[state] and IsValidRGB(r, g, b) then
         ActiveProfile().priorityColors[state] = { r = r, g = g, b = b }
     end
 end
@@ -557,7 +560,7 @@ local function EffectColor(effect)
 end
 
 local function SetEffectColor(effect, r, g, b)
-    if DEFAULT_EFFECT_COLORS[effect] then
+    if DEFAULT_EFFECT_COLORS[effect] and IsValidRGB(r, g, b) then
         ActiveProfile().effectColors[effect] = { r = r, g = g, b = b }
     end
 end

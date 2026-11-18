@@ -833,6 +833,32 @@ do
     equal(settings.GetActiveProfile(), profile, "switch back resolves original profile")
 end
 
+-- Color setters reject invalid components without replacing a valid color.
+do
+    SimpleNameplatesDB = nil
+    local settings = loadCore()
+    local category = next(settings.GetActiveProfile().priorityColors)
+    local cases = {
+        {0 / 0, 0.5, 0.5}, {0.5, math.huge, 0.5},
+        {0.5, 0.5, -math.huge}, {-0.1, 0.5, 0.5},
+        {0.5, 1.1, 0.5}, {0.5, 0.5, "1"}, {},
+    }
+    settings.SetPriorityColor(category, 0, 0.5, 1)
+    settings.SetEffectColor("interruptible", 0, 0.5, 1)
+    for _, rgb in ipairs(cases) do
+        settings.SetPriorityColor(category, rgb[1], rgb[2], rgb[3])
+        settings.SetEffectColor("interruptible", rgb[1], rgb[2], rgb[3])
+        local r, g, b = settings.PriorityColorForState(category)
+        equal(r, 0, "invalid priority red ignored")
+        equal(g, 0.5, "invalid priority green ignored")
+        equal(b, 1, "invalid priority blue ignored")
+        r, g, b = settings.EffectColor("interruptible")
+        equal(r, 0, "invalid effect red ignored")
+        equal(g, 0.5, "invalid effect green ignored")
+        equal(b, 1, "invalid effect blue ignored")
+    end
+end
+
 print("Core behavior smoke: passed")
 
 

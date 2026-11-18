@@ -1,3 +1,8 @@
+## 1.1.309 — 2026-11-17
+
+- Reject non-finite, missing, and out-of-range color components before saving or rendering them, using the same RGB validation as saved settings.
+- Reuse the current profile when checking cached font flags.
+
 ## 1.1.308 — 2026-11-17
 
 - Remove unused runtime aliases, stale refactor comments, and leftover extraction whitespace.

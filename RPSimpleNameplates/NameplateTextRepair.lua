@@ -33,7 +33,7 @@ local function CacheIsCurrent(frame, expected, context, assessment)
         if type(widgetsOnly) == "boolean" and widgetsOnly ~= (decision.suppressText == true) then return false, "widget mode" end
     end
     if expected.suppressed then return true end
-    if expected.flags ~= ns.FontFlags() then return false, "font flags setting" end
+    if expected.flags ~= ns.FontFlags(profile) then return false, "font flags setting" end
     if not ns.FontPathMatches(expected.font, NameFontPath(context, profile)) then return false, "font setting" end
     if expected.bar ~= assessment.healthBar then return false, "health bar replaced" end
     if frame.RPSNOriginalVisibility
