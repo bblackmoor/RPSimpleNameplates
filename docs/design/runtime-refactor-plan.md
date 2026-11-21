@@ -9,6 +9,6 @@ The runtime module separation, cached context, entity facts, and presentation/re
 - `PresentationCapabilities.lua` assesses accessible/missing/forbidden/restricted/unknown regions. `PresentationRules.lua` resolves the uniform current bar/title policy.
 - Frame geometry/artwork, name/title layout, threat, cast effects, full/focused presentation, event scheduling, diagnostics, and restoration have separate modules.
 - Restricted writes are skipped and retried. Deferred restoration continues with styling disabled and validates recycled units/replaced regions.
-- Legacy overhead-replacement originals are restoration-only. Critter hiding remains independently managed; friendly class-color settings are read-only.
+- Legacy overhead-replacement originals are restoration-only. Critter hiding remains independently managed; startup class-color handling is covered in the runtime notes.
 
 Use [runtime evaluation](evaluation-overview.md) and [runtime notes](runtime-notes.md) for current behavior. Client checks are maintained only in [live verification](live-wow-verification.md); older phase-specific location and control checklists are retired. Release history is in the [changelog](../../CHANGELOG.md).

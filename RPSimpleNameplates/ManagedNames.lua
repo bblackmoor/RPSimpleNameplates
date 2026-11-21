@@ -187,8 +187,7 @@ local FRIENDLY_COLOR_CVARS = {
     "ShowClassColorInFriendlyNameplate",
 }
 ns.FRIENDLY_COLOR_CVARS = FRIENDLY_COLOR_CVARS
--- Observe these settings without writing them. Their CVAR_UPDATE callback
--- rebuilds native plates synchronously and must not run from addon execution.
+-- Observe changes during play. NameplateSetup.lua owns login-time writes.
 
 ns.GetHideCritterCompanionNames = GetHideCritterCompanionNames
 ns.SetHideCritterCompanionNames = SetHideCritterCompanionNames

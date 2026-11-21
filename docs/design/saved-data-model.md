@@ -71,7 +71,7 @@ Default and High Contrast are editable account-wide Profiles. Default always exi
 
 ## CVar safety and compatibility
 
-Managed overhead-name original values are persisted in `global.managedNameCVarOriginals` and must survive the refactor unchanged until restored. Setup-approved visibility originals are stored separately per character in `global.nameplateSetupOriginals`. Friendly class-color CVars are observed only; the addon does not capture or write them. Keep combat deferral, capture-before-set, and restoration on disable or when no longer managed. A code-layout refactor has no reason to bump `schemaVersion`; it remains descriptive metadata rather than a reason to reset valid settings. The saved schema marker does not reject an otherwise valid setting. Recognized fields are validated in their current locations; retired cast selector values are discarded without conversion. Retain valid restoration-ledger entries until they are restored.
+Managed overhead-name original values are persisted in `global.managedNameCVarOriginals` and must survive the refactor unchanged until restored. Setup-approved visibility originals are stored separately per character in `global.nameplateSetupOriginals`. Friendly class-color originals are stored separately in `global.nameplateClassColorOriginals` and are applied or restored at login. Keep combat deferral, capture-before-set, and restoration on disable or when no longer managed. A code-layout refactor has no reason to bump `schemaVersion`; it remains descriptive metadata rather than a reason to reset valid settings. The saved schema marker does not reject an otherwise valid setting. Recognized fields are validated in their current locations; retired cast selector values are discarded without conversion. Retain valid restoration-ledger entries until they are restored.
 
 ## Runtime phase-3 category fields
 
@@ -79,7 +79,7 @@ Both Global category modes and Profile priority colors recognize only `attacking
 
 ## Removal of experimental replacement (1.0.105)
 
-`replaceBlizzardOverheadNames` is no longer a recognized field and is silently discarded. No preference is converted. Valid `managedNameCVarOriginals` entries for its former Blizzard settings remain restoration records: normal managed-settings processing restores them without capturing or applying new replacement values, retains them after failed writes, and defers restricted restoration until combat ends. Only the independent critter/companion control makes ordinary-name CVar claims now; friendly class-color CVars are read-only.
+`replaceBlizzardOverheadNames` is no longer a recognized field and is silently discarded. No preference is converted. Valid `managedNameCVarOriginals` entries for its former Blizzard settings remain restoration records: normal managed-settings processing restores them without capturing or applying new replacement values, retains them after failed writes, and defers restricted restoration until combat ends. Only the independent critter/companion control makes ordinary-name visibility claims in this ledger.
 
 
 `healthBars` accepts boolean values only. Copies and reloads retain false; missing or invalid values use the category default (first five on, background off). Reset color settings restores those defaults in the selected profile. Reset Text preserves these choices. Names default to size 18; saved sizes are preserved, and long titles use the chosen name size minus two.

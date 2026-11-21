@@ -1,3 +1,7 @@
+## 1.1.310 — 2026-11-21
+
+- Disable Blizzard’s class colors on friendly overhead names and health bars at login or UI reload when styling is enabled. Restore the previous settings on login or reload with styling disabled.
+
 ## 1.1.309 — 2026-11-17
 
 - Reject non-finite, missing, and out-of-range color components before saving or rendering them, using the same RGB validation as saved settings.

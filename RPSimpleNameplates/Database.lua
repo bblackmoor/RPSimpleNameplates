@@ -295,6 +295,8 @@ local function ValidatedDB(saved)
     ValidateTRP3Settings(db, savedGlobal)
     db.global.managedNameCVarOriginals = CopySavedCVarOriginals(
         savedGlobal.managedNameCVarOriginals, MANAGED_NAME_CVARS) or {}
+    db.global.nameplateClassColorOriginals = CopySavedCVarOriginals(
+        savedGlobal.nameplateClassColorOriginals, ns.NAMEPLATE_CLASS_COLOR_CVARS or {}) or {}
     db.global.nameplateSetupOriginals = {}
     local setupOriginals = savedGlobal.nameplateSetupOriginals
     if type(setupOriginals) == "table" and ns.NAMEPLATE_SETUP_CVARS then

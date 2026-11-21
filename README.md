@@ -45,6 +45,8 @@ Start World of Warcraft and enable the addon at character selection. RP Simple N
 
 On your first login, the addon may ask to enable the nameplate settings it needs. Choose **Apply and enable** to accept the listed changes, or **Disable styling** to leave it off. Disabling styling restores the settings changed by that setup.
 
+At login or UI reload, the addon turns off Blizzard’s class colors for friendly overhead health bars and names when styling is enabled. Logging in or reloading with styling disabled restores the previous class-color settings.
+
 ## Using RP Simple Nameplates
 
 Type `/rpsn` to open settings, or find **RP Simple Nameplates** under **Options → AddOns**.

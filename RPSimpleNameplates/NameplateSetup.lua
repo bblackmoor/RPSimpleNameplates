@@ -13,6 +13,12 @@ for _, requirement in ipairs(requirements) do
     ns.NAMEPLATE_SETUP_CVARS[#ns.NAMEPLATE_SETUP_CVARS + 1] = requirement[1]
 end
 
+local classColorCVars = {
+    "nameplateShowFriendlyClassColor",
+    "nameplateUseClassColorForFriendlyPlayerUnitNames",
+}
+ns.NAMEPLATE_CLASS_COLOR_CVARS = classColorCVars
+
 local deferredAction, applying
 local Check, Apply, Restore
 
@@ -36,6 +42,26 @@ local function Write(cvar, value)
     if not setter then return false end
     local ok = pcall(setter, cvar, value)
     return ok and Read(cvar) == value
+end
+
+local function ApplyNameplateClassColorsAtLogin()
+    if InCombat() then return end
+
+    -- Changing the health-bar CVar rebuilds Blizzard's live plates synchronously.
+    -- Only write during PLAYER_LOGIN, before entering the world.
+    local enabled = ns.GetCharacterEnabled()
+    local originals = ns.EnsureDB().global.nameplateClassColorOriginals
+    for _, cvar in ipairs(classColorCVars) do
+        local current = Read(cvar)
+        if current ~= nil then
+            if enabled and current ~= "0" then
+                if originals[cvar] == nil then originals[cvar] = current end
+                Write(cvar, "0")
+            elseif not enabled and originals[cvar] ~= nil then
+                if Write(cvar, originals[cvar]) then originals[cvar] = nil end
+            end
+        end
+    end
 end
 
 local function CharacterKey()
@@ -178,6 +204,7 @@ Check = function()
     return false
 end
 
+ns.ApplyNameplateClassColorsAtLogin = ApplyNameplateClassColorsAtLogin
 ns.CheckNameplateSetup = Check
 ns.RestoreNameplateSetup = Restore
 ns.GetNameplateSetupIssues = Issues

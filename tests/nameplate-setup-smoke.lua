@@ -43,6 +43,8 @@ local function Fresh()
         nameplateShowAll = "1", nameplateShowEnemies = "1",
         nameplateShowFriendlyPlayers = "1", nameplateShowFriendlyNpcs = "1",
         nameplateShowOnlyNameForFriendlyPlayerUnits = "0",
+        nameplateShowFriendlyClassColor = "0",
+        nameplateUseClassColorForFriendlyPlayerUnitNames = "0",
     }
     writes, rejected, callbacks, shown = {}, {}, {}, nil
     inCombat, character, refreshes, restores = false, "Player-One", 0, 0
@@ -201,5 +203,47 @@ equal(shown.key, "RPSN_NAMEPLATE_SETUP", "review appears after restoration finis
 StaticPopupDialogs.RPSN_NAMEPLATE_SETUP.OnAccept()
 equal(ns.GetStylingEnabled(), true, "fresh consent resumes styling")
 equal(cvars.nameplateShowFriendlyNpcs, "1", "consent reapplies required NPC plates")
+
+ns = Fresh()
+cvars.nameplateShowFriendlyClassColor = "1"
+cvars.nameplateUseClassColorForFriendlyPlayerUnitNames = "1"
+cvars.nameplateShowClassColor = "1"
+cvars.raidFramesDisplayClassColor = "1"
+inCombat = true
+ns.ApplyNameplateClassColorsAtLogin()
+equal(#writes, 0, "class-color writes skipped in combat")
+inCombat = false
+ns.ApplyNameplateClassColorsAtLogin()
+equal(cvars.nameplateShowFriendlyClassColor, "0", "login disables friendly health-bar class colors")
+equal(cvars.nameplateUseClassColorForFriendlyPlayerUnitNames, "0", "login disables friendly name class colors")
+equal(cvars.nameplateShowOnlyNameForFriendlyPlayerUnits, "0", "friendly health bars stay visible")
+equal(cvars.nameplateShowClassColor, "1", "enemy class colors preserved")
+equal(cvars.raidFramesDisplayClassColor, "1", "raid frame colors preserved")
+equal(#writes, 2, "only the friendly class-color settings are written")
+equal(shown, nil, "class colors require no setup popup")
+
+ns = Load()
+ns.ApplyNameplateClassColorsAtLogin()
+equal(#writes, 2, "compatible reload does not write again")
+character = "Player-Two"
+ns.SetStylingEnabled(false)
+equal(#writes, 2, "disabling in world does not rebuild plates")
+rejected.nameplateShowFriendlyClassColor = "error"
+ns = Load()
+ns.ApplyNameplateClassColorsAtLogin()
+equal(cvars.nameplateUseClassColorForFriendlyPlayerUnitNames, "1", "disabled login restores original friendly name colors")
+equal(cvars.nameplateShowFriendlyClassColor, "0", "failed restoration leaves bar color alone")
+rejected.nameplateShowFriendlyClassColor = nil
+ns = Load()
+ns.ApplyNameplateClassColorsAtLogin()
+equal(cvars.nameplateShowFriendlyClassColor, "1", "disabled reload retries original friendly bar colors")
+
+ns.SetStylingEnabled(true)
+equal(ns.CheckNameplateSetup(), true, "class colors do not block activation")
+equal(cvars.nameplateShowFriendlyClassColor, "1", "enabling in world defers class colors")
+rejected.nameplateShowFriendlyClassColor = "error"
+ns.ApplyNameplateClassColorsAtLogin()
+equal(cvars.nameplateUseClassColorForFriendlyPlayerUnitNames, "0", "other color setting still applies")
+equal(ns.GetStylingEnabled(), true, "rejected class-color write does not block styling")
 
 print("Nameplate setup smoke: passed")

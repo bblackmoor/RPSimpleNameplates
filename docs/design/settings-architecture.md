@@ -28,7 +28,7 @@ Reset text settings on Text restores profile appearance and threat display plus 
 | `Core.lua` | Metadata, conflict warning and safe accessibility helpers |
 | `Profiler.lua` | Off-by-default session timing wrappers and performance commands; no saved data |
 | `WorldContext.lua` | Event-driven world snapshot, revision and unknown-value preservation |
-| `ManagedNames.lua` | Critter CVar ownership, legacy restoration ledger and combat deferral; friendly class-color CVars are read-only |
+| `ManagedNames.lua` | Critter CVar ownership, legacy restoration ledger and combat deferral; observes friendly class-color CVar changes |
 | `NameplateSetup.lua` | Consent-based plate-visibility compatibility review and per-character restoration |
 | `Database.lua` | Schema-2 field validation, profiles, character selection and scoped settings access |
 | `TRP3.lua` | Optional cached RP integration with normal-name fallback |
@@ -76,7 +76,7 @@ Queued refresh flags merge per unit and across all-plate requests, then run from
 
 The `.toc` is authoritative. Bundled libraries load first, then Defaults, FontMedia, Core, Profiler, PeriodicWork and WorldContext. ManagedNames constructs the restoration allowlist before Database validates saved records; its callbacks resolve database functions after loading. NameplateSetup also loads before Database. Runtime modules follow Database/TRP3, and settings modules follow Nameplates/Diagnostics.
 
-Critter hiding claims only its supported world-name CVar. Legacy managed-name records are restoration-only. Approved setup changes have a separate per-character backup. Failed writes retain originals, and restricted writes/restoration defer until allowed. Friendly class-color CVars are observed without mutation. Profile switches do not change plate-visibility CVars.
+Critter hiding claims only its supported world-name CVar. Legacy managed-name records are restoration-only. Approved setup changes have a separate per-character backup. Failed writes retain originals, and restricted writes/restoration defer until allowed. Nameplate setup writes friendly name and bar class-color settings at login only. Profile switches do not change plate-visibility CVars.
 
 ## Verification
 

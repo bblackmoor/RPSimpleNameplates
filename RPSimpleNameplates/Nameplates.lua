@@ -253,6 +253,7 @@ FlushQueuedRefreshes = ns.Profiler.Wrap("Urgent refresh", FlushQueuedRefreshes)
 
 local function HandlePlayerLogin()
     ns.EnsureDB()
+    if ns.ApplyNameplateClassColorsAtLogin then ns.ApplyNameplateClassColorsAtLogin() end
     if ns.CheckNameplateSetup then ns.CheckNameplateSetup() end
     ns.ApplyCritterCompanionNameVisibility()
     C_Timer.After(1, function()
