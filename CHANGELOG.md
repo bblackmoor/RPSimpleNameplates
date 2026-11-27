@@ -1,3 +1,10 @@
+## 1.2.0 — 2026-11-27
+
+- Set separate colors for interruptible and non-interruptible casts and channels, plus an optional interruptible border color.
+- Switch nameplate previews between interruptible casts, non-interruptible casts, and no cast. The **Text** tab is now **Text & Layout**.
+- While styling is enabled, the addon automatically turns off Blizzard’s class colors for friendly overhead names and health bars.
+- Nameplate updates allocate less temporary memory, and color settings reject invalid values.
+
 ## 1.1.311 — 2026-11-27
 
 - Add separate interruptible and non-interruptible cast and channel fills. Move the optional interruptible border color to Colors with both fills.

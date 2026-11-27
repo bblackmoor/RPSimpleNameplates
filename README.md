@@ -4,6 +4,13 @@
 
 **RP Simple Nameplates** makes it easier to see who is attacking you, who might, and who is worth talking to. It gives Blizzard's nameplates clear, consistent colors and readable names, with optional roleplaying names and titles. It is for players who want a useful view of the people and creatures around them, especially during everyday play and roleplay. Choose it over Blizzard's defaults for more control over colors and text, or over **EllesmereUI** or **Plater** when a few straightforward settings cover what you need.
 
+## What’s new in 1.2.0
+
+- Set separate colors for interruptible and non-interruptible casts and channels, plus an optional interruptible border color.
+- Switch nameplate previews between interruptible casts, non-interruptible casts, and no cast. The **Text** tab is now **Text & Layout**.
+- While styling is enabled, the addon automatically turns off Blizzard’s class colors for friendly overhead names and health bars.
+- Nameplate updates allocate less temporary memory, and color settings reject invalid values.
+
 ## Features
 
 - Color names and health bars by danger, friendliness, and NPC interaction.
