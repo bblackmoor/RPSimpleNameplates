@@ -1,3 +1,8 @@
+## 1.1.311 — 2026-11-27
+
+- Add separate interruptible and non-interruptible cast and channel fills. Move the optional interruptible border color to Colors with both fills.
+- Rename Text to Text & Layout and add interruptible, non-interruptible and idle samples to the nameplate previews.
+
 ## 1.1.310 — 2026-11-21
 
 - Disable Blizzard’s class colors on friendly overhead names and health bars at login or UI reload when styling is enabled. Restore the previous settings on login or reload with styling disabled.

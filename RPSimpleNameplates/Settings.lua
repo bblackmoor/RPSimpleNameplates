@@ -5,7 +5,7 @@ local categories, panels = {}, {}
 local pageOrder = {
     {key = "About", label = "About"},
     {key = "Profiles", label = "Profiles"},
-    {key = "Appearance", label = "Text"},
+    {key = "Appearance", label = "Text & Layout"},
     {key = "Colors", label = "Colors"},
     {key = "Highlight", label = "Cast Highlight"},
     {key = "TRP3", label = "TRP3"},

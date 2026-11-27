@@ -105,8 +105,8 @@ local function AddControls(context)
 end
 
 local function CreateAppearancePanel()
-    local panel, content, layout = UI.CreateScrollablePanel("Text")
-    UI.AddTitle(content, layout, "Text")
+    local panel, content, layout = UI.CreateScrollablePanel("Text & Layout")
+    UI.AddTitle(content, layout, "Text & Layout")
     local context = {content = content, layout = layout, refreshers = {}, fontRefreshers = {}, sliders = {}}
     local function CancelEdits(quiet)
         local changed = false
@@ -123,14 +123,14 @@ local function CreateAppearancePanel()
     addon.RefreshFontControls = function() UI.RunRefreshers(context.fontRefreshers) end
     local function RefreshPage() Refresh(context) end
     addon.AddProfileSelector(content, layout, context.refreshers, RefreshPage)
-    UI.AddPageAction(content, layout, "Reset text settings", function()
+    UI.AddPageAction(content, layout, "Reset text & layout settings", function()
         CancelEdits(true)
         addon.ResetAppearance()
         addon.SetThreatEnabled(addon.Defaults.showThreat)
         addon.SetHideCritterCompanionNames(addon.Defaults.hideCritterCompanionNames)
         RefreshPage()
         UI.RefreshNameplates("text")
-    end)
+    end, 230)
     UI.AddDescription(content, layout, "Resets the settings below, including global critter/companion visibility.")
     if addon.AddNameplatePreview then addon.AddNameplatePreview(context) end
     AddControls(context)

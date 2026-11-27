@@ -22,7 +22,9 @@ local DEFAULT_CATEGORY_MODES = {
     useless = "active",
 }
 local DEFAULT_EFFECT_COLORS = {
-    interruptible = RGB8(51, 0, 255),
+    interruptible = RGB8(255, 255, 0),
+    interruptibleFill = RGB8(255, 255, 0),
+    nonInterruptibleFill = RGB8(153, 153, 102),
 }
 local COLOR_PRESETS = {
     highContrast = {
@@ -35,9 +37,6 @@ local COLOR_PRESETS = {
             friendly = RGB8(0, 255, 255),
             useful = RGB8(0, 102, 255),
             useless = RGB8(255, 255, 255),
-        },
-        effectColors = {
-            interruptible = RGB8(51, 0, 255),
         },
     },
 }

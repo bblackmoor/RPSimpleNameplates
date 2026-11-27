@@ -1,4 +1,4 @@
--- All interruptible-cast controls live on one page.
+-- Controls for the optional interruptible cast border.
 local _, addon = ...
 local UI, Widgets = addon.SettingsUI, addon.SettingsWidgets
 local function CreateHighlightPanel()
@@ -33,22 +33,13 @@ local function CreateHighlightPanel()
         Changed()
     end, 230)
     UI.AddDescription(content, layout,
-        "Restores this profile's cast highlight activation, color, effect and border settings.")
+        "Restores this profile's border activation, effect, geometry and timing.")
     if addon.AddNameplatePreview then addon.AddNameplatePreview(context, true) end
     UI.AddSwitchRow(content, layout, context.refreshers, "Highlight interruptible casts",
         addon.GetInterruptibleHighlightEnabled, function(value)
             addon.SetInterruptibleHighlightEnabled(value)
             Changed()
         end)
-    local row = UI.CreateSettingRow(content, layout, "Cast highlight color")
-    local swatch = Widgets.CreateColorPicker(row, function(r, g, b)
-        addon.SetEffectColor("interruptible", r, g, b)
-        Changed()
-    end, function() return addon.EffectColor("interruptible") end)
-    swatch:SetPoint("LEFT", row, "LEFT", UI.CONTROL_X, 0)
-    context.refreshers[#context.refreshers + 1] = function()
-        swatch:SetColor(addon.EffectColor("interruptible"))
-    end
     local _, effect = UI.CreateDropdownRow(content, layout, "Effect",
         function() return addon.CAST_EFFECT_OPTIONS end, function(value)
             addon.SetInterruptibleEffect(value)
@@ -108,7 +99,6 @@ local function CreateHighlightPanel()
     panel:SetScript("OnShow", Refresh)
     panel:SetScript("OnHide", function()
         CancelEdits()
-        UI.CancelColorEdit()
         if context.StopPreview then context.StopPreview() end
     end)
     Refresh()

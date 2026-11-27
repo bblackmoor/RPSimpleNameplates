@@ -28,7 +28,7 @@ Capture a complete current-build report if flicker or hitches return. Additional
 
 ## Settings foundation and page layout
 
-- [ ] With Details/Plater and standalone Details Framework disabled, log in/reload and open About, Profiles, Text, Colors, Cast Highlight and TRP3. Confirm one registration, correct page order and scrolling. Repeat with an external DF embedder and record the selected DF minor version.
+- [ ] With Details/Plater and standalone Details Framework disabled, log in/reload and open About, Profiles, Text & Layout, Colors, Cast Highlight and TRP3. Confirm one registration, correct page order and scrolling. Repeat with an external DF embedder and record the selected DF minor version.
 - [ ] Check headings, wrapping, switches, disabled labels, swatches, sliders, dropdowns and info-link spacing at narrow/normal widths and different UI scales. Test content growing/shrinking and wheel/scrollbar operation.
 - [ ] Verify `/rpsn` and `/rpsn text` open Text (`/rpsn appearance` remains an alias); profiles/colors/highlight/trp3/about routes open their pages. Settings commands refuse combat opening; debug/perf commands remain available during combat.
 - [ ] Enter combat with an open color picker, typed slider editor, held slider drag, dropdown menu or profile dialog. Verify unfinished previews roll back, menus/dialogs close, current selections are restored, and all settings mutations (including resets and profile actions) are disabled. Previously committed edits remain.
@@ -43,15 +43,15 @@ Capture a complete current-build report if flicker or hitches return. Additional
 - [ ] Create/copy/rename/delete profiles, including long names and many entries. Copies are independent; rename updates assignments; deletion falls back to Default. Default cannot be renamed/deleted; High Contrast deletion/rename survives reload, and bundled restore recreates it without changing custom profiles or globals.
 - [ ] Open Copy/Rename/Delete, then change selection or replace the captured object before accepting. Stale confirmations do nothing and request reopening; normal unchanged-target actions work. Test bundled restore with missing/replaced targets.
 - [ ] Preview/accept/cancel RGB colors. Switch profiles, reset Colors, hide the page and open another swatch during drafts. Rollback stays with the original current target; retired callbacks cannot undo a reset or affect a later edit. Test with RP Emote Menu's actual picker enabled; neither addon closes or edits the other's session.
-- [ ] Type slider values and test Enter/Escape, focus loss, page hide, profile switching and Text reset during previews. Check 8–36 points/step 1 and 80–150% width/step 5 without stale rollback.
+- [ ] Type slider values and test Enter/Escape, focus loss, page hide, profile switching and Text & Layout reset during previews. Check 8–36 points/step 1 and 80–150% width/step 5 without stale rollback.
 - [ ] Retired cast-style strings are discarded without conversion; valid current activation/effect values are retained and missing/invalid values use defaults. Legacy category modes remain stored but do not affect rendering.
 
 ## Current Colors controls and reset scopes
 
 - [ ] All six Health Bar switches follow the selected profile; On shows a supported bar in both combat states, Off shows its name/title without a bar. Verify first-match priority and no category Active/Inactive or Hide controls.
 - [ ] Factory bars are On for the first five categories and Off for NPC - Background. Background-name dimming defaults On; On is grey #999999 and Off white #FFFFFF, with matching subtitles, inside/above/no-bar. Bar colors and threat styling are independent.
-- [ ] All cast highlight controls are on Cast Highlight: activation, color (#3300FF by default), effect, shared thickness (4) and offset (3), Pulse fade times (0.1 seconds each), and Alert length (20–100%), shrink/grow times (0.2 seconds each), end opacity (0%) and center opacity (100%). Pulse and Alert sections appear only for their selected effect; Solid shows shared controls only. Hidden values are retained. Text, Colors and Cast Highlight share a complete sample preview with category selection, name/title, partial health fill, optional threat and a cast/title switch. Disabled cast highlighting dims the preview cast and stops its effect animations. Page hide stops preview animations. Reset cast highlight settings restores activation, color, effect and all border parameters; Text and Colors resets preserve them.
-- [ ] Colors reset restores category palette, bars On except Background, dimming On and gradient opacity 100% for Default/custom or 0% for High Contrast. It preserves cast settings, text/threat, Enabled, global visibility, TRP3 and legacy modes. Cast Highlight reset affects only cast activation/color/effect/border parameters.
+- [ ] On Colors, check the three cast color swatches and both fill previews. On Cast Highlight, check activation, effect, shared thickness and offset, and effect-specific timing and geometry. Page hide stops preview animation. Reset cast highlight settings restores border behavior. Colors reset restores the cast colors.
+- [ ] Colors reset restores category and cast colors, bars On except Background, dimming On and gradient opacity 100% for Default/custom or 0% for High Contrast. Cast Highlight reset affects border activation, effect, geometry and timing.
 - [ ] Text reset restores selected-profile fonts/rendering/size/placement/width and threat On, plus global critter hiding Off. It preserves Colors preferences, per-character Enabled, TRP3 and selection. Bundled restore has the separate scope described above.
 
 ## Fonts, geometry, gradients and native labels
@@ -61,7 +61,7 @@ Capture a complete current-build report if flicker or hitches return. Additional
 - [ ] Open long font lists, select absent saved fonts and register providers late. Choices survive reload/copy; unavailable faces use Arial Narrow temporarily and resume when available. Sanctuary matching changes only the name/title face, using the localized world font.
 - [ ] Inside names keep full size; bars leave four units above/three below. Native health labels and threat form the documented right-hand chain with three-unit gaps. Appearance changes, native label show/hide and rounded geometry converge without endless repair; switching Above or disabling restores captured dimensions/anchors.
 - [ ] Known Retail restricted-anchor layouts size correctly without requiring readable GetPoint; unsupported layouts remain untouched. Test modern/classic layouts and different UI scales without Lua/secret-value errors.
-- [ ] Complete previews on Text, Colors and Cast Highlight show the selected category, profile fonts/size/placement/width, partial health, title, optional threat and a sample cast. Cast/title switching does not alter saved appearance. Gradients remain clipped to native health fill with no secret-health arithmetic.
+- [ ] Complete previews on Text & Layout, Colors and Cast Highlight show the selected category, profile fonts/size/placement/width, partial health, title, optional threat and a sample cast. Cast/title switching does not alter saved appearance. Gradients remain clipped to native health fill with no secret-health arithmetic.
 - [ ] Decorative bar edges/absorb overflow glow are suppressed; shield fill, heal prediction, icons, shields, target/mouseover treatment and classification visibility remain intact. Disable styling and verify native artwork/text baselines restore, including retired/replaced regions.
 
 ## Casts, threat, NPC subtitles and TRP3
@@ -98,8 +98,8 @@ See [the repeatable cast test](cast-effect-testing.md) for enemy selection, prev
 
 ## Recent cast-fill and preview regression checks
 
-- [ ] On the current build, test a fresh live interruptible cast, then leave combat and change its highlight color/profile/effect. Subsequent casts keep a plain fill. Check actual tint, completion/interruption, native shields/icons, disable/re-enable, and restoration without secret-value or taint errors.
-- [ ] Turn Highlight interruptible casts off on Cast Highlight. Preview casts dim and their effects become static. Re-enable and verify the selected effect resumes; hide/show each page and repeat.
+- [ ] Test live interruptible and non-interruptible casts and channels with contrasting fills and the border off and on. Check progress, completion, interruption, shields/icons, profile changes and restoration.
+- [ ] Turn Highlight interruptible casts off. The sample keeps its fill and the preview border becomes static grey. Re-enable it and verify the chosen effect resumes. Repeat after hiding and reopening the page.
 
 Acceptance remains partial until the applicable client checks are recorded. Passing local suites or one converged scene does not close unobserved native behavior.
 

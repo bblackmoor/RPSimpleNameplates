@@ -583,6 +583,7 @@ local function ResetAllColors()
         profile.priorityColors[key] = CopyColor(default)
         profile.healthBars[key] = DEFAULT_HEALTH_BARS[key]
     end
+    profile.effectColors = defaults.effectColors
     profile.gradientOpacity = defaults.gradientOpacity
     profile.dimBackgroundNames = DEFAULT_DIM_BACKGROUND_NAMES
 end
@@ -593,7 +594,6 @@ local function ResetHighlightSettings()
     local profile = ActiveProfile()
     profile.interruptibleEffect = defaults.interruptibleEffect
     profile.interruptibleHighlight = defaults.interruptibleHighlight
-    profile.effectColors = ActiveProfileDefaults().effectColors
     profile.castAdvanced = ValidatedCastBorders()
 end
 ns.ResetHighlightSettings = ResetHighlightSettings

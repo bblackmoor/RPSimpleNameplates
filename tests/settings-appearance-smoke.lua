@@ -153,7 +153,7 @@ assert(ns.GetHideCritterCompanionNames())
 Editor(size):SetText("34")
 local reset
 for _, object in ipairs(ui.objects) do
-    if object.MyObject and object.MyObject.type == "button" and object.text:GetText() == "Reset text settings" then reset = object end
+    if object.MyObject and object.MyObject.type == "button" and object.text:GetText() == "Reset text & layout settings" then reset = object end
 end
 Click(reset)
 assert(size:GetValue() == 18 and width:GetValue() == 120 and ns.GetThreatEnabled())

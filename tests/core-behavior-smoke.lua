@@ -59,7 +59,7 @@ equal(widthNS.GetAppearanceSetting("healthBarWidth"), 125, "copied width survive
 widthNS.ResetAppearance()
 equal(widthNS.GetAppearanceSetting("healthBarWidth"), 120, "Appearance reset restores wider default")
 
--- Cast activation is profile-specific, survives reload, and resets with Colors.
+-- Cast activation is profile-specific, survives reload, and resets with Cast Highlight.
 local effectNS = fresh()
 equal(effectNS.GetInterruptibleEffect(), "PULSE", "effect defaults pulse")
 effectNS.SetInterruptibleEffect("SOLID")
@@ -131,6 +131,14 @@ equal(borders.GetCastBorderSetting("ALERT", "minLength"), 20, "Colors reset Aler
 
 borders.SetInterruptibleHighlightEnabled(true)
 borders.SetEffectColor("interruptible", 0.4, 0.5, 0.6)
+-- Older saved profiles only have the border color.
+profile = borders.EnsureDB().profiles[borders.GetActiveProfileName()]
+profile.effectColors.interruptibleFill = nil
+profile.effectColors.nonInterruptibleFill = nil
+borders = loadCore()
+equal(select(1, borders.EffectColor("interruptible")), 0.4, "existing border color survives upgrade")
+equal(select(2, borders.EffectColor("interruptibleFill")), 1, "missing interruptible fill defaults")
+equal(select(3, borders.EffectColor("nonInterruptibleFill")), 0.4, "missing non-interruptible fill defaults")
 borders.SetInterruptibleEffect("ALERT")
 borders.SetCastBorderSetting("PULSE", "fadeIn", 0.5)
 borders.ResetHighlightSettings()
@@ -138,12 +146,12 @@ equal(borders.GetInterruptibleEffect(), "PULSE", "Highlight reset restores effec
 equal(borders.GetCastBorderSetting("PULSE", "fadeIn"), 0.1, "Highlight reset restores timing")
 equal(borders.GetInterruptibleHighlightEnabled(), false, "Highlight reset disables highlight")
 local r, g, b = borders.EffectColor("interruptible")
-equal(r, 0.2, "Highlight reset restores cast color")
+equal(r, 0.4, "Highlight reset preserves border color")
 borders.ResetAllColors()
 r, g, b = borders.EffectColor("interruptible")
-equal(r, 0.2, "new factory red component")
-equal(g, 0, "new factory green component")
-equal(b, 1, "new factory blue component")
+equal(r, 1, "new factory red component")
+equal(g, 1, "new factory green component")
+equal(b, 0, "new factory blue component")
 
 -- Background dimming validation and persistence.
 local dim = fresh()
@@ -241,7 +249,7 @@ for _, case in ipairs(expectedPalettes) do
         equal(ns.GetCategoryMode(state), "inactive", "Colors reset preserves legacy category modes")
     end
     local r, g, b = ns.EffectColor("interruptible")
-    local expected = {r=0.2, g=0.3, b=0.4}
+    local expected = {r=1, g=1, b=0}
     equal(r, expected.r, case[1] .. " reset cast red")
     equal(g, expected.g, case[1] .. " reset cast green")
     equal(b, expected.b, case[1] .. " reset cast blue")

@@ -26,12 +26,12 @@ local function AddHealthBarSwitch(context, row, swatch, state)
     end
 end
 
-local function CreateColorRow(context, text, displayText, getColor, setColor, state)
+local function CreateColorRow(context, text, displayText, getColor, setColor, state, refreshScope)
     local row = UI.CreateSettingRow(context.content, context.layout, text)
     local swatch = Widgets.CreateColorPicker(row, function(r, g, b)
         setColor(r, g, b)
         RefreshContext(context)
-        RefreshNameplates("color")
+        RefreshNameplates(refreshScope or "color")
     end, getColor)
     swatch:SetPoint("LEFT", row, "LEFT", UI.CONTROL_X, 0)
     context.refreshers[#context.refreshers + 1] = function() swatch:SetColor(getColor()) end
@@ -106,6 +106,21 @@ local function AddPriorityColorControls(context)
     AddBackgroundNameControl(context)
 end
 
+local function AddCastColors(context)
+    AddSection(context.content, context.layout, "Cast colors")
+    for _, setting in ipairs({
+        {key = "interruptibleFill", label = "Interruptible cast fill"},
+        {key = "nonInterruptibleFill", label = "Non-interruptible cast fill"},
+        {key = "interruptible", label = "Interruptible cast border"},
+    }) do
+        local key = setting.key
+        CreateColorRow(context, setting.label, nil,
+            function() return addon.EffectColor(key) end,
+            function(r, g, b) addon.SetEffectColor(key, r, g, b) end,
+            nil, "castSettings")
+    end
+end
+
 local function CreateColorsPanel()
     local panel, content, layout = UI.CreateScrollablePanel("Colors")
     UI.AddTitle(content, layout, "Colors")
@@ -136,8 +151,9 @@ local function CreateColorsPanel()
     end)
     AddDescription(content, layout,
         "Restores High Contrast defaults for that profile, Default for all others. " ..
-        "Restores health-bar preferences, background-name dimming and gradient opacity. Cast highlight settings are unchanged.")
-    if addon.AddNameplatePreview then addon.AddNameplatePreview(context) end
+        "Restores nameplate and cast colors, health-bar preferences, background-name dimming and gradient opacity.")
+    if addon.AddNameplatePreview then addon.AddNameplatePreview(context, true) end
+    AddCastColors(context)
     AddGradientControl(context)
     AddPriorityColorControls(context)
     panel.Refresh = Refresh

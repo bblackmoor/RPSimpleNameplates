@@ -10,7 +10,8 @@ local function Region(parent)
     local r = {parent = parent, shown = true, level = 1, scripts = {}}
     function r:GetParent() return self.parent end
     function r:SetPoint() end
-    function r:ClearAllPoints() end
+    function r:ClearAllPoints() self.anchor = nil end
+    function r:SetAllPoints(region) self.anchor = region end
     function r:SetHeight(v) self.height = v end
     function r:SetWidth(v) self.width = v end
     function r:SetFrameLevel(v) self.level = v end
@@ -73,13 +74,18 @@ local ns = {
     WorldContext = {Get = function() return {} end},
     GetStylingEnabled = function() return enabled end,
     GetInterruptibleHighlightEnabled = function() return enabled and highlightEnabled end,
-    EffectColor = function() return table.unpack(color) end,
+    EffectColor = function(key)
+        if key == "interruptibleFill" then return 1, 1, 0 end
+        if key == "nonInterruptibleFill" then return 0.6, 0.6, 0.4 end
+        return table.unpack(color)
+    end,
     NameplateFrames = {
         GetCastBar = function(frame) return frame.castBar end,
         GetHealthBar = function(frame) return frame.healthBar end,
     },
 }
 
+local nativeFill = Region()
 local frame = {
     unit = "nameplate1",
     castBar = Region(),
@@ -94,6 +100,10 @@ frame.castBar.HideIconWhenNotInterruptible = true
 assert(loadfile("RPSimpleNameplates/Profiler.lua"))("RPSimpleNameplates", ns)
 assert(loadfile("RPSimpleNameplates/PeriodicWork.lua"))("RPSimpleNameplates", ns)
 assert(loadfile("RPSimpleNameplates/CastHighlight.lua"))("RPSimpleNameplates", ns)
+function frame.castBar:GetStatusBarTexture() return nativeFill end
+function frame.castBar:UpdateBarFillTexture(isFull) self.fullFill = isFull end
+frame.castBar.GetValue = function() error("live cast progress must stay native") end
+
 local function Update() ns.CastHighlight.UpdateInterruptibleHighlight(frame, {}, frame.RPSNPresentation) end
 
 Update()
@@ -168,21 +178,20 @@ ns.PeriodicWork.Advance(0.25)
 ns.PeriodicWork.Run()
 equal(highlight.frame.shown, false, "deferred refresh uses current native state")
 
--- Disabled features retire blocked retries and cannot queue new work from
--- explicit refreshes or native visibility hooks.
-for _, setting in ipairs({"styling", "highlight"}) do
-    enabled, highlightEnabled, blocked = true, true, true
-    Update()
-    assert(ns.PeriodicWork.Has("cast retry", frame), "blocked active cast queues retry")
-    if setting == "styling" then enabled = false else highlightEnabled = false end
-    ns.PeriodicWork.Advance(0.25)
-    ns.PeriodicWork.Run()
-    assert(not ns.PeriodicWork.Has("cast retry", frame), setting .. " disable retires blocked retry")
-    Update()
-    assert(not ns.PeriodicWork.Has("cast retry", frame), setting .. " disabled refresh does not queue")
-    frame.castBar.Icon:SetShown(not frame.castBar.Icon.shown)
-    assert(not ns.PeriodicWork.Has("cast retry", frame), setting .. " disabled native hook does not queue")
-end
+-- Fill colors still need cast-state retries with the border disabled.
+enabled, highlightEnabled, blocked = true, false, true
+Update()
+assert(ns.PeriodicWork.Has("cast retry", frame), "blocked fill queues retry even with border off")
+ns.PeriodicWork.Advance(0.25)
+ns.PeriodicWork.Run()
+assert(ns.PeriodicWork.Has("cast retry", frame), "border disable preserves fill retry")
+enabled = false
+ns.PeriodicWork.Advance(0.25)
+ns.PeriodicWork.Run()
+assert(not ns.PeriodicWork.Has("cast retry", frame), "styling disable retires blocked retry")
+Update()
+frame.castBar.Icon:SetShown(not frame.castBar.Icon.shown)
+assert(not ns.PeriodicWork.Has("cast retry", frame), "disabled styling does not requeue")
 enabled, highlightEnabled, blocked = false, true, false
 Update()
 equal(highlight.frame.shown, false, "disable hides pulse")
@@ -225,6 +234,40 @@ assert(not directHighlight.frame.shown, "unknown state does not fabricate interr
 direct.castBar.Icon.IsShown = NativeIsShown
 ns.PeriodicWork.Advance(0.25); ns.PeriodicWork.Run()
 assert(directHighlight.frame.shown, "unknown visual state recovers without new event")
+-- Fill follows the native texture and remains independent of border activation.
+highlightEnabled = false
+ns.CastHighlight.RecordSpellcastEvent("UNIT_SPELLCAST_CHANNEL_START", "nameplate1")
+ns.CastHighlight.RecordSpellcastEvent("UNIT_SPELLCAST_INTERRUPTIBLE", "nameplate1")
+Update()
+assert(highlight.fill.shown and highlight.fill.anchor == nativeFill and not highlight.frame.shown)
+assert(highlight.fill.color[1] == 1 and highlight.fill.color[2] == 1 and highlight.fill.color[3] == 0)
+ns.CastHighlight.RecordSpellcastEvent("UNIT_SPELLCAST_NOT_INTERRUPTIBLE", "nameplate1")
+nativeFill = Region()
+frame.castBar:UpdateBarFillTexture(false)
+assert(highlight.fill.shown and highlight.fill.anchor == nativeFill, "changed native fill reanchors tint")
+assert(highlight.fill.color[1] == 0.6 and highlight.fill.color[2] == 0.6 and highlight.fill.color[3] == 0.4)
+frame.castBar:UpdateBarFillTexture(true)
+assert(not highlight.fill.shown and not highlight.frame.shown, "native completion immediately clears styling")
+Update()
+assert(not highlight.fill.shown, "a finishing bar keeps its native color")
+ns.CastHighlight.RecordSpellcastEvent("UNIT_SPELLCAST_CHANNEL_STOP", "nameplate1")
+ns.CastHighlight.RecordSpellcastEvent("UNIT_SPELLCAST_START", "nameplate1")
+frame.castBar:UpdateBarFillTexture(false)
+assert(highlight.fill.shown, "next native cast restores the configured fill")
+ns.CastHighlight.RecordSpellcastEvent("UNIT_SPELLCAST_INTERRUPTED", "nameplate1")
+Update()
+assert(not highlight.fill.shown, "interrupted cast keeps its native color")
+ns.CastHighlight.RecordSpellcastEvent("UNIT_SPELLCAST_START", "nameplate1")
+frame.castBar.showIcon = false
+frame.castBar.Icon.shown = false
+frame.castBar.BorderShield.shown = false
+Update()
+assert(not highlight.fill.shown, "unknown interruptibility keeps the native fill")
+frame.castBar.Icon.shown = true
+Update()
+assert(highlight.fill.shown)
+ns.CastHighlight.ClearAppearance(frame)
+assert(not highlight.fill.shown and not highlight.frame.shown, "restoration clears both layers")
 print("Cast pulse integration smoke: passed")
 
 

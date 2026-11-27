@@ -64,8 +64,20 @@ local sampleTitle=Object(text, "Sample title")
 assert(sampleTitle.fontSize==28, "title preview uses runtime name size minus two")
 Choose(Control(text, "Sample category", "dropdown"), "useless")
 assert(sampleName.textColor[1]==0.6 and sampleTitle.textColor[1]==0.6)
-Click(Control(text, "Preview a cast", "switch"))
+Choose(Control(text, "Sample cast", "dropdown"), "interruptibleFill")
 assert(not sampleTitle:IsShown(), "preview casts replace titles")
+Choose(Control(text, "Sample cast", "dropdown"), "none")
+assert(sampleTitle:IsShown(), "idle sample restores the title")
+local colorsCast = Control(colors, "Sample cast", "dropdown")
+Choose(colorsCast, "nonInterruptibleFill")
+local solidFill
+for _, object in ipairs(ui.objects) do
+    if Belongs(object, colors) and object.kind == "StatusBar" and object:GetValue() == 55 then solidFill = object end
+end
+assert(solidFill and solidFill.statusColor[1] == 0.6 and animations[solidFill] == nil)
+ns.SetEffectColor("nonInterruptibleFill", 0.24, 0.34, 0.44)
+colors.Refresh()
+assert(solidFill.statusColor[1] == 0.24, "the selected preview follows its profile fill")
 local effect=Control(cast, "Effect", "dropdown")
 local fade=Object(cast,"Fade in"):GetParent()
 local length=Object(cast,"Minimum length"):GetParent()

@@ -126,7 +126,7 @@ local function RestoreAccessibleFrame(frame, assessment, context, removedUnit)
     if frame.RPSNFullTitleText then frame.RPSNFullTitleText:SetText(""); frame.RPSNFullTitleText:Hide() end
     frame.RPSNFullTitleAvailable = nil
     Text.RestoreNameDisplay(frame, context, assessment)
-    if frame.RPSNInterruptibleHighlight then frame.RPSNInterruptibleHighlight.frame:Hide() end
+    if ns.CastHighlight then ns.CastHighlight.ClearAppearance(frame) end
     Text.RestoreOriginalBarHeight(frame, assessment.healthBar, context, assessment)
     ns.NameplateFrames.RestoreBarArtwork(frame, context)
     ns.NameplateFrames.RestoreBarWidth(frame, assessment)

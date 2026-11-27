@@ -142,10 +142,23 @@ local function Samples(panel)
     return sample
 end
 local colorSample, highlightSample = Samples(panel), Samples(highlightPanel)
-ns.SetInterruptibleHighlightEnabled(true); panel.Refresh(); highlightPanel.Refresh()
-assert(colorSample.cast.alpha == 1 and highlightSample.cast.alpha == 1)
-ns.SetInterruptibleHighlightEnabled(false); panel.Refresh(); highlightPanel.Refresh()
-assert(colorSample.cast.alpha == 0.5 and highlightSample.cast.alpha == 0.5)
+for _, enabled in ipairs({true, false}) do
+    ns.SetInterruptibleHighlightEnabled(enabled); panel.Refresh(); highlightPanel.Refresh()
+    for _, sample in ipairs({colorSample, highlightSample}) do
+        RGBEqual(sample.cast.statusColor, 1, 1, 0)
+        assert(sample.cast:GetAlpha() == 1, "fill stays opaque independently of highlight")
+    end
+end
+for _, object in ipairs(ui.objects) do
+    if BelongsTo(object, panel) and object.kind == "FontString" and object:GetText() == "Sample cast" then
+        local dropdown = Control(object:GetParent(), "dropdown")
+        for _, option in ipairs(dropdown.MyObject.func()) do
+            if option.value == "nonInterruptibleFill" then option.onclick(nil, nil, option.value) end
+        end
+    end
+end
+RGBEqual(colorSample.cast.statusColor, 0.6, 0.6, 0.4)
+RGBEqual(highlightSample.cast.statusColor, 1, 1, 0)
 
 local dimToggle = Control(Row("Dim background NPC names"), "switch")
 assert(ns.GetDimBackgroundNames(), "background dimming defaults on")
@@ -195,7 +208,7 @@ ns.SetGradientOpacity(50); ns.ResetAllColors(); panel.Refresh(); highlightPanel.
 assert(ns.GetGradientOpacity() == 0 and not preview.RPSNHealthGradient:IsShown())
 assert(ns.SetActiveProfileName("Default")); panel.Refresh()
 
-local castRow = Row("Cast highlight color")
+local castRow = Row("Interruptible cast border")
 local cast = Control(castRow, "color")
 local castToggle = Control(Row("Highlight interruptible casts"), "switch")
 local effectDropdown = Control(Row("Effect"), "dropdown")
@@ -219,7 +232,7 @@ local picker = ColorPickerFrame.info
 picker.swatchFunc()
 RGBEqual({ns.EffectColor("interruptible")}, 0.2, 0.3, 0.4)
 picker.cancelFunc()
-RGBEqual({ns.EffectColor("interruptible")}, 0.2, 0, 1)
+RGBEqual({ns.EffectColor("interruptible")}, 1, 1, 0)
 assert(ns.GetInterruptibleHighlightEnabled(), "cast-color cancellation preserves activation")
 
 -- Adapted profile selector stays shared; switching refreshes DF controls silently.
@@ -244,7 +257,10 @@ for _, object in ipairs(ui.objects) do
     if object.MyObject and object.MyObject.type == "button" and object.text:GetText() == "Reset color settings" then resetAll = object end
 end
 assert(resetAll:GetWidth() == 190 and resetAll:GetHeight() == 24)
-assert(not BelongsTo(castRow, panel), "cast color is absent from Colors")
+for _, label in ipairs({"Interruptible cast fill", "Non-interruptible cast fill", "Interruptible cast border"}) do
+    assert(BelongsTo(Row(label), panel), "cast color belongs to Colors")
+    assert(not BelongsTo(Row(label), highlightPanel), "cast color is absent from Cast Highlight")
+end
 local before = refreshes
 Click(resetAll)
 assert(refreshes == before + 1 and ns.GetInterruptibleHighlightEnabled())
@@ -257,7 +273,7 @@ for _, case in ipairs(cases) do
     assert(ns.GetHealthBarEnabled(case[1]) == (case[1] ~= "useless"))
 end
 highlightPanel.Refresh()
-RGBEqual(SwatchRGB(cast), 0.4, 0.5, 0.6)
+RGBEqual(SwatchRGB(cast), 1, 1, 0)
 initial, before = Snapshot(SimpleNameplatesDB), refreshes
 panel:GetScript("OnShow")(panel)
 panel:GetScript("OnShow")(panel)

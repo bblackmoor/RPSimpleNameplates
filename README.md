@@ -54,9 +54,9 @@ Type `/rpsn` to open settings, or find **RP Simple Nameplates** under **Options 
 | Page | What you can change |
 | --- | --- |
 | Profiles | Enable styling for this character; manage profiles; import or export themes |
-| Text | Fonts, text size, bar width, names inside or above bars, threat display, and critter/companion name hiding |
-| Colors | Category colors and health bars, background-name dimming, gradient strength, and a complete preview |
-| Cast Highlight | Cast-highlight activation, color, effect, border geometry, timing, and a complete preview |
+| Text & Layout | Fonts, text size, bar width, names inside or above bars, threat display, and critter/companion name hiding |
+| Colors | Category colors and health bars, background-name dimming, gradient strength, cast and channel fills, and interruptible border color |
+| Cast Highlight | Interruptible border activation, effect, geometry, and timing |
 | TRP3 | Roleplaying names, short and long titles, and OOC markers |
 | About | Installed version, source, commands, and known limitations |
 
@@ -79,9 +79,13 @@ An enemy that is attacking you uses red even if it also offers an interaction.
 
 Each category has a **Health Bar** switch. Turn it off to show a colored name and title without a bar. Background NPCs use names alone by default. Names inside bars use white outlined text, with optional dimming for background NPCs.
 
-Cast highlighting is off by default. Enable **Highlight interruptible casts** on **Cast Highlight**, then choose its color and effect. Pulse and Alert settings appear when their effect is selected.
+### Casts and channels
 
-Text, Colors, and Cast Highlight each provide a complete nameplate preview. Choose a sample category and turn **Preview a cast** on or off to see how your settings work together. Each tab’s reset button resets only controls on that tab.
+Set the two fills and the optional border color under **Colors → Cast colors**. The interruptible fill and border default to yellow (`#FFFF00`). The non-interruptible fill defaults to `#999966`. Blizzard's fill is used when interruptibility is unavailable.
+
+Enable **Highlight interruptible casts** on **Cast Highlight** to show the optional border. Pulse and Alert settings appear when their effect is selected.
+
+Text & Layout, Colors, and Cast Highlight each provide a complete nameplate preview. Use **Sample cast** to switch between interruptible, non-interruptible, and no cast. Each tab’s reset button resets only controls on that tab.
 
 ### Profiles
 
@@ -109,7 +113,7 @@ Use one nameplate addon at a time. If you see competing colors or duplicate disp
 
 | Command | Action |
 | --- | --- |
-| `/rpsn`, `/rpsn text`, `/rpsn appearance` | Open Text settings |
+| `/rpsn`, `/rpsn text`, `/rpsn appearance` | Open Text & Layout settings |
 | `/rpsn profiles` | Open Profiles |
 | `/rpsn colors` | Open Colors |
 | `/rpsn highlight` | Open Cast Highlight |

@@ -98,7 +98,7 @@ local gradientOpacity = Control("Gradient opacity", "slider")
 local pulseThickness = Control("Border thickness", "slider")
 local pulseLength = Control("Minimum length", "slider")
 local pulseOpacity = Control("End opacity", "slider")
-local swatch = Control("Cast highlight color", "color")
+local swatch = Control("Interruptible cast border", "color")
 local castToggle = Control("Highlight interruptible casts", "switch")
 local trpChild = Control("Use TRP3 roleplaying full name", "switch")
 assert(not trpChild:IsEnabled(), "TRP3 dependent starts disabled")
@@ -141,7 +141,7 @@ assert(pulseLength:GetValue() == originalLength and pulseOpacity:GetValue() == o
 assert(not effect.dropdownframe:IsShown() and effect.MyObject.myvalue == "PULSE", "menu closes and current choice is restored")
 assert(not ColorPickerFrame:IsShown() and not oldPopup:IsShown(), "owned picker and profile dialog close")
 assert(oldPopup.data.cancelled, "cancelled dialog callbacks cannot revive after combat")
-for _, frame in ipairs({size, width, pulseThickness, pulseLength, pulseOpacity, gradientOpacity, effect, swatch, castToggle, Button("Reset text settings"), Button("Reset color settings"), Button("Create")}) do
+for _, frame in ipairs({size, width, pulseThickness, pulseLength, pulseOpacity, gradientOpacity, effect, swatch, castToggle, Button("Reset text & layout settings"), Button("Reset color settings"), Button("Create")}) do
     assert(not frame:IsEnabled(), "editable control is disabled")
 end
 -- Simulate callbacks already queued before lockdown, and refresh while locked.

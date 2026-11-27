@@ -139,13 +139,9 @@ Direct font/color/alpha setters also use guarded cached repair. Dimension recove
 
 ## Interruptible effects
 
-Cast Highlight owns activation, color, effect and border settings. Pulsing border,
-Solid border and Alert border share thickness (default 4) and outward offset
-(default 3). Pulse fades between 35% and 100% opacity with 0.1-second fade-in and
-fade-out defaults. Solid stays fully opaque; Alert animates centered top/bottom
-gradient segments with hidden sides. Colors and Cast Highlight show full nameplate
-previews, greyed out and static when highlighting is off. Reset cast highlight
-settings restores all highlight settings; Reset color settings affects the Colors
-page only. Native icon/shield and cast-bar visibility hooks refresh detection;
-hidden casts gate explicit events, and unknown active state retries conservatively.
-See [cast-effect testing](cast-effect-testing.md) for the controls and live checks.
+Colors owns the two cast/channel fills and the interruptible border color.
+Cast Highlight owns the optional border behavior. The fill overlay anchors to
+the native cast-bar texture so Blizzard drives progress. Cast events and native
+bar, icon and shield hooks refresh interruptibility. Hidden, ending and
+unresolved casts use the native fill. See [cast-effect testing](cast-effect-testing.md)
+for the controls and live checks.

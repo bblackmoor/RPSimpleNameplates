@@ -205,7 +205,7 @@ assert(ns.RegisterSettingsPanels, "settings registration API")
 ns.RegisterSettingsPanels()
 equal(#categories, 6, "About and four subcategories")
 equal(table.concat({categories[1].name,categories[2].name,categories[3].name,categories[4].name,categories[5].name,categories[6].name}, ","),
-    "RP Simple Nameplates,Profiles,Text,Colors,Cast Highlight,TRP3", "tab order")
+    "RP Simple Nameplates,Profiles,Text & Layout,Colors,Cast Highlight,TRP3", "tab order")
 ns.RegisterSettingsPanels()
 equal(#categories, 6, "one-time registration")
 equal(SLASH_RPSN1, "/rpsn", "slash registration")
@@ -338,21 +338,6 @@ end
 assert(stylingSwitch, "master styling switch exists")
 stylingSwitch:Click()
 equal(styling, false, "master styling callback")
-local swatch
-for _, item in ipairs(frames) do
-    if item.MyObject and item.MyObject.__iscolorpicker then
-        swatch = item
-        break
-    end
-end
-assert(swatch, "editable color swatch exists")
-swatch:Click()
-assert(ColorPickerFrame.options, "color picker opens")
-ColorPickerFrame.options.swatchFunc()
-equal(attacking[1], 0.4, "color picker applies")
-ColorPickerFrame.options.cancelFunc()
-equal(attacking[1], 1, "color picker cancel restores")
-
 -- Category color pickers update, cancel, and reset their saved values.
 local function colorRow(labelText)
     local row
@@ -379,6 +364,14 @@ local function colorRow(labelText)
     assert(not reset, "no per-color reset")
     return assert(swatch), nil, assert(fill)
 end
+local swatch = colorRow("1. Attacking me")
+swatch:Click()
+assert(ColorPickerFrame.options, "color picker opens")
+ColorPickerFrame.options.swatchFunc()
+equal(attacking[1], 0.4, "color picker applies")
+ColorPickerFrame.options.cancelFunc()
+equal(attacking[1], 1, "color picker cancel restores")
+
 for _, case in ipairs({
     {"friendly", "4. Player - Friendly", 0.2},
     {"useful", "5. NPC - Interactive", 0.8},
@@ -426,13 +419,13 @@ equal(profilesSelector.MyObject.myvalue, "High Contrast", "Profiles selector ref
 equal(appearanceSelector.MyObject.myvalue, "High Contrast", "Appearance selector refreshes on show")
 assert(belongsTo(button("Create"), categories[2].panel), "management belongs to Profiles")
 assert(belongsTo(fullTitle, categories[6].panel), "long-title switch belongs to TRP3")
-local _, _, effectFill = colorRow("Cast highlight color")
-assert(belongsTo(effectFill, categories[5].panel), "cast color belongs to Colors")
+local _, _, effectFill = colorRow("Interruptible cast border")
+assert(belongsTo(effectFill, categories[4].panel), "cast color belongs to Colors")
 assert(not switchFor("Highlight interruptible casts and channels"), "redundant Appearance cast toggle removed")
 assert(not button("Reset priority colors"), "priority reset button removed")
 assert(not button("Reset all profile colors"), "old bottom reset removed")
 local castToggle = assert(switchFor("Highlight interruptible casts"))
-assert(belongsTo(castToggle, categories[5].panel), "cast Active switch on Colors")
+assert(belongsTo(castToggle, categories[5].panel), "cast activation belongs to Cast Highlight")
 for _, enabled in ipairs({true, false, true}) do
     castToggle:GetScript("OnClick")(castToggle, "LeftButton")
     equal(castEnabled, enabled, "cast Active switch changes activation")
@@ -455,7 +448,7 @@ equal(profile.healthBarWidth, 125, "width slider changes profile setting")
 profile.nameSize, profile.matchSanctuaryFont = 31, false
 profile.nameFont, profile.threatFont, profile.namePlacement = "SKURRI", "MORPHEUS", "INSIDE"
 hideCritters = true
-button("Reset text settings"):Click()
+button("Reset text & layout settings"):Click()
 equal(profile.nameSize, 18, "text reset restores size")
 equal(profile.healthBarWidth, 100, "page reset restores width")
 equal(profile.matchSanctuaryFont, true, "text reset restores sanctuary switch")
@@ -502,16 +495,16 @@ stylingSwitch:Click()
 equal(styling, true, "moved enable switch enables styling")
 equal(setupChecks, 1, "enabling checks compatibility")
 usefulSwitch:Click()
-button("Reset text settings"):Click()
+button("Reset text & layout settings"):Click()
 button("Reset color settings"):Click()
 equal(styling, true, "reset retains global styling choice")
 equal(hideCritters, false, "page reset restores global critter default")
 equal(modes.useful, "active", "Colors reset restores global category mode")
 assert(stylingSwitch.points.LEFT[3] == ns.SettingsUI.CONTROL_X, "Enabled uses its own labeled row")
 assert(not button("Reset text and layout"), "old reset removed")
-assert(button("Reset text settings").points.TOPLEFT[4] > hideSwitch.parent.points.TOPLEFT[4], "reset precedes global visibility")
+assert(button("Reset text & layout settings").points.TOPLEFT[4] > hideSwitch.parent.points.TOPLEFT[4], "reset precedes global visibility")
 
-assert(button("Reset text settings").points.TOPLEFT[4] > sanctuaryFont.parent.points.TOPLEFT[4], "reset precedes font controls")
+assert(button("Reset text & layout settings").points.TOPLEFT[4] > sanctuaryFont.parent.points.TOPLEFT[4], "reset precedes font controls")
 -- Startup review failures must show the effective inactive state.
 stylingSwitch:Click()
 setupAllowed = false
@@ -524,9 +517,9 @@ stylingSwitch:Click()
 equal(stylingSwitch:GetChecked(), false, "setup rejection keeps switch off")
 
 
--- Cast activation and color share the same row.
+-- Cast activation and border color remain accessible on their respective pages.
 assert(switchFor("Highlight interruptible casts") == castToggle, "cast Active switch retained")
-assert(colorRow("Cast highlight color"), "cast color remains available")
+assert(colorRow("Interruptible cast border"), "cast color remains available")
 button("Reset color settings"):Click()
 button("Reset cast highlight settings"):Click()
 equal(castToggle.MyObject:GetValue(), false, "Cast Highlight reset clears activation")

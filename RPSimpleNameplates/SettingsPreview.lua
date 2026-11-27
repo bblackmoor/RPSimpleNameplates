@@ -8,6 +8,12 @@ local states = {
     {value="neutral", label="Neutral"}, {value="friendly", label="Friendly player"},
     {value="useful", label="Interactive NPC"}, {value="useless", label="Background NPC"},
 }
+local castSamples = {
+    {value = "none", label = "No cast"},
+    {value = "interruptibleFill", label = "Interruptible"},
+    {value = "nonInterruptibleFill", label = "Non-interruptible"},
+}
+
 function addon.RefreshSettingsPreviews()
     for _, preview in ipairs(previews) do
         if preview.panel:IsShown() then preview.Refresh() end
@@ -16,7 +22,8 @@ end
 function addon.AddNameplatePreview(context, castingDefault)
     local content, layout = context.content, context.layout
     local panel = content:GetParent():GetParent()
-    local state, casting = "hostile", castingDefault == true
+    local state = "hostile"
+    local castSample = castingDefault and "interruptibleFill" or "none"
     UI.AddSection(content, layout, "Nameplate preview")
     local _, category = UI.CreateDropdownRow(content, layout, "Sample category", function() return states end, function(value)
         state = value
@@ -41,20 +48,21 @@ function addon.AddNameplatePreview(context, castingDefault)
     local threat = overlay:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     local cast = CreateFrame("StatusBar", nil, row)
     cast:SetStatusBarTexture(WHITE)
-    cast:SetStatusBarColor(0.65, 0.5, 0.15, 1)
     cast:SetMinMaxValues(0, 100)
     cast:SetValue(55)
     local spell = cast:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     spell:SetAllPoints(cast)
-    spell:SetText("Sample interruptible cast")
-    local refresh
-    local toggle = UI.AddSwitchRow(content, layout, context.refreshers, "Preview a cast",
-        function() return casting end, function(value) casting = value; refresh() end)
+    spell:SetText("Sample Spell")
+    local _, castChoice = UI.CreateDropdownRow(content, layout, "Sample cast", function() return castSamples end, function(value)
+        castSample = value
+        context.RefreshPreview()
+    end)
     UI.AddDescription(content, layout, "Sample values only. Casts temporarily replace titles. Preview controls do not change your profile.")
     local function Stop()
         if addon.CastHighlight then addon.CastHighlight.StopPreview(cast) end
     end
-    refresh = function()
+    local function Refresh()
+        local casting = castSample ~= "none"
         local size = addon.GetAppearanceSetting("nameSize")
         local font = addon.FontPath(addon.GetAppearanceSetting("nameFont"))
         if addon.NameplateText and addon.WorldContext then
@@ -105,11 +113,11 @@ function addon.AddNameplatePreview(context, castingDefault)
         spell:SetFont(font, 12, flags)
         spell:SetTextColor(1, 1, 1, 1)
         cast:SetShown(casting)
-        cast:SetAlpha(addon.GetInterruptibleHighlightEnabled() and 1 or 0.5)
+        if casting then cast:SetStatusBarColor(addon.EffectColor(castSample)) end
         if addon.HealthGradient and addon.WorldContext then
             addon.HealthGradient.Apply(health, health:GetStatusBarTexture(), addon.WorldContext.Get())
         end
-        if casting and panel:IsShown() then
+        if castSample == "interruptibleFill" and panel:IsShown() then
             if addon.CastHighlight then addon.CastHighlight.UpdatePreview(cast) end
         else Stop() end
         for _, text in ipairs({name, title, threat, spell}) do
@@ -119,13 +127,13 @@ function addon.AddNameplatePreview(context, castingDefault)
             text:SetShadowOffset(0, 0)
         end
         category:SetValue(state)
-        toggle:SetChecked(casting)
+        castChoice:SetValue(castSample)
     end
-    context.RefreshPreview, context.StopPreview = refresh, Stop
-    context.refreshers[#context.refreshers + 1] = refresh
-    previews[#previews + 1] = {panel = panel, Refresh = refresh}
+    context.RefreshPreview, context.StopPreview = Refresh, Stop
+    context.refreshers[#context.refreshers + 1] = Refresh
+    previews[#previews + 1] = {panel = panel, Refresh = Refresh}
     row:HookScript("OnHide", Stop)
     -- Expose the rendered sample for fixture checks without native plate access.
     context.sample = {health=health, name=name, title=title, threat=threat, cast=cast}
-    refresh()
+    Refresh()
 end

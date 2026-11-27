@@ -1,4 +1,4 @@
--- Simple Nameplates: Blizzard-driven interruptible cast effects.
+-- Simple Nameplates: Cast fill colors and optional interruptible border.
 local _, ns = ...
 local Capabilities = ns.PresentationCapabilities
 local CanAccessFrame = Capabilities.CanAccessFrame
@@ -17,7 +17,7 @@ local function CancelRetry(frame)
 end
 local function RetryFrame(frame)
     if not pendingFrames[frame] then return end
-    if not GetStylingEnabled() or not GetInterruptibleHighlightEnabled() then
+    if not GetStylingEnabled() then
         CancelRetry(frame)
         return
     end
@@ -29,7 +29,7 @@ local function RetryFrame(frame)
     return 0.25
 end
 local function DeferFrame(frame)
-    if not GetStylingEnabled() or not GetInterruptibleHighlightEnabled() then
+    if not GetStylingEnabled() then
         CancelRetry(frame)
         return
     end
@@ -228,15 +228,13 @@ local function ApplyRenderer(highlight)
     end
 end
 
--- Midnight can make IsInterruptable() secret. Blizzard has already consumed that
--- value to render the native icon/shield, so inspect those ordinary visual states
--- instead. Modern nameplates hide the spell icon for uninterruptible casts;
--- Classic-style nameplates keep the icon and show BorderShield instead.
+-- When IsInterruptable() is secret, inspect the native icon and shield.
+-- Modern nameplates can hide the icon for uninterruptible casts. Classic-style
+-- nameplates keep the icon and show BorderShield instead.
 local function NativeInterruptibleState(highlight, context)
-    local bar = highlight and highlight.castBar
-    if not bar then return nil end
-    local barShown = ns.AccessibleBoolean(Capabilities.ReadRegion(bar, "IsShown", context))
-    if barShown ~= true then return false end
+    local bar = highlight.castBar
+    local interruptible = ns.AccessibleBoolean(Capabilities.ReadRegion(bar, "IsInterruptable", context))
+    if interruptible ~= nil then return interruptible end
 
     local icon = Capabilities.SafeField(bar, "Icon", context)
     local shield = Capabilities.SafeField(bar, "BorderShield", context)
@@ -244,8 +242,11 @@ local function NativeInterruptibleState(highlight, context)
     local shieldShown = ns.AccessibleBoolean(Capabilities.ReadRegion(shield, "IsShown", context))
     local hideIcon = Capabilities.SafeField(bar, "HideIconWhenNotInterruptible", context)
 
-    if hideIcon == true and iconShown ~= nil then return iconShown end
     if shieldShown == true then return false end
+    if hideIcon == true and iconShown ~= nil and Capabilities.SafeField(bar, "showIcon", context) ~= false then
+        local look = Capabilities.SafeField(bar, "look", context)
+        if look == nil or look == "UNITFRAME" then return iconShown end
+    end
     if iconShown == true then return true end
     return nil
 end
@@ -254,33 +255,76 @@ local function ResolvedInterruptibleState(highlight, context)
     local shown = ns.AccessibleBoolean(Capabilities.ReadRegion(highlight and highlight.castBar, "IsShown", context))
     if shown == false then return false, "cast bar hidden" end
     if shown == nil then return nil, "cast visibility unavailable" end
+    if highlight.finished then return nil, "cast ended" end
     local unit = ns.AccessibleValue(highlight and highlight.owner and highlight.owner.unit)
-    if type(unit) == "string" and eventStateByUnit[unit] ~= nil then
-        return eventStateByUnit[unit], "spellcast event"
+    if type(unit) == "string" then
+        local eventState = eventStateByUnit[unit]
+        if eventState == "ended" then return nil, "cast ended" end
+        if eventState ~= nil then return eventState, "spellcast event" end
     end
     local native = NativeInterruptibleState(highlight, context)
     if native ~= nil then return native, "native visual" end
     return nil, "unavailable"
 end
 
+local function HideAppearance(highlight)
+    highlight.frame:Hide()
+    if highlight.fill then highlight.fill:Hide() end
+end
+
+local function UpdateFill(highlight, context, state, source)
+    local bar = highlight.castBar
+    local nativeFill
+    if state ~= nil and source ~= "cast bar hidden" then
+        nativeFill = Capabilities.ReadRegion(bar, "GetStatusBarTexture", context)
+    end
+    if type(Capabilities.SafeField(nativeFill, "SetPoint", context)) ~= "function" then
+        if highlight.fill then highlight.fill:Hide() end
+        return
+    end
+
+    -- Anchor to Blizzard's fill so cast and channel progress stay native,
+    -- including when the bar value is secret.
+    if not highlight.fill then highlight.fill = bar:CreateTexture(nil, "ARTWORK", nil, 3) end
+    local fill = highlight.fill
+    if highlight.nativeFill ~= nativeFill then
+        fill:ClearAllPoints()
+        fill:SetAllPoints(nativeFill)
+        highlight.nativeFill = nativeFill
+    end
+    local r, g, b = EffectColor(state and "interruptibleFill" or "nonInterruptibleFill")
+    if r ~= highlight.fillRed or g ~= highlight.fillGreen or b ~= highlight.fillBlue then
+        fill:SetColorTexture(r, g, b, 1)
+        highlight.fillRed, highlight.fillGreen, highlight.fillBlue = r, g, b
+    end
+    fill:Show()
+end
+
 local function RefreshHighlight(highlight, context, decision)
-    if not highlight then return end
-    if not GetStylingEnabled() or not GetInterruptibleHighlightEnabled()
-        or not decision or not decision.showCastBar then
+    if not GetStylingEnabled() or not decision or not decision.showCastBar then
         highlight.interruptibleState, highlight.interruptibleSource = false, "disabled"
-        highlight.frame:Hide()
+        HideAppearance(highlight)
         return
     end
 
     local state, source = ResolvedInterruptibleState(highlight, context)
     highlight.interruptibleState, highlight.interruptibleSource = state, source
-    if state == true then
+    UpdateFill(highlight, context, state, source)
+    if state == true and GetInterruptibleHighlightEnabled() then
         highlight.frame:Show()
         ApplyRenderer(highlight)
     else
         highlight.frame:Hide()
-        if state == nil and highlight.owner then DeferFrame(highlight.owner) end
     end
+    if state == nil and source ~= "cast ended" then DeferFrame(highlight.owner) end
+end
+
+local function RefreshFromHook(highlight, context)
+    local owner = highlight.owner
+    if owner.RPSNInterruptibleHighlight ~= highlight or owner.RPSNRestoring then return end
+    context = context or GetContext()
+    if not CanAccessFrame(owner, context) then DeferFrame(owner); return end
+    RefreshHighlight(highlight, context, owner.RPSNPresentation)
 end
 
 local function InstallRegionHook(highlight, region, registry)
@@ -288,19 +332,13 @@ local function InstallRegionHook(highlight, region, registry)
     highlight[registry] = highlight[registry] or setmetatable({}, {__mode = "k"})
     if highlight[registry][region] then return true end
 
-    local overlay = highlight.frame
     local function Changed()
         local context = GetContext()
-        if not CanAccessFrame(highlight.owner, context) then
-            DeferFrame(highlight.owner)
-            return
-        end
-        if highlight.owner.RPSNInterruptibleHighlight ~= highlight then overlay:Hide(); return end
         local bar = highlight.castBar
-        local icon = Capabilities.SafeField(bar, "Icon", context)
-        local shield = Capabilities.SafeField(bar, "BorderShield", context)
-        if region ~= bar and region ~= icon and region ~= shield then return end
-        RefreshHighlight(highlight, context, highlight.owner.RPSNPresentation)
+        if region == bar or region == Capabilities.SafeField(bar, "Icon", context)
+            or region == Capabilities.SafeField(bar, "BorderShield", context) then
+            RefreshFromHook(highlight, context)
+        end
     end
     local ok = true
     for _, method in ipairs({"SetShown", "Show", "Hide"}) do
@@ -321,17 +359,18 @@ local function InstallInterruptibleHighlightHooks(highlight)
     InstallRegionHook(highlight, Capabilities.SafeField(bar, "BorderShield", context), "hookedShields")
     InstallRegionHook(highlight, bar, "hookedBars")
     if not highlight.barVisibilityHooked then
-        local function Changed()
-            local context = GetContext()
-            if highlight.owner.RPSNInterruptibleHighlight ~= highlight then highlight.frame:Hide(); return end
-            if not CanAccessFrame(highlight.owner, context) then DeferFrame(highlight.owner); return end
-            RefreshHighlight(highlight, context, highlight.owner.RPSNPresentation)
-        end
+        local function Changed() RefreshFromHook(highlight) end
         local ok = pcall(function()
             bar:HookScript("OnShow", Changed)
             bar:HookScript("OnHide", Changed)
         end)
         highlight.barVisibilityHooked = ok
+    end
+    if not highlight.fillHooked and type(Capabilities.SafeField(bar, "UpdateBarFillTexture", context)) == "function" then
+        highlight.fillHooked = pcall(hooksecurefunc, bar, "UpdateBarFillTexture", function(_, isFull)
+            highlight.finished = ns.AccessibleBoolean(isFull) == true
+            RefreshFromHook(highlight)
+        end)
     end
 end
 
@@ -391,40 +430,55 @@ local function CreateHighlight(castBar, owner, healthBar)
     return highlight
 end
 
-local function EnsureInterruptibleHighlight(frame, context)
+local function EnsureInterruptibleHighlight(frame, context, castBar)
     context = context or GetContext()
-    if not CanAccessFrame(frame, context) then return end
-    local castBar = GetCastBar(frame, context)
-    if not castBar then return nil end
-    local existing = frame.RPSNInterruptibleHighlight
-    if existing and existing.castBar == castBar then
-        InstallInterruptibleHighlightHooks(existing)
-        return existing
+    if not castBar then
+        if not CanAccessFrame(frame, context) then return end
+        castBar = GetCastBar(frame, context)
     end
-    if existing and existing.frame then existing.frame:Hide() end
-    local highlight = CreateHighlight(castBar, frame, GetHealthBar(frame, context))
+    local existing = frame.RPSNInterruptibleHighlight
+    if existing and existing.castBar ~= castBar then
+        HideAppearance(existing)
+        frame.RPSNInterruptibleHighlight = nil
+    end
+    if not castBar then return end
+
+    local highlight = castBar.RPSNCastAppearance
+    if not highlight or highlight.owner ~= frame then
+        highlight = CreateHighlight(castBar, frame, GetHealthBar(frame, context))
+        castBar.RPSNCastAppearance = highlight
+    end
     frame.RPSNInterruptibleHighlight = highlight
     InstallInterruptibleHighlightHooks(highlight)
     return highlight
 end
 
+local function ClearAppearance(frame)
+    CancelRetry(frame)
+    local highlight = frame.RPSNInterruptibleHighlight
+    if not highlight then return end
+    highlight.interruptibleState, highlight.interruptibleSource = false, "disabled"
+    HideAppearance(highlight)
+end
+
 UpdateInterruptibleHighlight = function(frame, context, decision)
     context = context or GetContext()
-    if not GetStylingEnabled() or not decision or not decision.showCastBar
-        or not GetInterruptibleHighlightEnabled() then
-        CancelRetry(frame)
-        if CanAccessFrame(frame, context) and frame.RPSNInterruptibleHighlight then
-            frame.RPSNInterruptibleHighlight.interruptibleState = false
-            frame.RPSNInterruptibleHighlight.interruptibleSource = "disabled"
-            frame.RPSNInterruptibleHighlight.frame:Hide()
-        end
+    if not CanAccessFrame(frame, context) then DeferFrame(frame); return end
+    if not GetStylingEnabled() or not decision or not decision.showCastBar then
+        ClearAppearance(frame)
         return
     end
-    if not CanAccessFrame(frame, context) then DeferFrame(frame); return end
     CancelRetry(frame)
-    local highlight = EnsureInterruptibleHighlight(frame, context)
-    if not highlight then return end
-    RefreshHighlight(highlight, context, decision)
+    local castBar = GetCastBar(frame, context)
+    if not castBar then
+        ClearAppearance(frame)
+        frame.RPSNInterruptibleHighlight = nil
+        return
+    end
+    if not frame.RPSNInterruptibleHighlight and not GetInterruptibleHighlightEnabled()
+        and ns.AccessibleBoolean(Capabilities.ReadRegion(castBar, "IsShown", context)) == false then return end
+    local highlight = EnsureInterruptibleHighlight(frame, context, castBar)
+    if highlight then RefreshHighlight(highlight, context, decision) end
 end
 
 local function RecordSpellcastEvent(event, unit)
@@ -438,7 +492,7 @@ local function RecordSpellcastEvent(event, unit)
         -- cast-start event has finished dispatching.
         eventStateByUnit[unit] = nil
     elseif STOP_EVENTS[event] then
-        eventStateByUnit[unit] = false
+        eventStateByUnit[unit] = "ended"
     else
         return false
     end
@@ -454,7 +508,7 @@ ns.CastHighlight = {
     EnsureInterruptibleHighlight = EnsureInterruptibleHighlight,
     UpdateInterruptibleHighlight = UpdateInterruptibleHighlight,
     RecordSpellcastEvent = RecordSpellcastEvent,
-    ClearUnit = ClearUnit,
+    ClearUnit = ClearUnit, ClearAppearance = ClearAppearance,
     UpdatePreview = function(bar, effect)
         if not bar.RPSNCastPreview then bar.RPSNCastPreview = CreateHighlight(bar) end
         bar.RPSNCastPreview.previewEffect = effect
