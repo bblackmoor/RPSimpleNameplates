@@ -1,3 +1,9 @@
+## 1.2.314 — 2026-11-28
+
+- Update `RPSimpleNameplates/Media/icon-64.tga`.
+- Update `RPSimpleNameplates/Media/icon.blp`.
+- Update `RPSimpleNameplates/Media/icon.png`.
+
 ## 1.2.313 — 2026-11-28
 
 - Update `Media/icon-1200.png`.
