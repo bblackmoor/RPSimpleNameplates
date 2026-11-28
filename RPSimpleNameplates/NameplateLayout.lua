@@ -174,13 +174,13 @@ local function SuppressText(frame, context)
 end
 
 -- Repair cached native text without classification, profile lookup, or geometry writes.
-local function RepairNameOnly(frame, context, assessment)
+local function RepairNameOnly(frame, context, assessment, nameReadable)
     assessment = assessment or ns.PresentationCapabilities.InspectFrame(frame, context)
     if not assessment.canAccess or frame.RPSNRestoring then return end
     local expected = frame.RPSNNameStyle
     if expected.suppressed then SuppressText(frame, context); return end
     local name = frame.name
-    name:SetText(expected.text)
+    if nameReadable then name:SetText(expected.text) end
     name:SetFont(expected.font, expected.size, expected.flags)
     name:SetShadowColor(0, 0, 0, 0)
     name:SetShadowOffset(0, 0)

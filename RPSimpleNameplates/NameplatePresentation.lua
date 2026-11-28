@@ -6,6 +6,8 @@ local Classify = ns.NameplateClassification.StateForUnit
 local Resolve = ns.PresentationRules.Resolve
 local Restore = ns.NameplateRestoration
 local Text = ns.NameplateText
+local CheckUnitName = ns.NameplateTextRepair.CheckUnitName
+local UnitIdentityHasChanged = ns.EntityFacts.UnitIdentityHasChanged
 local SetShownSafe = ns.NameplateFrames.SetShownSafe
 local InstallGeometryHook, RepairPendingGeometry
 
@@ -175,12 +177,7 @@ local function PresentationIsCurrent(frame, assessment, context, work)
     end
     local unit = ns.AccessibleValue(frame.unit)
     if type(unit) ~= "string" or not unit:match("^nameplate%d+$") then return false, "unit token" end
-    if UnitGUID then
-        local ok, value = pcall(UnitGUID, unit)
-        local guid = ok and ns.AccessibleValue(value)
-        local previous = frame.RPSNEntityFacts and frame.RPSNEntityFacts.guid
-        if type(guid) == "string" and type(previous) == "string" and guid ~= previous then return false, "unit identity" end
-    end
+    if UnitIdentityHasChanged(unit, frame.RPSNEntityFacts) then return false, "unit identity" end
     if UnitNameplateShowsWidgetsOnly then
         local ok, value = pcall(UnitNameplateShowsWidgetsOnly, unit)
         local widgetsOnly = ok and ns.AccessibleBoolean(value)
@@ -264,14 +261,11 @@ local function PerformDataUpdate(frame, assessment, context, work)
 end
 
 local function PerformNameRepair(frame, assessment, context)
-    local source = ns.AccessibleValue(UnitName(frame.unit))
-    local expected = frame.RPSNNameStyle
-    local previous = ns.AccessibleValue(expected.unitName)
-    if not expected.suppressed and type(source) == "string" and type(previous) == "string"
-        and source ~= previous then
+    local nameChanged, nameReadable = CheckUnitName(frame, frame.RPSNNameStyle)
+    if nameChanged then
         return PerformDataUpdate(frame, assessment, context, {classify = true, name = true})
     end
-    Text.RepairNameOnly(frame, context, assessment)
+    Text.RepairNameOnly(frame, context, assessment, nameReadable)
     RepairBarVisibility(frame, assessment, context)
     if LayoutHasChanged(frame, context) then Text.UpdateNameLayout(frame, context, frame.RPSNPresentation, assessment) end
 end

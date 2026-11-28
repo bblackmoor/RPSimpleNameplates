@@ -7,6 +7,7 @@ local AccessibleNumber, AccessibleValue = ns.AccessibleNumber, ns.AccessibleValu
 
 local NameFontPath = ns.NameplateTitles.NameFontPath
 local PositionName = ns.NameplateLayout.PositionName
+local UnitIdentityHasChanged = ns.EntityFacts.UnitIdentityHasChanged
 local function AppearanceNumber(value)
     value = AccessibleNumber(value)
     if value and value == value and value ~= math.huge and value ~= -math.huge then return value end
@@ -93,6 +94,18 @@ local function DimensionDifferent(actual, desired, region, context)
     return math.abs(actual - desired) > tolerance
 end
 
+local function CheckUnitName(frame, expected)
+    if expected.suppressed then return false, false end
+    local ok, source = pcall(UnitName, frame.unit)
+    if not ok then return false, false end
+    local previous = AccessibleValue(expected.unitName)
+    -- A newly secret name can go straight to the FontString in a fresh style.
+    if issecretvalue and issecretvalue(source) then return type(previous) == "string", false end
+    source = AccessibleValue(source)
+    if type(source) ~= "string" then return false, false end
+    return source ~= previous, true
+end
+
 local function CachedNameHasDrifted(frame, context, assessment)
     context = context or GetContext()
     assessment = assessment or ns.PresentationCapabilities.InspectFrame(frame, context)
@@ -101,6 +114,11 @@ local function CachedNameHasDrifted(frame, context, assessment)
     if not name or not expected then return false end
     local current, reason = CacheIsCurrent(frame, expected, context, assessment)
     if not current then return true, reason, {full = true} end
+    if UnitIdentityHasChanged(expected.unit, frame.RPSNEntityFacts) then
+        return true, "unit identity", {full = true}
+    end
+    local nameChanged, nameReadable = CheckUnitName(frame, expected)
+    if nameChanged then return true, "unit name", {full = true} end
     local plan
     local function Add(key, value, label)
         plan = plan or {expected = expected, name = name, bar = assessment.healthBar,
@@ -143,7 +161,10 @@ local function CachedNameHasDrifted(frame, context, assessment)
             Check("containerAlpha", frame.HealthBarsContainer, "GetAlpha", 1, "container alpha")
         end
     end
-    Check("text", name, "GetText", AccessibleValue(expected.text), "native name text")
+    -- Repair cached text only after verifying its source name. Unreadable
+    -- names leave text alone while the independent appearance checks continue.
+    local cachedText = nameReadable and AccessibleValue(expected.text) or nil
+    Check("text", name, "GetText", cachedText, "native name text")
     local font, size, flags = Observe(expected, "font", name, "GetFont", context, 3)
     local faceDrift = font ~= nil and not ns.FontPathMatches(font, expected.font)
     local sizeDrift = Different(size, expected.size)
@@ -182,7 +203,7 @@ local function CachedNameHasDrifted(frame, context, assessment)
         if not inside or frame.RPSNInsideNameBar ~= expected.bar then return true, "inside name replaced", {full = true} end
         Check("insideAlpha", inside, "GetAlpha", 1, "inside label alpha")
         Check("insideShown", inside, "IsShown", true, "inside label visibility")
-        Check("insideText", inside, "GetText", AccessibleValue(expected.text), "inside name text")
+        Check("insideText", inside, "GetText", cachedText, "inside name text")
     elseif frame.RPSNInsideName then
         Check("insideShown", frame.RPSNInsideName, "IsShown", false, "inside name visible")
     end
@@ -323,12 +344,7 @@ local function InstallNameAppearanceHooks(frame, name, context)
                 if not expected or (expected.suppressed and method ~= "SetAlpha") or expected.name ~= name
                     or expected.unit ~= AccessibleValue(frame.unit)
                     or frame.RPSNOriginalUnit ~= expected.unit then return end
-                if UnitGUID then
-                    local ok, value = pcall(UnitGUID, expected.unit)
-                    local guid = ok and AccessibleValue(value)
-                    local previous = frame.RPSNEntityFacts and frame.RPSNEntityFacts.guid
-                    if type(guid) == "string" and type(previous) == "string" and guid ~= previous then return end
-                end
+                if UnitIdentityHasChanged(expected.unit, frame.RPSNEntityFacts) then return end
                 local assessment = cap.InspectFrame(frame, current)
                 local decision = frame.RPSNPresentation
                 -- A native bar-visibility/geometry change must not veto color
@@ -464,12 +480,7 @@ FinishCachedAppearance = function(frame, context)
     local expected, name = frame.RPSNNameStyle, assessment.name
     if not expected or frame.RPSNOriginalUnit ~= expected.unit
         or not CacheIsCurrent(frame, expected, context, assessment) then return end
-    if UnitGUID then
-        local ok, guid = pcall(UnitGUID, expected.unit)
-        guid = ok and AccessibleValue(guid)
-        local previous = frame.RPSNEntityFacts and frame.RPSNEntityFacts.guid
-        if type(guid) == "string" and type(previous) == "string" and guid ~= previous then return end
-    end
+    if UnitIdentityHasChanged(expected.unit, frame.RPSNEntityFacts) then return end
     local colorChanged
     if not expected.suppressed then
         local r, g, b = Observe(expected, "color", name, "GetTextColor", context, 3)
@@ -506,6 +517,7 @@ RepairCachedName = ns.Profiler.Wrap("Text repair", RepairCachedName)
 
 ns.NameplateTextRepair = {
     CachedNameHasDrifted = CachedNameHasDrifted,
+    CheckUnitName = CheckUnitName,
     RepairCachedName = RepairCachedName,
     RepairBarGeometry = RepairBarGeometry,
     RepairPendingNameAppearance = RepairPendingNameAppearance,

@@ -1,3 +1,8 @@
+## 1.2.315 — 2026-11-28
+
+- Verify the unit and its current name before restoring a nameplate's cached text.
+- Recheck attack permissions on visible player-controlled units after a zone or PvP status change.
+
 ## 1.2.314 — 2026-11-28
 
 - Update `RPSimpleNameplates/Media/icon-64.tga`.

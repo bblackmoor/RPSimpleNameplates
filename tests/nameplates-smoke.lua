@@ -2845,8 +2845,12 @@ do
     Frame()
     local stale = list[10]; local originalSize = stale.UnitFrame.name.size
     guid[stale.UnitFrame.unit] = "Creature-Recycled-Same-Token"
+    scheduler.Clear("reconciliation")
     Settle()
     equal(stale.UnitFrame.name.size, originalSize, "stale global GUID performs no writes")
+    Tick(0.25)
+    equal(stale.UnitFrame.RPSNEntityFacts.guid, guid[stale.UnitFrame.unit],
+        "reconciliation independently recognizes the new unit")
     -- A failed native write preserves the error, pending flags and retry job.
     local failedPlate, failure = list[9], {}
     local setter = failedPlate.UnitFrame.name.SetFont
@@ -3178,6 +3182,89 @@ do
     ns.NameplatePresentation.UpdateData(frame, context, {castSettings=true})
     equal(full, 1, "unexpected changes retain safe full-style fallback")
     ns.Profiler.Count, barColorOverride = count, nil
+end
+
+-- Reconciliation verifies the source even when no name event arrives and
+-- the visible FontString still agrees with the old name cache.
+do
+    local frame, token = Region(), "nameplate401"
+    frame.unit, frame.name, frame.healthBar, frame.HealthBarsContainer = token, Region(), Region(), Region()
+    frame.name:SetFont("Native", 10, "")
+    frame.name:SetTextColor(1, 1, 1)
+    frame.name:SetVertexColor(1, 1, 1, 1)
+    local plate = {UnitFrame = frame}
+    C_NamePlate.GetNamePlates = function() return {plate} end
+    C_NamePlate.GetNamePlateForUnit = function(requested) if requested == token then return plate end end
+    UnitGUID = function() return nil end
+    stylingEnabled, categoryMode, showBar = true, "active", true
+    appearance.namePlacement = "INSIDE"
+    unit = {reaction = 3, names = {[token] = "Monster X"}}
+    events.scripts.OnEvent(events, "NAME_PLATE_UNIT_ADDED", token)
+    equal(frame.RPSNInsideName.text, "Monster X", "initial name applied immediately")
+    unit.names[token] = "Monster Y"
+    Tick(0.25)
+    equal(frame.name.text, "Monster Y", "scan refreshes the native name")
+    equal(frame.RPSNInsideName.text, "Monster Y", "scan refreshes the visible inside name")
+
+    local secret, savedSecret = {}, issecretvalue
+    issecretvalue = function(value) return rawequal(value, secret) or (savedSecret and savedSecret(value)) end
+    unit.names[token] = secret
+    Tick(0.25)
+    assert(rawequal(frame.RPSNInsideName.text, secret), "fresh style passes a newly secret name to the label")
+    unit.names[token] = "Monster Z"
+    Tick(0.25)
+    equal(frame.RPSNInsideName.text, "Monster Z", "scan recovers when the name becomes readable")
+    issecretvalue = savedSecret
+
+    unit.unavailableNames = true
+    frame.name.text = "Native update"
+    hooks[2].callback(frame)
+    Tick(0.25)
+    equal(frame.name.text, "Native update", "an unavailable source cannot restore stale cached text")
+    unit.unavailableNames = nil
+    events.scripts.OnEvent(events, "NAME_PLATE_UNIT_REMOVED", token)
+end
+
+-- A visible same-faction player can keep the same token while the attack
+-- permissions arrive well after the subzone event.
+do
+    local frame, token = Region(), "nameplate402"
+    frame.unit, frame.name, frame.healthBar, frame.HealthBarsContainer = token, Region(), Region(), Region()
+    frame.name:SetFont("Native", 10, "")
+    frame.name:SetTextColor(1, 1, 1)
+    frame.name:SetVertexColor(1, 1, 1, 1)
+    local plate = {UnitFrame = frame}
+    C_NamePlate.GetNamePlates = function() return {plate} end
+    C_NamePlate.GetNamePlateForUnit = function(requested) if requested == token then return plate end end
+    UnitGUID = function() return "Player-PvPTransition" end
+    unit = {player = true, faction = "Alliance", canAttack = true, canAttackUs = true}
+    local subzone = "Free-for-all"
+    GetSubZoneText = function() return subzone end
+    local color = ns.PriorityColorForState
+    ns.PriorityColorForState = function(state)
+        if state == "hostile" then return 1, 0.5, 0 end
+        if state == "friendly" then return 0, 1, 0 end
+        return color(state)
+    end
+    events.scripts.OnEvent(events, "NAME_PLATE_UNIT_ADDED", token)
+    equal(frame.healthBar.barG, 0.5, "same-faction opponent uses hostile color while attackable")
+    subzone = "Normal"
+    events.scripts.OnEvent(events, "ZONE_CHANGED")
+    Tick(0.25)
+    equal(frame.RPSNState, "hostile", "zone event keeps hostility while WoW reports attack permission")
+    Tick(14.75)
+    unit.canAttack, unit.canAttackUs = false, false
+    Tick(0.25)
+    equal(frame.RPSNState, "friendly", "visible player reclassified after delayed permission change")
+    equal(frame.healthBar.barG, 1, "health bar uses friendly color without another event")
+    Tick(5)
+    unit.canAttack = true
+    Tick(0.25)
+    equal(frame.RPSNState, "friendly", "transition checks expire")
+    events.scripts.OnEvent(events, "UNIT_FACTION", token)
+    Tick(0.01)
+    equal(frame.RPSNState, "hostile", "ordinary faction updates continue after the transition")
+    ns.PriorityColorForState = color
 end
 
 print("Nameplates smoke: passed")

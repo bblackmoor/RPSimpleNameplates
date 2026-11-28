@@ -1,7 +1,6 @@
 -- Simple Nameplates: text selection and styling orchestration.
 local _, ns = ...
 local GetContext = ns.WorldContext.Get
-local UnitName = UnitName
 local AccessibleNumber, AccessibleValue = ns.AccessibleNumber, ns.AccessibleValue
 local PriorityColorForState = ns.PriorityColorForState
 local GetAppearanceSetting, GetTRP3Setting = ns.GetAppearanceSetting, ns.GetTRP3Setting

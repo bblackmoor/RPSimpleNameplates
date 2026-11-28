@@ -27,6 +27,21 @@ local function ThreatOn(who, unit)
     if value ~= nil then return value >= 2, value end
 end
 
+local function AttackPermissions(unit)
+    return Boolean(Read(UnitCanAttack, unit, "player")), Boolean(Read(UnitCanAttack, "player", unit))
+end
+
+local function PvPEligibilityHasChanged(unit, facts)
+    local canFight = Either(AttackPermissions(unit))
+    return canFight ~= nil and canFight ~= Either(facts.canAttackYou, facts.canAttackThem)
+end
+
+local function UnitIdentityHasChanged(unit, facts)
+    if not facts or not facts.guid then return false end
+    local guid = Read(UnitGUID, unit)
+    return type(guid) == "string" and guid ~= facts.guid
+end
+
 local function Collect(unit, context)
     context = context or GetContext()
     local player = Boolean(Read(UnitIsPlayer, unit))
@@ -34,8 +49,7 @@ local function Collect(unit, context)
     local owned = Boolean(Read(UnitIsOwnerOrControllerOfUnit, "player", unit))
     if owned == true then controlled = true end
     local reaction = Number(Read(UnitReaction, unit, "player"))
-    local canAttackYou = Boolean(Read(UnitCanAttack, unit, "player"))
-    local canAttackThem = Boolean(Read(UnitCanAttack, "player", unit))
+    local canAttackYou, canAttackThem = AttackPermissions(unit)
     local unitFaction = Read(UnitFactionGroup, unit)
     if type(unitFaction) ~= "string" then unitFaction = nil end
     local guid = Read(UnitGUID, unit)
@@ -91,4 +105,5 @@ end
 
 ns.EntityFacts = {
     Collect = Collect, TargetsPlayerControlledUnit = TargetsPlayerControlledUnit,
+    PvPEligibilityHasChanged = PvPEligibilityHasChanged, UnitIdentityHasChanged = UnitIdentityHasChanged,
 }

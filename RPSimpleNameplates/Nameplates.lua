@@ -14,6 +14,7 @@ local RepairHealthColor, RepairName =
 local Restoration = ns.NameplateRestoration
 local Periodic = ns.PeriodicWork
 local Cap = ns.PresentationCapabilities
+local PvPEligibilityHasChanged = ns.EntityFacts.PvPEligibilityHasChanged
 local knownFrames, knownPlates = {}, {}
 local reconcilePlates, nextSnapshot = {}, 0
 local function ResetReconciliation()
@@ -206,6 +207,12 @@ end
 
 local dirtyUnits = {}
 local allWork
+local pvpTransitionUntil = 0
+local pvpTransitionEvents = {
+    ZONE_CHANGED = true, ZONE_CHANGED_INDOORS = true, ZONE_CHANGED_NEW_AREA = true,
+    WAR_MODE_STATUS_UPDATE = true, PLAYER_FLAGS_CHANGED = true, PVP_TIMER_UPDATE = true,
+}
+local pvpWork = {classify = true, threat = true}
 local eventWork = {
     UNIT_NAME_UPDATE = {classify = true, name = true},
     UNIT_FACTION = {classify = true}, UNIT_FLAGS = {classify = true},
@@ -363,6 +370,10 @@ local function HandleEvent(_, event, unit)
         ns.CastHighlight.RecordSpellcastEvent(event, readableUnit)
     end
     if not GetStylingEnabled() then return end
+    if pvpTransitionEvents[event] then
+        -- Attack permissions can settle after the initial subzone refresh.
+        pvpTransitionUntil = Periodic.Now() + 20
+    end
     if HandleNameplateEvent(event, unit) then return end
     if event == "PLAYER_TARGET_CHANGED" or event == "PLAYER_SOFT_INTERACT_CHANGED"
         or event == "UPDATE_MOUSEOVER_UNIT" then QueueRefreshAll(event, eventWork[event]); return end
@@ -409,6 +420,11 @@ local function ReconcileNames(plate)
                 ns.Profiler.Count("Reconciliation repairs", "full-style fallback")
                 ApplySimpleStyle(frame, context, "reconciliation fallback")
             end
+        end
+        local facts = frame.RPSNEntityFacts
+        if Periodic.Now() < pvpTransitionUntil and facts and facts.playerControlled == true
+            and PvPEligibilityHasChanged(unit, facts) then
+            UpdateData(frame, context, pvpWork)
         end
         if frame.RPSNArtworkPending then
             local current = Cap.InspectFrame(frame, context)
@@ -457,6 +473,7 @@ local function RuntimeUpdate(_, elapsed)
     if enabled ~= wasEnabled then
         ResetReconciliation()
         if not enabled then
+            pvpTransitionUntil = 0
             ClearGlobalWork()
             Periodic.Clear("unit retry"); Periodic.Clear("plate retry")
         end
