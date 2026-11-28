@@ -1,3 +1,14 @@
+## 1.2.313 — 2026-11-28
+
+- Update `Media/icon-1200.png`.
+- Update `Media/icon-1200.psd`.
+- Update `Media/icon-256.png`.
+- Update `Media/icon-256.psd`.
+- Update `Media/icon-400.png`.
+- Update `Media/icon-400.psd`.
+- Update `Media/icon-64.png`.
+- Update `Media/icon-64.psd`.
+
 ## 1.2.0 — 2026-11-27
 
 - Set separate colors for interruptible and non-interruptible casts and channels, plus an optional interruptible border color.
